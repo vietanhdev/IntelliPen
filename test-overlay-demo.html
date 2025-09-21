@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliPen Overlay Demo - Fixed Version</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f8fafc;
+        }
+        
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .test-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 10px 0;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .test-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .test-button:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        
+        .test-button.secondary {
+            background: #6b7280;
+        }
+        
+        .test-button.secondary:hover {
+            background: #4b5563;
+        }
+        
+        .test-button.danger {
+            background: #ef4444;
+        }
+        
+        .test-button.danger:hover {
+            background: #dc2626;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        
+        .status.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+        
+        .console-output {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .instructions {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .demo-text {
+            font-style: italic;
+            color: #6b7280;
+            background: #f9fafb;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🖋️ IntelliPen Grammar Overlay Demo</h1>
+        <p>Interactive test page for the writing assistance overlay system</p>
+    </div>
+    
+    <div class="status info" id="statusContainer">
+        <span>📡</span>
+        <span><strong>System Status:</strong> <span id="testStatus">Initializing overlay system...</span></span>
+    </div>
+    
+    <div class="instructions">
+        <h3>🔧 How to Test</h3>
+        <ol>
+            <li><strong>Basic Test:</strong> Click "Test Basic Overlay" to see a demo popup</li>
+            <li><strong>Field Tests:</strong> Click on any input field and use the field-specific test buttons</li>
+            <li><strong>Interactive:</strong> Type text with errors (like "I seen him yesterday") and use overlay functions</li>
+            <li><strong>Keyboard Shortcuts:</strong> Ctrl+1 (basic), Ctrl+2 (input), Ctrl+3 (textarea), Ctrl+H (hide)</li>
+        </ol>
+    </div>
+    
+    <div class="test-container">
+        <h3>📝 Test Input Fields</h3>
+        <p>Try typing text with grammar errors in these fields:</p>
+        
+        <div class="demo-text">
+            Example texts to try: "I seen him yesterday", "The thing is that...", "very good work", "alot of people"
+        </div>
+        
+        <input type="text" 
+               class="test-input" 
+               id="testInput1" 
+               placeholder="Try typing: I seen him yesterday at the store..."
+               value="">
+        
+        <textarea class="test-input" 
+                  id="testTextarea" 
+                  rows="4" 
+                  placeholder="Try typing: The thing is that I seen him yesterday and he was very good at his job."></textarea>
+        
+        <div contenteditable="true" 
+             class="test-input" 
+             id="testContentEditable" 
+             style="min-height: 80px;">
+            Click here and type some text with errors... (ContentEditable)
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h3>🚀 Test Controls</h3>
+        
+        <div class="button-grid">
+            <button class="test-button" onclick="testBasicOverlay()">
+                🎯 Test Basic Overlay
+            </button>
+            <button class="test-button" onclick="testInputField()">
+                📝 Test Input Field
+            </button>
+            <button class="test-button" onclick="testTextarea()">
+                📄 Test Textarea
+            </button>
+            <button class="test-button" onclick="testContentEditable()">
+                ✏️ Test ContentEditable
+            </button>
+            <button class="test-button secondary" onclick="hideOverlay()">
+                👁️ Hide Overlay
+            </button>
+            <button class="test-button secondary" onclick="debugOverlay()">
+                🔍 Debug Info
+            </button>
+            <button class="test-button danger" onclick="clearConsole()">
+                🗑️ Clear Console
+            </button>
+            <button class="test-button" onclick="testOverlayMethods()">
+                🔧 Test All Methods
+            </button>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h3>📊 Console Output</h3>
+        <div id="consoleOutput" class="console-output">Console output will appear here...</div>
+    </div>
+
+    <!-- Load the grammar overlay script -->
+    <script src="content-scripts/grammar-overlay.js"></script>
+    
+    <script>
+        // Console output redirection
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+        const consoleOutput = document.getElementById('consoleOutput');
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const typeIcon = type === 'error' ? '❌' : type === 'warn' ? '⚠️' : '📝';
+            const line = `[${timestamp}] ${typeIcon} ${message}\n`;
+            
+            consoleOutput.textContent += line;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            // Keep only last 100 lines to prevent memory issues
+            const lines = consoleOutput.textContent.split('\n');
+            if (lines.length > 100) {
+                consoleOutput.textContent = lines.slice(-100).join('\n');
+            }
+        }
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            addToConsole(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            addToConsole(args.join(' '), 'warn');
+        };
+        
+        // Status management
+        function updateStatus(message, type = 'info') {
+            const statusElement = document.getElementById('testStatus');
+            const statusContainer = document.getElementById('statusContainer');
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: '📡'
+            };
+            
+            statusElement.textContent = message;
+            statusContainer.className = `status ${type}`;
+            statusContainer.querySelector('span:first-child').textContent = icons[type] || '📡';
+        }
+        
+        // Test functions
+        function testBasicOverlay() {
+            console.log('🎯 Testing basic overlay functionality...');
+            
+            if (!window.IntelliPenGrammarOverlay) {
+                updateStatus('Grammar overlay not available - check console for errors', 'error');
+                console.error('window.IntelliPenGrammarOverlay is not available');
+                return;
+            }
+            
+            try {
+                // Use the built-in test method
+                window.IntelliPenGrammarOverlay.testOverlay();
+                updateStatus('Basic overlay test completed successfully', 'success');
+                console.log('✅ Basic overlay test successful');
+            } catch (error) {
+                updateStatus('Basic overlay test failed', 'error');
+                console.error('❌ Basic overlay test failed:', error);
+            }
+        }
+        
+        function testInputField() {
+            console.log('📝 Testing overlay with input field...');
+            
+            const input = document.getElementById('testInput1');
+            const suggestions = [
+                {
+                    type: 'grammar',
+                    original: 'I seen',
+                    replacement: 'I saw',
+                    explanation: 'Use past tense "saw" instead of "seen"'
+                },
+                {
+                    type: 'style',
+                    original: 'at the store',
+                    replacement: 'at the shop',
+                    explanation: 'Alternative word choice for variety'
+                }
+            ];
+            
+            if (window.IntelliPenGrammarOverlay) {
+                try {
+                    window.IntelliPenGrammarOverlay.showSuggestionsForElement(input, suggestions);
+                    updateStatus('Input field test completed', 'success');
+                    console.log('✅ Input field test successful');
+                } catch (error) {
+                    updateStatus('Input field test failed', 'error');
+                    console.error('❌ Input field test failed:', error);
+                }
+            } else {
+                updateStatus('Grammar overlay not available', 'error');
+            }
+        }
+        
+        function testTextarea() {
+            console.log('📄 Testing overlay with textarea...');
+            
+            const textarea = document.getElementById('testTextarea');
+            const suggestions = [
+                {
+                    type: 'clarity',
+                    original: 'The thing is that',
+                    replacement: 'The issue is that',
+                    explanation: 'More specific and clear language'
+                },
+                {
+                    type: 'style',
+                    original: 'very good',
+                    replacement: 'excellent',
+                    explanation: 'More precise and impactful word choice'
+                },
+                {
+                    type: 'grammar',
+                    original: 'I seen',
+                    replacement: 'I saw',
+                    explanation: 'Use past tense "saw" instead of "seen"'
+                }
+            ];
+            
+            if (window.IntelliPenGrammarOverlay) {
+                try {
+                    window.IntelliPenGrammarOverlay.showSuggestionsForElement(textarea, suggestions);
+                    updateStatus('Textarea test completed', 'success');
+                    console.log('✅ Textarea test successful');
+                } catch (error) {
+                    updateStatus('Textarea test failed', 'error');
+                    console.error('❌ Textarea test failed:', error);
+                }
+            } else {
+                updateStatus('Grammar overlay not available', 'error');
+            }
+        }
+        
+        function testContentEditable() {
+            console.log('✏️ Testing overlay with contentEditable...');
+            
+            const contentEditable = document.getElementById('testContentEditable');
+            const suggestions = [
+                {
+                    type: 'grammar',
+                    original: 'errors',
+                    replacement: 'mistakes',
+                    explanation: 'Alternative word choice for variety'
+                },
+                {
+                    type: 'style',
+                    original: 'some text',
+                    replacement: 'meaningful content',
+                    explanation: 'More descriptive language'
+                }
+            ];
+            
+            if (window.IntelliPenGrammarOverlay) {
+                try {
+                    window.IntelliPenGrammarOverlay.showSuggestionsForElement(contentEditable, suggestions);
+                    updateStatus('ContentEditable test completed', 'success');
+                    console.log('✅ ContentEditable test successful');
+                } catch (error) {
+                    updateStatus('ContentEditable test failed', 'error');
+                    console.error('❌ ContentEditable test failed:', error);
+                }
+            } else {
+                updateStatus('Grammar overlay not available', 'error');
+            }
+        }
+        
+        function hideOverlay() {
+            console.log('👁️ Hiding overlay...');
+            
+            if (window.IntelliPenGrammarOverlay) {
+                try {
+                    window.IntelliPenGrammarOverlay.hidePopup();
+                    updateStatus('Overlay hidden successfully', 'success');
+                    console.log('✅ Overlay hidden');
+                } catch (error) {
+                    updateStatus('Failed to hide overlay', 'error');
+                    console.error('❌ Failed to hide overlay:', error);
+                }
+            } else {
+                updateStatus('Grammar overlay not available', 'error');
+            }
+        }
+        
+        function debugOverlay() {
+            console.log('🔍 === OVERLAY DEBUG INFO ===');
+            console.log('window.IntelliPenGrammarOverlay:', !!window.IntelliPenGrammarOverlay);
+            
+            if (window.IntelliPenGrammarOverlay) {
+                const overlay = window.IntelliPenGrammarOverlay;
+                console.log('Overlay container exists:', !!overlay.overlayContainer);
+                console.log('Active popup:', !!overlay.activePopup);
+                console.log('Is enabled:', overlay.isEnabled);
+                
+                // Check DOM elements
+                const container = document.getElementById('intellipen-grammar-overlay');
+                console.log('Container in DOM:', !!container);
+                
+                const styles = document.getElementById('intellipen-overlay-styles');
+                console.log('Styles loaded:', !!styles);
+                
+                if (container) {
+                    console.log('Container children count:', container.children.length);
+                    console.log('Container z-index:', window.getComputedStyle(container).zIndex);
+                }
+                
+                // Test methods availability
+                console.log('Available methods:');
+                console.log('- createDemoSuggestions:', typeof overlay.createDemoSuggestions);
+                console.log('- showSuggestions:', typeof overlay.showSuggestions);
+                console.log('- showSuggestionsForElement:', typeof overlay.showSuggestionsForElement);
+                console.log('- testOverlay:', typeof overlay.testOverlay);
+                
+                updateStatus('Debug information logged to console', 'info');
+            } else {
+                console.error('❌ Grammar overlay not initialized');
+                updateStatus('Grammar overlay not initialized - check script loading', 'error');
+            }
+        }
+        
+        function clearConsole() {
+            consoleOutput.textContent = 'Console cleared...\n';
+            console.log('🗑️ Console cleared');
+        }
+        
+        function testOverlayMethods() {
+            console.log('🔧 Testing all overlay methods...');
+            
+            if (!window.IntelliPenGrammarOverlay) {
+                updateStatus('Grammar overlay not available', 'error');
+                return;
+            }
+            
+            const overlay = window.IntelliPenGrammarOverlay;
+            let testsPassed = 0;
+            let totalTests = 0;
+            
+            // Test 1: createDemoSuggestions
+            totalTests++;
+            try {
+                const suggestions = overlay.createDemoSuggestions();
+                if (Array.isArray(suggestions) && suggestions.length > 0) {
+                    console.log('✅ createDemoSuggestions: PASS');
+                    testsPassed++;
+                } else {
+                    console.log('❌ createDemoSuggestions: FAIL - no suggestions returned');
+                }
+            } catch (error) {
+                console.log('❌ createDemoSuggestions: FAIL -', error.message);
+            }
+            
+            // Test 2: testOverlay
+            totalTests++;
+            try {
+                overlay.testOverlay();
+                console.log('✅ testOverlay: PASS');
+                testsPassed++;
+            } catch (error) {
+                console.log('❌ testOverlay: FAIL -', error.message);
+            }
+            
+            // Test 3: showSuggestionsForElement
+            totalTests++;
+            try {
+                const testElement = document.getElementById('testInput1');
+                const testSuggestions = [{ type: 'test', text: 'Test suggestion' }];
+                overlay.showSuggestionsForElement(testElement, testSuggestions);
+                console.log('✅ showSuggestionsForElement: PASS');
+                testsPassed++;
+            } catch (error) {
+                console.log('❌ showSuggestionsForElement: FAIL -', error.message);
+            }
+            
+            const result = `${testsPassed}/${totalTests} tests passed`;
+            if (testsPassed === totalTests) {
+                updateStatus(`All overlay methods working! (${result})`, 'success');
+            } else {
+                updateStatus(`Some tests failed (${result})`, 'warning');
+            }
+        }
+        
+        // Initialization
+        function checkOverlayStatus() {
+            if (window.IntelliPenGrammarOverlay) {
+                updateStatus('Grammar overlay initialized successfully!', 'success');
+                console.log('✅ Grammar overlay available and ready');
+                
+                // Run a quick functionality check
+                try {
+                    const testSuggestions = window.IntelliPenGrammarOverlay.createDemoSuggestions();
+                    if (testSuggestions && testSuggestions.length > 0) {
+                        console.log('✅ Demo suggestions working');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Demo suggestions method has issues:', error);
+                }
+                
+                return true;
+            } else {
+                console.log('⏳ Grammar overlay not yet available, checking again...');
+                return false;
+            }
+        }
+        
+        // Multiple initialization checks
+        let initAttempts = 0;
+        const maxAttempts = 10;
+        
+        function initializeWithRetry() {
+            initAttempts++;
+            
+            if (checkOverlayStatus()) {
+                console.log(`🎉 Initialization successful after ${initAttempts} attempt(s)`);
+                return;
+            }
+            
+            if (initAttempts < maxAttempts) {
+                setTimeout(initializeWithRetry, 200 * initAttempts); // Increasing delay
+            } else {
+                updateStatus('Grammar overlay failed to initialize after multiple attempts', 'error');
+                console.error('❌ Grammar overlay initialization failed after', maxAttempts, 'attempts');
+                console.error('Check if the grammar-overlay.js file is loaded correctly');
+            }
+        }
+        
+        // Start initialization
+        setTimeout(initializeWithRetry, 100);
+        
+        // Event listeners for input fields
+        document.getElementById('testInput1').addEventListener('focus', function() {
+            console.log('📝 Input field focused - ready for testing');
+        });
+        
+        document.getElementById('testTextarea').addEventListener('focus', function() {
+            console.log('📄 Textarea focused - ready for testing');
+        });
+        
+        document.getElementById('testContentEditable').addEventListener('focus', function() {
+            console.log('✏️ ContentEditable focused - ready for testing');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        testBasicOverlay();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        testInputField();
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        testTextarea();
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        testContentEditable();
+                        break;
+                    case 'h':
+                        e.preventDefault();
+                        hideOverlay();
+                        break;
+                    case 'd':
+                        e.preventDefault();
+                        debugOverlay();
+                        break;
+                    case 'c':
+                        e.preventDefault();
+                        clearConsole();
+                        break;
+                }
+            }
+        });
+        
+        console.log('🚀 IntelliPen Overlay Demo loaded');
+        console.log('⌨️ Keyboard shortcuts available:');
+        console.log('   Ctrl+1: Basic test | Ctrl+2: Input test | Ctrl+3: Textarea test');
+        console.log('   Ctrl+4: ContentEditable test | Ctrl+H: Hide | Ctrl+D: Debug | Ctrl+C: Clear console');
+    </script>
+</body>
+</html>

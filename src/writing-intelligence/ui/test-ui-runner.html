@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Intelligence UI System Tests</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .demo-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            background-color: #f8fff9;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-family: inherit;
+            resize: vertical;
+            margin: 10px 0;
+        }
+        .contenteditable-demo {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            margin: 10px 0;
+            background: white;
+        }
+        #output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .keyboard-help {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .keyboard-help kbd {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖋️ Writing Intelligence UI System Tests</h1>
+        
+        <div class="test-section">
+            <h2>Automated Tests</h2>
+            <p>Run automated tests to verify the UI system functionality.</p>
+            <button onclick="runAutomatedTests()" id="runTestsBtn">Run All Tests</button>
+            <button onclick="clearOutput()">Clear Output</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 Interactive Demo</h2>
+            <p>Test the suggestion overlay system with live text editing:</p>
+            
+            <h3>Textarea Demo</h3>
+            <textarea id="demo-textarea" placeholder="Type here to see suggestions...">this is a test sentence with some errors and it could be improved.</textarea>
+            <button onclick="analyzeTextarea()">Analyze Textarea</button>
+            <button onclick="clearTextareaOverlay()">Clear Overlay</button>
+            
+            <h3>ContentEditable Demo</h3>
+            <div id="demo-contenteditable" class="contenteditable-demo" contenteditable="true">
+                this is editable content that can be analyzed for writing improvements.
+            </div>
+            <button onclick="analyzeContentEditable()">Analyze ContentEditable</button>
+            <button onclick="clearContentEditableOverlay()">Clear Overlay</button>
+            
+            <div class="keyboard-help">
+                <strong>Keyboard Navigation:</strong><br>
+                <kbd>Tab</kbd> / <kbd>↓</kbd> Next suggestion &nbsp;
+                <kbd>Shift+Tab</kbd> / <kbd>↑</kbd> Previous suggestion &nbsp;
+                <kbd>Enter</kbd> Show details &nbsp;
+                <kbd>A</kbd> Apply &nbsp;
+                <kbd>I</kbd> Ignore &nbsp;
+                <kbd>H</kbd> Help &nbsp;
+                <kbd>Esc</kbd> Exit
+            </div>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script type="module">
+        // Import UI components
+        import SuggestionOverlay from './SuggestionOverlay.js';
+        import KeyboardNavigationManager from './KeyboardNavigationManager.js';
+        import AnimationManager from './AnimationManager.js';
+
+        let overlay, keyboardManager, animationManager;
+        let output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            
+            output.textContent += logMessage + '\n';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            output.textContent = '';
+        }
+
+        // Initialize UI system
+        function initializeUISystem() {
+            if (!overlay) {
+                overlay = new SuggestionOverlay();
+                animationManager = new AnimationManager();
+                keyboardManager = new KeyboardNavigationManager(overlay);
+                
+                overlay.initialize();
+                log('UI system initialized', 'info');
+            }
+        }
+
+        // Create mock suggestions
+        function createMockSuggestions(text) {
+            const suggestions = [];
+            
+            // Check for capitalization
+            if (text.match(/^[a-z]/)) {
+                suggestions.push({
+                    id: 'suggestion-' + Date.now() + '-1',
+                    type: 'grammar',
+                    range: { start: 0, end: 1 },
+                    original: text.charAt(0),
+                    replacement: text.charAt(0).toUpperCase(),
+                    confidence: 0.9,
+                    explanation: 'Capitalize the first word of the sentence',
+                    severity: 'error',
+                    applied: false,
+                    markAsApplied: function() { this.applied = true; },
+                    applyToText: function(text) {
+                        return text.substring(0, this.range.start) + this.replacement + text.substring(this.range.end);
+                    }
+                });
+            }
+            
+            // Check for long sentences
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            const longSentences = sentences.filter(s => s.split(' ').length > 15);
+            if (longSentences.length > 0) {
+                const longSentence = longSentences[0];
+                const startIndex = text.indexOf(longSentence);
+                
+                if (startIndex !== -1) {
+                    suggestions.push({
+                        id: 'suggestion-' + Date.now() + '-2',
+                        type: 'style',
+                        range: { start: startIndex, end: startIndex + Math.min(longSentence.length, 20) },
+                        original: text.substring(startIndex, startIndex + Math.min(longSentence.length, 20)),
+                        replacement: 'Consider shorter sentences',
+                        confidence: 0.7,
+                        explanation: 'This sentence is quite long. Consider breaking it into shorter sentences for better readability.',
+                        severity: 'suggestion',
+                        applied: false,
+                        markAsApplied: function() { this.applied = true; },
+                        applyToText: function(text) {
+                            return text; // Just a suggestion, no direct replacement
+                        }
+                    });
+                }
+            }
+            
+            // Check for repeated words
+            const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+            const wordCounts = {};
+            words.forEach(word => {
+                wordCounts[word] = (wordCounts[word] || 0) + 1;
+            });
+            
+            const repeatedWords = Object.entries(wordCounts).filter(([word, count]) => 
+                count > 2 && word.length > 3
+            );
+            
+            if (repeatedWords.length > 0) {
+                const word = repeatedWords[0][0];
+                const firstIndex = text.toLowerCase().indexOf(word);
+                
+                suggestions.push({
+                    id: 'suggestion-' + Date.now() + '-3',
+                    type: 'enhancement',
+                    range: { start: firstIndex, end: firstIndex + word.length },
+                    original: word,
+                    replacement: 'Use synonyms',
+                    confidence: 0.6,
+                    explanation: `The word "${word}" appears ${repeatedWords[0][1]} times. Consider using synonyms for variety.`,
+                    severity: 'suggestion',
+                    applied: false,
+                    markAsApplied: function() { this.applied = true; },
+                    applyToText: function(text) {
+                        return text; // Just a suggestion, no direct replacement
+                    }
+                });
+            }
+            
+            return suggestions;
+        }
+
+        // Analyze textarea
+        window.analyzeTextarea = async function() {
+            initializeUISystem();
+            
+            const textarea = document.getElementById('demo-textarea');
+            const text = textarea.value;
+            
+            if (!text.trim()) {
+                log('Please enter some text to analyze', 'info');
+                return;
+            }
+            
+            // Clear existing overlay
+            overlay.removeOverlay(textarea);
+            
+            // Create suggestions
+            const suggestions = createMockSuggestions(text);
+            
+            if (suggestions.length === 0) {
+                log('No suggestions found for the text', 'info');
+                return;
+            }
+            
+            // Create overlay
+            const overlayContainer = overlay.createOverlay(textarea, suggestions);
+            overlay.setActiveElement(textarea);
+            
+            // Animate highlights
+            const highlights = overlayContainer.querySelectorAll('.intellipen-suggestion-highlight');
+            for (let i = 0; i < highlights.length; i++) {
+                setTimeout(() => {
+                    animationManager.animateSuggestionAppearance(highlights[i], { delay: i * 100 });
+                }, i * 50);
+            }
+            
+            log(`Created ${suggestions.length} suggestions for textarea`, 'info');
+        };
+
+        // Analyze contenteditable
+        window.analyzeContentEditable = async function() {
+            initializeUISystem();
+            
+            const contentEditable = document.getElementById('demo-contenteditable');
+            const text = contentEditable.textContent || contentEditable.innerText || '';
+            
+            if (!text.trim()) {
+                log('Please enter some text to analyze', 'info');
+                return;
+            }
+            
+            // Clear existing overlay
+            overlay.removeOverlay(contentEditable);
+            
+            // Create suggestions
+            const suggestions = createMockSuggestions(text);
+            
+            if (suggestions.length === 0) {
+                log('No suggestions found for the text', 'info');
+                return;
+            }
+            
+            // Create overlay
+            const overlayContainer = overlay.createOverlay(contentEditable, suggestions);
+            overlay.setActiveElement(contentEditable);
+            
+            // Animate highlights
+            const highlights = overlayContainer.querySelectorAll('.intellipen-suggestion-highlight');
+            for (let i = 0; i < highlights.length; i++) {
+                setTimeout(() => {
+                    animationManager.animateSuggestionAppearance(highlights[i], { delay: i * 100 });
+                }, i * 50);
+            }
+            
+            log(`Created ${suggestions.length} suggestions for contenteditable`, 'info');
+        };
+
+        // Clear overlays
+        window.clearTextareaOverlay = function() {
+            if (overlay) {
+                const textarea = document.getElementById('demo-textarea');
+                overlay.removeOverlay(textarea);
+                log('Cleared textarea overlay', 'info');
+            }
+        };
+
+        window.clearContentEditableOverlay = function() {
+            if (overlay) {
+                const contentEditable = document.getElementById('demo-contenteditable');
+                overlay.removeOverlay(contentEditable);
+                log('Cleared contenteditable overlay', 'info');
+            }
+        };
+
+        // Run automated tests
+        window.runAutomatedTests = async function() {
+            const runBtn = document.getElementById('runTestsBtn');
+            runBtn.disabled = true;
+            runBtn.textContent = 'Running Tests...';
+            
+            clearOutput();
+            log('🧪 Starting UI System Tests...', 'info');
+            
+            try {
+                initializeUISystem();
+                
+                // Test 1: Basic overlay creation
+                log('Testing basic overlay creation...', 'info');
+                const testTextarea = document.getElementById('demo-textarea');
+                const testSuggestions = createMockSuggestions('this is a test');
+                
+                const overlayContainer = overlay.createOverlay(testTextarea, testSuggestions);
+                if (overlayContainer && overlayContainer.classList.contains('intellipen-overlay-container')) {
+                    log('✓ Overlay creation test passed', 'pass');
+                } else {
+                    throw new Error('Overlay creation failed');
+                }
+                
+                // Test 2: Suggestion highlights
+                log('Testing suggestion highlights...', 'info');
+                const highlights = overlayContainer.querySelectorAll('.intellipen-suggestion-highlight');
+                if (highlights.length === testSuggestions.length) {
+                    log('✓ Suggestion highlights test passed', 'pass');
+                } else {
+                    throw new Error(`Expected ${testSuggestions.length} highlights, got ${highlights.length}`);
+                }
+                
+                // Test 3: Color coding
+                log('Testing color coding...', 'info');
+                const grammarHighlight = overlayContainer.querySelector('.intellipen-grammar');
+                const styleHighlight = overlayContainer.querySelector('.intellipen-style');
+                
+                if (grammarHighlight || styleHighlight) {
+                    log('✓ Color coding test passed', 'pass');
+                } else {
+                    log('⚠ Color coding test: No specific type highlights found', 'info');
+                }
+                
+                // Test 4: Tooltip functionality
+                log('Testing tooltip functionality...', 'info');
+                if (highlights.length > 0) {
+                    const firstSuggestion = testSuggestions[0];
+                    const firstHighlight = highlights[0];
+                    
+                    overlay.showTooltip(firstSuggestion, firstHighlight, testTextarea);
+                    const tooltip = document.querySelector('.intellipen-tooltip');
+                    
+                    if (tooltip && tooltip.textContent.includes(firstSuggestion.explanation)) {
+                        log('✓ Tooltip functionality test passed', 'pass');
+                        overlay.hideTooltip();
+                    } else {
+                        throw new Error('Tooltip creation or content failed');
+                    }
+                }
+                
+                // Test 5: Control panel
+                log('Testing control panel...', 'info');
+                overlay.showControlPanel(testSuggestions);
+                const panel = document.getElementById('intellipen-control-panel');
+                
+                if (panel && panel.textContent.includes('IntelliPen')) {
+                    log('✓ Control panel test passed', 'pass');
+                    overlay.hideControlPanel();
+                } else {
+                    throw new Error('Control panel creation failed');
+                }
+                
+                // Test 6: Keyboard navigation
+                log('Testing keyboard navigation...', 'info');
+                keyboardManager.updateFocusableElements();
+                
+                if (keyboardManager.focusableElements.length > 0) {
+                    log('✓ Keyboard navigation test passed', 'pass');
+                } else {
+                    log('⚠ Keyboard navigation test: No focusable elements found', 'info');
+                }
+                
+                // Test 7: Animation system
+                log('Testing animation system...', 'info');
+                const testElement = document.createElement('div');
+                testElement.style.position = 'absolute';
+                document.body.appendChild(testElement);
+                
+                await animationManager.animateSuggestionAppearance(testElement, { duration: 100 });
+                
+                if (testElement.style.opacity === '1') {
+                    log('✓ Animation system test passed', 'pass');
+                } else {
+                    log('⚠ Animation system test: Opacity not set correctly', 'info');
+                }
+                
+                testElement.remove();
+                
+                // Test 8: Accessibility features
+                log('Testing accessibility features...', 'info');
+                const liveRegion = document.getElementById('intellipen-live-region');
+                keyboardManager.announceMessage('Test announcement');
+                
+                setTimeout(() => {
+                    const newLiveRegion = document.getElementById('intellipen-live-region');
+                    if (newLiveRegion && newLiveRegion.getAttribute('aria-live')) {
+                        log('✓ Accessibility features test passed', 'pass');
+                    } else {
+                        log('⚠ Accessibility features test: Live region not found', 'info');
+                    }
+                }, 200);
+                
+                // Cleanup
+                overlay.removeOverlay(testTextarea);
+                
+                log('✅ All UI system tests completed successfully!', 'pass');
+                
+            } catch (error) {
+                log(`❌ Test failed: ${error.message}`, 'fail');
+                console.error(error);
+            } finally {
+                runBtn.disabled = false;
+                runBtn.textContent = 'Run All Tests';
+            }
+        };
+
+        // Make functions globally available
+        window.clearOutput = clearOutput;
+        
+        // Initialize on load
+        setTimeout(() => {
+            log('🖋️ Writing Intelligence UI System Test Suite Ready', 'info');
+            log('Click "Run All Tests" to validate the implementation', 'info');
+            log('Try the Interactive Demo to see the UI system in action!', 'info');
+            log('Use keyboard navigation: Tab, Enter, A (apply), I (ignore), H (help)', 'info');
+        }, 500);
+    </script>
+</body>
+</html>

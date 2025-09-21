@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome AI APIs Test - Fixed</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .status.error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .status.warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .result {
+            background: #f1f3f4;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Chrome AI APIs Test - Fixed Version</h1>
+    <p>This test will verify that Chrome AI APIs are working after the manifest fixes.</p>
+
+    <div class="test-section">
+        <h2>📋 Quick Status Check</h2>
+        <button onclick="checkAPIsQuick()">🔄 Check All APIs</button>
+        <div id="quick-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Prompt API Test</h2>
+        <button onclick="testPromptAPI()">Test Prompt API</button>
+        <div id="prompt-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Summarizer API Test</h2>
+        <button onclick="testSummarizerAPI()">Test Summarizer API</button>
+        <div id="summarizer-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>✍️ Writer API Test</h2>
+        <button onclick="testWriterAPI()">Test Writer API</button>
+        <div id="writer-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 Rewriter API Test</h2>
+        <button onclick="testRewriterAPI()">Test Rewriter API</button>
+        <div id="rewriter-result"></div>
+    </div>
+
+    <script>
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            element.appendChild(statusDiv);
+        }
+
+        function showResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result';
+            resultDiv.textContent = result;
+            element.appendChild(resultDiv);
+        }
+
+        async function checkAPIsQuick() {
+            const statusElement = document.getElementById('quick-status');
+            statusElement.innerHTML = '';
+
+            const apis = [
+                { name: 'Prompt API', path: 'ai.languageModel' },
+                { name: 'Summarizer API', path: 'ai.summarizer' },
+                { name: 'Writer API', path: 'ai.writer' },
+                { name: 'Rewriter API', path: 'ai.rewriter' },
+                { name: 'Proofreader API', path: 'ai.proofreader' },
+                { name: 'Translator API', path: 'ai.translator' }
+            ];
+
+            for (const api of apis) {
+                try {
+                    const apiObj = getNestedProperty(window, api.path);
+                    if (apiObj) {
+                        if (typeof apiObj.availability === 'function') {
+                            const availability = await apiObj.availability();
+                            showStatus('quick-status', `${api.name}: ${availability}`, 
+                                availability === 'available' ? 'success' : 
+                                availability === 'downloadable' ? 'warning' : 'error');
+                        } else {
+                            showStatus('quick-status', `${api.name}: Available (no availability check)`, 'success');
+                        }
+                    } else {
+                        showStatus('quick-status', `${api.name}: Not found`, 'error');
+                    }
+                } catch (error) {
+                    showStatus('quick-status', `${api.name}: Error - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function testPromptAPI() {
+            const resultElement = document.getElementById('prompt-result');
+            resultElement.innerHTML = '';
+
+            try {
+                showStatus('prompt-result', 'Testing Prompt API...', 'warning');
+                
+                if (!window.ai?.languageModel) {
+                    throw new Error('Prompt API not available');
+                }
+
+                const availability = await window.ai.languageModel.availability();
+                showStatus('prompt-result', `Availability: ${availability}`, 
+                    availability === 'available' ? 'success' : 'warning');
+
+                if (availability === 'unavailable') {
+                    throw new Error('Prompt API is unavailable');
+                }
+
+                const session = await window.ai.languageModel.create({
+                    outputLanguage: 'en'
+                });
+                showStatus('prompt-result', 'Session created successfully', 'success');
+
+                const result = await session.prompt('Say "Hello from Chrome AI!" in a friendly way.');
+                showStatus('prompt-result', 'Prompt completed successfully', 'success');
+                showResult('prompt-result', result);
+
+                session.destroy();
+                showStatus('prompt-result', 'Session cleaned up', 'success');
+
+            } catch (error) {
+                showStatus('prompt-result', `Error: ${error.message}`, 'error');
+                console.error('Prompt API test failed:', error);
+            }
+        }
+
+        async function testSummarizerAPI() {
+            const resultElement = document.getElementById('summarizer-result');
+            resultElement.innerHTML = '';
+
+            try {
+                showStatus('summarizer-result', 'Testing Summarizer API...', 'warning');
+                
+                if (!window.ai?.summarizer) {
+                    throw new Error('Summarizer API not available');
+                }
+
+                const availability = await window.ai.summarizer.availability();
+                showStatus('summarizer-result', `Availability: ${availability}`, 
+                    availability === 'available' ? 'success' : 'warning');
+
+                if (availability === 'unavailable') {
+                    throw new Error('Summarizer API is unavailable');
+                }
+
+                const session = await window.ai.summarizer.create({
+                    type: 'key-points',
+                    format: 'plain-text',
+                    length: 'short'
+                });
+                showStatus('summarizer-result', 'Session created successfully', 'success');
+
+                const longText = `
+                Chrome's built-in AI APIs represent a significant advancement in web development, 
+                bringing powerful artificial intelligence capabilities directly to the browser. 
+                These APIs include the Prompt API for general language tasks, the Summarizer API 
+                for content summarization, the Writer API for content generation, the Rewriter API 
+                for content modification, and the Proofreader API for grammar and style checking. 
+                All processing happens locally using the Gemini Nano model, ensuring user privacy 
+                while providing fast, responsive AI-powered features. This represents a major shift 
+                from cloud-based AI services to local, privacy-first AI processing.
+                `;
+
+                const result = await session.summarize(longText);
+                showStatus('summarizer-result', 'Summarization completed successfully', 'success');
+                showResult('summarizer-result', result);
+
+                session.destroy();
+                showStatus('summarizer-result', 'Session cleaned up', 'success');
+
+            } catch (error) {
+                showStatus('summarizer-result', `Error: ${error.message}`, 'error');
+                console.error('Summarizer API test failed:', error);
+            }
+        }
+
+        async function testWriterAPI() {
+            const resultElement = document.getElementById('writer-result');
+            resultElement.innerHTML = '';
+
+            try {
+                showStatus('writer-result', 'Testing Writer API...', 'warning');
+                
+                if (!window.ai?.writer) {
+                    throw new Error('Writer API not available');
+                }
+
+                const availability = await window.ai.writer.availability();
+                showStatus('writer-result', `Availability: ${availability}`, 
+                    availability === 'available' ? 'success' : 'warning');
+
+                if (availability === 'unavailable') {
+                    throw new Error('Writer API is unavailable');
+                }
+
+                const session = await window.ai.writer.create({
+                    tone: 'casual',
+                    format: 'plain-text',
+                    length: 'short'
+                });
+                showStatus('writer-result', 'Session created successfully', 'success');
+
+                const result = await session.write('A thank you email to a colleague who helped with a project');
+                showStatus('writer-result', 'Writing completed successfully', 'success');
+                showResult('writer-result', result);
+
+                session.destroy();
+                showStatus('writer-result', 'Session cleaned up', 'success');
+
+            } catch (error) {
+                showStatus('writer-result', `Error: ${error.message}`, 'error');
+                console.error('Writer API test failed:', error);
+            }
+        }
+
+        async function testRewriterAPI() {
+            const resultElement = document.getElementById('rewriter-result');
+            resultElement.innerHTML = '';
+
+            try {
+                showStatus('rewriter-result', 'Testing Rewriter API...', 'warning');
+                
+                if (!window.ai?.rewriter) {
+                    throw new Error('Rewriter API not available');
+                }
+
+                const availability = await window.ai.rewriter.availability();
+                showStatus('rewriter-result', `Availability: ${availability}`, 
+                    availability === 'available' ? 'success' : 'warning');
+
+                if (availability === 'unavailable') {
+                    throw new Error('Rewriter API is unavailable');
+                }
+
+                const session = await window.ai.rewriter.create({
+                    tone: 'more-formal',
+                    format: 'plain-text',
+                    length: 'as-is'
+                });
+                showStatus('rewriter-result', 'Session created successfully', 'success');
+
+                const originalText = "Hey, can you help me out with this thing? It's kinda urgent and I really need it done ASAP.";
+                const result = await session.rewrite(originalText);
+                showStatus('rewriter-result', 'Rewriting completed successfully', 'success');
+                showResult('rewriter-result', `Original: ${originalText}\n\nRewritten: ${result}`);
+
+                session.destroy();
+                showStatus('rewriter-result', 'Session cleaned up', 'success');
+
+            } catch (error) {
+                showStatus('rewriter-result', `Error: ${error.message}`, 'error');
+                console.error('Rewriter API test failed:', error);
+            }
+        }
+
+        function getNestedProperty(obj, path) {
+            return path.split('.').reduce((current, key) => {
+                return current && current[key] !== undefined ? current[key] : null;
+            }, obj);
+        }
+
+        // Auto-run quick check on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(checkAPIsQuick, 1000);
+        });
+    </script>
+</body>
+</html>
+</content>

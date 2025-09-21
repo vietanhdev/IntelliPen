@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliPen Grammar Overlay - Standalone Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .test-container {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .test-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 16px;
+            margin: 10px 0;
+            resize: vertical;
+        }
+        
+        .test-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #5a67d8;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        
+        .console-output {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🖋️ IntelliPen Grammar Overlay - Standalone Test</h1>
+    
+    <div class="status info">
+        <strong>Test Status:</strong> <span id="testStatus">Loading...</span>
+    </div>
+    
+    <div class="test-container">
+        <h3>Test Input Fields</h3>
+        <p>Type some text with grammar errors to test the overlay system:</p>
+        
+        <input type="text" 
+               class="test-input" 
+               id="testInput1" 
+               placeholder="I seen him yesterday at the store..."
+               value="I seen him yesterday">
+        
+        <textarea class="test-input" 
+                  id="testTextarea" 
+                  rows="4" 
+                  placeholder="Type a longer text with multiple errors...">The thing is that I seen him yesterday and he was very good at his job.</textarea>
+        
+        <div contenteditable="true" 
+             class="test-input" 
+             id="testContentEditable" 
+             style="min-height: 60px;">
+            Click here and type some text with errors...
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h3>Test Controls</h3>
+        <button class="test-button" onclick="testOverlayBasic()">Test Basic Overlay</button>
+        <button class="test-button" onclick="testOverlayWithInput()">Test with Input Field</button>
+        <button class="test-button" onclick="testOverlayWithTextarea()">Test with Textarea</button>
+        <button class="test-button" onclick="testOverlayWithContentEditable()">Test with ContentEditable</button>
+        <button class="test-button" onclick="testManualOverlay()">Manual Overlay Test</button>
+        <button class="test-button" onclick="hideOverlay()">Hide Overlay</button>
+        <button class="test-button" onclick="debugOverlay()">Debug Info</button>
+    </div>
+    
+    <div class="test-container">
+        <h3>Console Output</h3>
+        <div id="consoleOutput" class="console-output"></div>
+    </div>
+
+    <!-- Load the grammar overlay script directly -->
+    <script src="content-scripts/grammar-overlay.js"></script>
+    
+    <script>
+        // Override console methods to show output in the page
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+        const consoleOutput = document.getElementById('consoleOutput');
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const line = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            consoleOutput.textContent += line;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            addToConsole(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            addToConsole(args.join(' '), 'warn');
+        };
+        
+        // Test functions
+        function updateStatus(message, type = 'info') {
+            const statusElement = document.getElementById('testStatus');
+            const statusContainer = statusElement.parentElement;
+            
+            statusElement.textContent = message;
+            statusContainer.className = `status ${type}`;
+        }
+        
+        function testOverlayBasic() {
+            console.log('Testing basic overlay functionality...');
+            
+            if (!window.IntelliPenGrammarOverlay) {
+                console.error('Grammar overlay not available!');
+                updateStatus('Grammar overlay not available', 'error');
+                return;
+            }
+            
+            console.log('Grammar overlay found:', window.IntelliPenGrammarOverlay);
+            
+            const suggestions = [
+                {
+                    type: 'grammar',
+                    original: 'Test error',
+                    replacement: 'Test correction',
+                    explanation: 'This is a basic test suggestion'
+                },
+                {
+                    type: 'style',
+                    original: 'basic test',
+                    replacement: 'comprehensive test',
+                    explanation: 'More descriptive language'
+                }
+            ];
+            
+            console.log('Calling showSuggestions with:', { suggestions, position: { x: 400, y: 200 } });
+            
+            // Show overlay at center of screen
+            try {
+                window.IntelliPenGrammarOverlay.showSuggestions({
+                    element: document.body,
+                    suggestions: suggestions,
+                    position: { x: 400, y: 200 }
+                });
+                console.log('showSuggestions called successfully');
+                updateStatus('Basic overlay test completed', 'success');
+            } catch (error) {
+                console.error('Error calling showSuggestions:', error);
+                updateStatus('Error showing overlay: ' + error.message, 'error');
+            }
+        }
+        
+        function testOverlayWithInput() {
+            console.log('Testing overlay with input field...');
+            
+            const input = document.getElementById('testInput1');
+            const suggestions = [
+                {
+                    type: 'grammar',
+                    original: 'I seen',
+                    replacement: 'I saw',
+                    explanation: 'Use past tense "saw" instead of "seen"'
+                }
+            ];
+            
+            if (window.IntelliPenGrammarOverlay) {
+                window.IntelliPenGrammarOverlay.showSuggestionsForElement(input, suggestions);
+                updateStatus('Input field test completed', 'success');
+            } else {
+                updateStatus('Grammar overlay not available', 'error');
+            }
+        }
+        
+        function testOverlayWithTextarea() {
+            console.log('Testing overlay with textarea...');
+            
+            const textarea = document.getElementById('testTextarea');
+            const suggestions = [
+                {
+                    type: 'clarity',
+                    original: 'The thing is that',
+                    replacement: 'The issue is that',
+                    explanation: 'More specific and clear language'
+                },
+                {
+                    type: 'style',
+                    original: 'very good',
+                    replacement: 'excellent',
+                    explanation: 'More precise and impactful word choice'
+                }
+            ];
+            
+            if (window.IntelliPenGrammarOverlay) {
+                window.IntelliPenGrammarOverlay.showSuggestionsForElement(textarea, suggestions);
+                updateStatus('Textarea test completed', 'success');
+            } else {
+                updateStatus('Grammar overlay not available', 'error');
+            }
+        }
+        
+        function testOverlayWithContentEditable() {
+            console.log('Testing overlay with contentEditable...');
+            
+            const contentEditable = document.getElementById('testContentEditable');
+            const suggestions = [
+                {
+                    type: 'grammar',
+                    original: 'errors',
+                    replacement: 'mistakes',
+                    explanation: 'Alternative word choice for variety'
+                }
+            ];
+            
+            if (window.IntelliPenGrammarOverlay) {
+                window.IntelliPenGrammarOverlay.showSuggestionsForElement(contentEditable, suggestions);
+                updateStatus('ContentEditable test completed', 'success');
+            } else {
+                updateStatus('Grammar overlay not available', 'error');
+            }
+        }
+        
+        function hideOverlay() {
+            console.log('Hiding overlay...');
+            
+            if (window.IntelliPenGrammarOverlay) {
+                window.IntelliPenGrammarOverlay.hidePopup();
+                updateStatus('Overlay hidden', 'success');
+            } else {
+                updateStatus('Grammar overlay not available', 'error');
+            }
+        }
+        
+        function testManualOverlay() {
+            console.log('Testing manual overlay creation...');
+            
+            // Create a simple popup manually to test if DOM manipulation works
+            const popup = document.createElement('div');
+            popup.id = 'manual-test-popup';
+            popup.style.cssText = `
+                position: fixed !important;
+                top: 100px !important;
+                left: 100px !important;
+                width: 300px !important;
+                background: white !important;
+                border: 2px solid #667eea !important;
+                border-radius: 8px !important;
+                padding: 20px !important;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+                z-index: 999999 !important;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            `;
+            
+            popup.innerHTML = `
+                <h3 style="margin: 0 0 10px 0; color: #667eea;">🖋️ Manual Test Popup</h3>
+                <p style="margin: 0 0 15px 0; color: #64748b;">This is a manually created popup to test DOM manipulation.</p>
+                <button onclick="document.getElementById('manual-test-popup').remove()" 
+                        style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                    Close
+                </button>
+            `;
+            
+            document.body.appendChild(popup);
+            console.log('Manual popup created and added to DOM');
+            updateStatus('Manual overlay test completed', 'success');
+        }
+        
+        function debugOverlay() {
+            console.log('=== OVERLAY DEBUG INFO ===');
+            console.log('window.IntelliPenGrammarOverlay:', window.IntelliPenGrammarOverlay);
+            
+            if (window.IntelliPenGrammarOverlay) {
+                console.log('Overlay container:', window.IntelliPenGrammarOverlay.overlayContainer);
+                console.log('Active popup:', window.IntelliPenGrammarOverlay.activePopup);
+                console.log('Is enabled:', window.IntelliPenGrammarOverlay.isEnabled);
+                
+                // Check if overlay container exists in DOM
+                const container = document.getElementById('intellipen-grammar-overlay');
+                console.log('Container in DOM:', container);
+                
+                // Check if styles are loaded
+                const styles = document.getElementById('intellipen-overlay-styles');
+                console.log('Styles loaded:', styles);
+                
+                if (container) {
+                    console.log('Container style:', container.style.cssText);
+                    console.log('Container children:', container.children.length);
+                }
+            } else {
+                console.log('Grammar overlay not initialized');
+            }
+            
+            updateStatus('Debug info logged to console', 'info');
+        }
+        
+        // Initialize test
+        function checkOverlayStatus() {
+            console.log('Checking overlay status...');
+            console.log('window.IntelliPenGrammarOverlay:', window.IntelliPenGrammarOverlay);
+            
+            if (window.IntelliPenGrammarOverlay) {
+                updateStatus('Grammar overlay initialized successfully!', 'success');
+                console.log('Grammar overlay available:', window.IntelliPenGrammarOverlay);
+                console.log('Overlay methods:', Object.getOwnPropertyNames(window.IntelliPenGrammarOverlay));
+                
+                // Test if the overlay container exists
+                const container = document.getElementById('intellipen-grammar-overlay');
+                console.log('Overlay container in DOM:', container);
+                
+                return true;
+            } else {
+                console.log('Grammar overlay not yet available, checking again...');
+                return false;
+            }
+        }
+        
+        // Check multiple times with increasing delays
+        setTimeout(() => checkOverlayStatus(), 100);
+        setTimeout(() => checkOverlayStatus(), 500);
+        setTimeout(() => {
+            if (!checkOverlayStatus()) {
+                updateStatus('Grammar overlay failed to initialize', 'error');
+            }
+        }, 2000);
+        
+        // Add event listeners to test inputs for automatic testing
+        document.getElementById('testInput1').addEventListener('focus', function() {
+            console.log('Input focused - you can now test typing');
+        });
+        
+        document.getElementById('testTextarea').addEventListener('focus', function() {
+            console.log('Textarea focused - you can now test typing');
+        });
+        
+        document.getElementById('testContentEditable').addEventListener('focus', function() {
+            console.log('ContentEditable focused - you can now test typing');
+        });
+        
+        // Add some keyboard shortcuts for quick testing
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        testOverlayBasic();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        testOverlayWithInput();
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        testOverlayWithTextarea();
+                        break;
+                    case 'h':
+                        e.preventDefault();
+                        hideOverlay();
+                        break;
+                    case 'd':
+                        e.preventDefault();
+                        debugOverlay();
+                        break;
+                }
+            }
+        });
+        
+        console.log('Standalone overlay test page loaded');
+        console.log('Keyboard shortcuts: Ctrl+1 (basic test), Ctrl+2 (input test), Ctrl+3 (textarea test), Ctrl+H (hide), Ctrl+D (debug)');
+    </script>
+</body>
+</html>

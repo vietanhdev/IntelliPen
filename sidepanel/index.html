@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IntelliPen Meeting Dashboard</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="sidepanel-container">
+    <!-- Header -->
+    <header class="sidepanel-header">
+      <div class="header-title">
+        <span class="title-icon">🖋️</span>
+        <h1>IntelliPen</h1>
+        <span class="subtitle">Meeting Dashboard</span>
+      </div>
+      <div class="header-controls">
+        <button class="control-btn" id="minimizeBtn" title="Minimize">
+          <span>−</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Meeting Controls -->
+    <section class="meeting-controls">
+      <div class="control-group">
+        <button class="record-btn" id="recordBtn">
+          <span class="record-icon">🎙️</span>
+          <span class="record-text">Start Recording</span>
+        </button>
+        <div class="recording-status" id="recordingStatus">
+          <span class="status-dot"></span>
+          <span class="status-text">Ready to record</span>
+          <span class="duration" id="recordingDuration">00:00</span>
+        </div>
+      </div>
+      
+      <div class="meeting-info">
+        <div class="info-item">
+          <span class="info-label">Session:</span>
+          <span class="info-value" id="sessionId">None</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Speakers:</span>
+          <span class="info-value" id="speakerCount">0</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Language:</span>
+          <span class="info-value" id="detectedLanguage">Auto</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Transcript -->
+    <section class="transcript-section">
+      <div class="section-header">
+        <h2>Live Transcript</h2>
+        <div class="transcript-controls">
+          <button class="control-btn small" id="clearTranscript" title="Clear Transcript">
+            <span>🗑️</span>
+          </button>
+          <button class="control-btn small" id="exportTranscript" title="Export Transcript">
+            <span>📄</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="transcript-container" id="transcriptContainer">
+        <div class="transcript-placeholder">
+          <span class="placeholder-icon">🎤</span>
+          <p>Start recording to see live transcript</p>
+          <p class="placeholder-subtitle">All processing happens locally on your device</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meeting Analysis -->
+    <section class="analysis-section" id="analysisSection" style="display: none;">
+      <div class="section-header">
+        <h2>Meeting Analysis</h2>
+        <div class="analysis-controls">
+          <button class="control-btn small" id="regenerateAnalysis" title="Regenerate Analysis">
+            <span>🔄</span>
+          </button>
+          <button class="control-btn small" id="exportAnalysis" title="Export Analysis">
+            <span>📋</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Executive Summary -->
+      <div class="analysis-card">
+        <h3>Executive Summary</h3>
+        <div class="summary-content" id="executiveSummary">
+          <p class="loading-text">Generating summary...</p>
+        </div>
+      </div>
+
+      <!-- Action Items -->
+      <div class="analysis-card">
+        <h3>Action Items</h3>
+        <div class="action-items" id="actionItems">
+          <p class="loading-text">Extracting action items...</p>
+        </div>
+      </div>
+
+      <!-- Key Decisions -->
+      <div class="analysis-card">
+        <h3>Key Decisions</h3>
+        <div class="key-decisions" id="keyDecisions">
+          <p class="loading-text">Identifying key decisions...</p>
+        </div>
+      </div>
+
+      <!-- Follow-up Email -->
+      <div class="analysis-card">
+        <h3>Follow-up Email Draft</h3>
+        <div class="email-draft" id="emailDraft">
+          <p class="loading-text">Generating follow-up email...</p>
+        </div>
+        <div class="email-actions">
+          <button class="action-btn secondary" id="copyEmail">Copy Email</button>
+          <button class="action-btn secondary" id="editEmail">Edit Email</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy Indicator -->
+    <footer class="privacy-footer">
+      <div class="privacy-indicator">
+        <span class="privacy-icon">🔒</span>
+        <span class="privacy-text">All processing happens locally on your device</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IntelliPen</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="logo">
+        <span class="logo-icon">🖋️</span>
+        <h1 class="logo-text">IntelliPen</h1>
+      </div>
+      <div class="status-indicator" id="statusIndicator">
+        <span class="status-dot" id="statusDot"></span>
+        <span class="status-text" id="statusText">Initializing...</span>
+      </div>
+    </header>
+
+    <!-- Main Controls -->
+    <main class="popup-main">
+      <!-- Writing Intelligence Section -->
+      <section class="feature-section">
+        <div class="feature-header">
+          <h2>Writing Intelligence</h2>
+          <div class="toggle-switch">
+            <input type="checkbox" id="writingToggle" class="toggle-input">
+            <label for="writingToggle" class="toggle-label">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="feature-stats">
+          <div class="stat-item">
+            <span class="stat-label">Active Fields:</span>
+            <span class="stat-value" id="activeFields">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Suggestions:</span>
+            <span class="stat-value" id="suggestionCount">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Meeting Intelligence Section -->
+      <section class="feature-section">
+        <div class="feature-header">
+          <h2>Meeting Intelligence</h2>
+          <div class="toggle-switch">
+            <input type="checkbox" id="meetingToggle" class="toggle-input">
+            <label for="meetingToggle" class="toggle-label">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="feature-stats">
+          <div class="stat-item">
+            <span class="stat-label">Sessions:</span>
+            <span class="stat-value" id="meetingSessions">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Recording:</span>
+            <span class="stat-value" id="recordingStatus">Off</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Privacy Status -->
+      <section class="privacy-section">
+        <div class="privacy-header">
+          <span class="privacy-icon">🔒</span>
+          <h3>Privacy Status</h3>
+        </div>
+        <div class="privacy-indicators">
+          <div class="privacy-item">
+            <span class="privacy-label">Local Processing:</span>
+            <span class="privacy-status active" id="localProcessing">Active</span>
+          </div>
+          <div class="privacy-item">
+            <span class="privacy-label">Data Encryption:</span>
+            <span class="privacy-status active" id="dataEncryption">Enabled</span>
+          </div>
+          <div class="privacy-item">
+            <span class="privacy-label">External Servers:</span>
+            <span class="privacy-status inactive" id="externalServers">None</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- API Availability -->
+      <section class="api-section">
+        <div class="api-header">
+          <h3>Chrome AI APIs</h3>
+          <button class="refresh-btn" id="refreshApis" title="Refresh API Status">
+            <span class="refresh-icon">🔄</span>
+          </button>
+        </div>
+        <div class="api-list" id="apiList">
+          <!-- API status items will be populated by JavaScript -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Actions -->
+    <footer class="popup-footer">
+      <button class="action-btn secondary" id="openSidePanel">
+        <span class="btn-icon">📋</span>
+        <span class="btn-text">Meeting Dashboard</span>
+      </button>
+      <button class="action-btn secondary" id="openOptions">
+        <span class="btn-icon">⚙️</span>
+        <span class="btn-text">Settings</span>
+      </button>
+    </footer>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>

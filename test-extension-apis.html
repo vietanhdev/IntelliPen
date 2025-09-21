@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliPen Extension API Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .status.error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .status.warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        .status.info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .result {
+            background: #f1f3f4;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .text-field {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 IntelliPen Extension API Test</h1>
+    <p>This page tests the IntelliPen extension's Chrome AI API integration.</p>
+
+    <div class="test-section">
+        <h2>📋 Extension Status</h2>
+        <button onclick="checkExtensionStatus()">Check Extension Status</button>
+        <div id="extension-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Chrome AI APIs Check</h2>
+        <button onclick="checkChromeAIAPIs()">Check Chrome AI APIs</button>
+        <div id="chrome-ai-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>✍️ Text Field Test</h2>
+        <p>Type in the text field below to test IntelliPen's text field detection:</p>
+        <textarea class="text-field" placeholder="Type something here to test IntelliPen integration..."></textarea>
+        <div id="text-field-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 API Functionality Test</h2>
+        <button onclick="testPromptAPI()">Test Prompt API</button>
+        <button onclick="testSummarizerAPI()">Test Summarizer API</button>
+        <button onclick="testWriterAPI()">Test Writer API</button>
+        <div id="api-test-results"></div>
+    </div>
+
+    <script>
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            element.appendChild(statusDiv);
+        }
+
+        function showResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result';
+            resultDiv.textContent = result;
+            element.appendChild(resultDiv);
+        }
+
+        async function checkExtensionStatus() {
+            const statusElement = document.getElementById('extension-status');
+            statusElement.innerHTML = '';
+
+            try {
+                showStatus('extension-status', 'Checking extension status...', 'info');
+                
+                const response = await chrome.runtime.sendMessage({ type: 'GET_EXTENSION_STATUS' });
+                
+                if (response?.success) {
+                    const data = response.data;
+                    showStatus('extension-status', `Extension initialized: ${data.initialized}`, 
+                        data.initialized ? 'success' : 'error');
+                    showStatus('extension-status', `Active sessions: ${data.activeSessions}`, 'info');
+                    showStatus('extension-status', `Meeting sessions: ${data.meetingSessions}`, 'info');
+                    showStatus('extension-status', `Writing intelligence: ${data.writingIntelligenceEnabled}`, 'info');
+                    showStatus('extension-status', `Meeting intelligence: ${data.meetingIntelligenceEnabled}`, 'info');
+                    
+                    if (data.apiAvailability) {
+                        showStatus('extension-status', 'API Availability:', 'info');
+                        for (const [api, status] of Object.entries(data.apiAvailability)) {
+                            showStatus('extension-status', `  ${api}: ${status}`, 
+                                status === 'available' ? 'success' : 
+                                status === 'downloadable' ? 'warning' : 'error');
+                        }
+                    }
+                } else {
+                    showStatus('extension-status', `Error: ${response?.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showStatus('extension-status', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkChromeAIAPIs() {
+            const statusElement = document.getElementById('chrome-ai-status');
+            statusElement.innerHTML = '';
+
+            const apis = [
+                { name: 'Language Model', path: 'ai.languageModel' },
+                { name: 'Summarizer', path: 'ai.summarizer' },
+                { name: 'Writer', path: 'ai.writer' },
+                { name: 'Rewriter', path: 'ai.rewriter' },
+                { name: 'Proofreader', path: 'ai.proofreader' },
+                { name: 'Translator', path: 'ai.translator' }
+            ];
+
+            for (const api of apis) {
+                try {
+                    const apiObject = getNestedProperty(window, api.path.split('.'));
+                    
+                    if (apiObject) {
+                        if (typeof apiObject.availability === 'function') {
+                            const status = await apiObject.availability();
+                            showStatus('chrome-ai-status', `${api.name}: ${status}`, 
+                                status === 'available' ? 'success' : 
+                                status === 'downloadable' ? 'warning' : 'error');
+                        } else if (typeof apiObject.create === 'function') {
+                            showStatus('chrome-ai-status', `${api.name}: Available (no availability check)`, 'success');
+                        } else {
+                            showStatus('chrome-ai-status', `${api.name}: Incomplete API`, 'error');
+                        }
+                    } else {
+                        showStatus('chrome-ai-status', `${api.name}: Not found`, 'error');
+                    }
+                } catch (error) {
+                    showStatus('chrome-ai-status', `${api.name}: Error - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function testPromptAPI() {
+            const resultElement = document.getElementById('api-test-results');
+            resultElement.innerHTML = '';
+
+            try {
+                showStatus('api-test-results', 'Testing Prompt API...', 'info');
+                
+                if (!window.ai?.languageModel) {
+                    throw new Error('Prompt API not available');
+                }
+
+                const availability = await window.ai.languageModel.availability();
+                if (availability === 'unavailable') {
+                    throw new Error('Prompt API is unavailable');
+                }
+
+                showStatus('api-test-results', `Availability: ${availability}`, 
+                    availability === 'available' ? 'success' : 'warning');
+
+                const session = await window.ai.languageModel.create({
+                    monitor: (m) => m.addEventListener('downloadprogress', (e) => 
+                        console.log(`Download: ${Math.round(e.loaded * 100)}%`))
+                });
+                showStatus('api-test-results', 'Session created successfully', 'success');
+
+                const result = await session.prompt('Say "Hello from IntelliPen!" in a friendly way.');
+                showStatus('api-test-results', 'Prompt completed successfully', 'success');
+                showResult('api-test-results', result);
+
+                session.destroy();
+                showStatus('api-test-results', 'Session cleaned up', 'success');
+
+            } catch (error) {
+                showStatus('api-test-results', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSummarizerAPI() {
+            const resultElement = document.getElementById('api-test-results');
+            resultElement.innerHTML = '';
+
+            try {
+                showStatus('api-test-results', 'Testing Summarizer API...', 'info');
+                
+                if (!window.ai?.summarizer) {
+                    throw new Error('Summarizer API not available');
+                }
+
+                const availability = await window.ai.summarizer.availability();
+                if (availability === 'unavailable') {
+                    throw new Error('Summarizer API is unavailable');
+                }
+
+                showStatus('api-test-results', `Availability: ${availability}`, 
+                    availability === 'available' ? 'success' : 'warning');
+
+                const session = await window.ai.summarizer.create({
+                    type: 'key-points',
+                    format: 'plain-text',
+                    length: 'short',
+                    monitor: (m) => m.addEventListener('downloadprogress', (e) => 
+                        console.log(`Download: ${Math.round(e.loaded * 100)}%`))
+                });
+                showStatus('api-test-results', 'Session created successfully', 'success');
+
+                const longText = `
+                IntelliPen is an intelligent writing companion extension that leverages Chrome's built-in AI APIs 
+                to provide real-time grammar correction, style improvements, and content enhancement. The extension 
+                works across multiple platforms including Gmail, LinkedIn, Notion, and Google Docs, automatically 
+                detecting text fields and providing contextual suggestions. It uses local AI processing through 
+                Chrome's Gemini Nano model, ensuring user privacy while delivering powerful writing assistance. 
+                The extension features a modular architecture with platform-specific adapters and a universal 
+                fallback system for maximum compatibility.
+                `;
+
+                const result = await session.summarize(longText);
+                showStatus('api-test-results', 'Summarization completed successfully', 'success');
+                showResult('api-test-results', result);
+
+                session.destroy();
+                showStatus('api-test-results', 'Session cleaned up', 'success');
+
+            } catch (error) {
+                showStatus('api-test-results', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testWriterAPI() {
+            const resultElement = document.getElementById('api-test-results');
+            resultElement.innerHTML = '';
+
+            try {
+                showStatus('api-test-results', 'Testing Writer API...', 'info');
+                
+                if (!window.ai?.writer) {
+                    throw new Error('Writer API not available');
+                }
+
+                const availability = await window.ai.writer.availability();
+                if (availability === 'unavailable') {
+                    throw new Error('Writer API is unavailable');
+                }
+
+                showStatus('api-test-results', `Availability: ${availability}`, 
+                    availability === 'available' ? 'success' : 'warning');
+
+                const session = await window.ai.writer.create({
+                    tone: 'professional',
+                    format: 'plain-text',
+                    length: 'short',
+                    monitor: (m) => m.addEventListener('downloadprogress', (e) => 
+                        console.log(`Download: ${Math.round(e.loaded * 100)}%`))
+                });
+                showStatus('api-test-results', 'Session created successfully', 'success');
+
+                const result = await session.write('A professional email thanking a colleague for their help on a project');
+                showStatus('api-test-results', 'Writing completed successfully', 'success');
+                showResult('api-test-results', result);
+
+                session.destroy();
+                showStatus('api-test-results', 'Session cleaned up', 'success');
+
+            } catch (error) {
+                showStatus('api-test-results', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        function getNestedProperty(obj, path) {
+            return path.reduce((current, key) => {
+                return current && current[key] !== undefined ? current[key] : null;
+            }, obj);
+        }
+
+        // Auto-run checks on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                checkExtensionStatus();
+                checkChromeAIAPIs();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

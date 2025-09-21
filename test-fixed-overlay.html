@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Overlay Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .button { background: #007cba; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 4px; cursor: pointer; }
+        .input { width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #ddd; border-radius: 4px; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>🖋️ Fixed Overlay Test</h1>
+    
+    <input type="text" class="input" placeholder="Test input" value="I seen him yesterday">
+    
+    <button class="button" onclick="testFixedOverlay()">Test Fixed Overlay</button>
+    <button class="button" onclick="hideOverlay()">Hide Overlay</button>
+    <button class="button" onclick="clearLog()">Clear Log</button>
+    
+    <div id="log" class="log"></div>
+
+    <script src="content-scripts/grammar-overlay.js"></script>
+    
+    <script>
+        function log(msg) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += new Date().toLocaleTimeString() + ': ' + msg + '<br>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(msg);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        function testFixedOverlay() {
+            log('Testing fixed overlay...');
+            
+            if (!window.IntelliPenGrammarOverlay) {
+                log('❌ Grammar overlay not found');
+                return;
+            }
+            
+            log('✅ Grammar overlay found');
+            
+            const suggestions = [
+                {
+                    type: 'grammar',
+                    original: 'I seen',
+                    replacement: 'I saw',
+                    explanation: 'Use past tense "saw" instead of "seen"'
+                },
+                {
+                    type: 'style',
+                    original: 'him',
+                    replacement: 'the person',
+                    explanation: 'More specific reference'
+                }
+            ];
+            
+            const input = document.querySelector('input');
+            const rect = input.getBoundingClientRect();
+            const position = { x: rect.left, y: rect.bottom + 10 };
+            
+            log('Calling showSuggestions...');
+            log('Position: ' + JSON.stringify(position));
+            
+            try {
+                window.IntelliPenGrammarOverlay.showSuggestions({
+                    element: input,
+                    suggestions: suggestions,
+                    position: position
+                });
+                
+                log('✅ showSuggestions called successfully');
+                
+                // Check if popup was created
+                setTimeout(() => {
+                    const container = document.getElementById('intellipen-grammar-overlay');
+                    if (container && container.children.length > 0) {
+                        log('✅ Popup created! Container has ' + container.children.length + ' children');
+                    } else {
+                        log('❌ No popup found in container');
+                    }
+                }, 100);
+                
+            } catch (error) {
+                log('❌ Error: ' + error.message);
+            }
+        }
+        
+        function hideOverlay() {
+            if (window.IntelliPenGrammarOverlay) {
+                window.IntelliPenGrammarOverlay.hidePopup();
+                log('Overlay hidden');
+            }
+        }
+        
+        setTimeout(() => {
+            if (window.IntelliPenGrammarOverlay) {
+                log('✅ Grammar overlay ready');
+            } else {
+                log('❌ Grammar overlay not ready');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

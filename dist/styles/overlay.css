@@ -1,0 +1,370 @@
+/* IntelliPen Overlay Styles */
+/* Styles for suggestion overlays and visual indicators */
+
+/* Active Element Indicator */
+.intellipen-active {
+  position: relative !important;
+  border: 1px solid rgba(102, 126, 234, 0.3) !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+.intellipen-active:focus {
+  border-color: rgba(102, 126, 234, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+}
+
+.intellipen-indicator {
+  position: absolute !important;
+  top: 2px !important;
+  right: 2px !important;
+  width: 16px !important;
+  height: 16px !important;
+  font-size: 12px !important;
+  opacity: 0.6 !important;
+  pointer-events: none !important;
+  z-index: 10000 !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 2px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.intellipen-indicator:hover {
+  opacity: 1 !important;
+}
+
+/* Suggestion Overlay Container */
+#intellipen-suggestion-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  z-index: 999999 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Suggestion Popup */
+.intellipen-suggestion-popup {
+  position: absolute !important;
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  padding: 0 !important;
+  min-width: 200px !important;
+  max-width: 300px !important;
+  pointer-events: auto !important;
+  z-index: 1000000 !important;
+  animation: intellipen-fade-in 0.2s ease-out !important;
+}
+
+/* Suggestion Header */
+.intellipen-suggestion-header {
+  padding: 8px 12px !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: 7px 7px 0 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.intellipen-suggestion-header::before {
+  content: "🖋️" !important;
+  font-size: 14px !important;
+}
+
+/* Suggestion List */
+.intellipen-suggestion-list {
+  padding: 8px 0 !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+}
+
+/* Individual Suggestion */
+.intellipen-suggestion-item {
+  padding: 8px 12px !important;
+  cursor: pointer !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  transition: background-color 0.15s ease !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+.intellipen-suggestion-item:hover {
+  background-color: #f8fafc !important;
+}
+
+.intellipen-suggestion-item:last-child {
+  border-bottom: none !important;
+}
+
+.intellipen-suggestion-item.selected {
+  background-color: #e0e7ff !important;
+}
+
+/* Suggestion Content */
+.intellipen-suggestion-text {
+  font-size: 13px !important;
+  color: #334155 !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+}
+
+.intellipen-suggestion-original {
+  font-size: 11px !important;
+  color: #64748b !important;
+  text-decoration: line-through !important;
+  margin: 0 !important;
+}
+
+.intellipen-suggestion-replacement {
+  font-size: 11px !important;
+  color: #059669 !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+}
+
+.intellipen-suggestion-explanation {
+  font-size: 11px !important;
+  color: #6b7280 !important;
+  font-style: italic !important;
+  margin: 0 !important;
+}
+
+/* Suggestion Type Indicators */
+.intellipen-suggestion-type {
+  display: inline-block !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  margin-right: 6px !important;
+}
+
+.intellipen-suggestion-type.grammar {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+.intellipen-suggestion-type.style {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.intellipen-suggestion-type.tone {
+  background: #dbeafe !important;
+  color: #1e40af !important;
+}
+
+.intellipen-suggestion-type.clarity {
+  background: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+/* Text Highlighting */
+.intellipen-highlight {
+  position: relative !important;
+  background: linear-gradient(120deg, transparent 0%, transparent 40%, #fef3c7 40%, #fef3c7 60%, transparent 60%) !important;
+  cursor: pointer !important;
+  border-radius: 2px !important;
+  transition: all 0.2s ease !important;
+}
+
+.intellipen-highlight.grammar {
+  background: linear-gradient(120deg, transparent 0%, transparent 40%, #fee2e2 40%, #fee2e2 60%, transparent 60%) !important;
+}
+
+.intellipen-highlight.style {
+  background: linear-gradient(120deg, transparent 0%, transparent 40%, #fef3c7 40%, #fef3c7 60%, transparent 60%) !important;
+}
+
+.intellipen-highlight.tone {
+  background: linear-gradient(120deg, transparent 0%, transparent 40%, #dbeafe 40%, #dbeafe 60%, transparent 60%) !important;
+}
+
+.intellipen-highlight.clarity {
+  background: linear-gradient(120deg, transparent 0%, transparent 40%, #d1fae5 40%, #d1fae5 60%, transparent 60%) !important;
+}
+
+.intellipen-highlight:hover {
+  background-color: rgba(102, 126, 234, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Privacy Indicator */
+.intellipen-privacy-indicator {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  color: white !important;
+  padding: 8px 12px !important;
+  border-radius: 20px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  z-index: 999998 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  animation: intellipen-slide-in 0.3s ease-out !important;
+  pointer-events: none !important;
+}
+
+.intellipen-privacy-indicator::before {
+  content: "🔒" !important;
+  font-size: 12px !important;
+}
+
+/* Meeting Interface Overlay */
+.intellipen-meeting-overlay {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  padding: 16px !important;
+  min-width: 250px !important;
+  pointer-events: auto !important;
+  z-index: 999997 !important;
+  animation: intellipen-slide-in 0.3s ease-out !important;
+}
+
+.intellipen-meeting-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+.intellipen-record-btn {
+  background: #ef4444 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.intellipen-record-btn:hover {
+  background: #dc2626 !important;
+  transform: translateY(-1px) !important;
+}
+
+.intellipen-record-btn.recording {
+  background: #10b981 !important;
+  animation: intellipen-pulse 2s infinite !important;
+}
+
+.intellipen-meeting-status {
+  font-size: 11px !important;
+  color: #64748b !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.intellipen-status-dot {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background: #94a3b8 !important;
+}
+
+.intellipen-status-dot.recording {
+  background: #10b981 !important;
+  animation: intellipen-pulse 2s infinite !important;
+}
+
+/* Animations */
+@keyframes intellipen-fade-in {
+  from {
+    opacity: 0 !important;
+    transform: translateY(-10px) !important;
+  }
+  to {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+}
+
+@keyframes intellipen-slide-in {
+  from {
+    opacity: 0 !important;
+    transform: translateX(20px) !important;
+  }
+  to {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+  }
+}
+
+@keyframes intellipen-pulse {
+  0%, 100% {
+    opacity: 1 !important;
+  }
+  50% {
+    opacity: 0.6 !important;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .intellipen-suggestion-popup {
+    max-width: 250px !important;
+  }
+  
+  .intellipen-meeting-overlay {
+    min-width: 200px !important;
+    top: 10px !important;
+    right: 10px !important;
+  }
+  
+  .intellipen-privacy-indicator {
+    bottom: 10px !important;
+    right: 10px !important;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .intellipen-highlight {
+    border: 2px solid currentColor !important;
+    background: transparent !important;
+  }
+  
+  .intellipen-suggestion-popup {
+    border: 2px solid #000 !important;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .intellipen-suggestion-popup,
+  .intellipen-meeting-overlay,
+  .intellipen-privacy-indicator {
+    animation: none !important;
+  }
+  
+  .intellipen-highlight {
+    transition: none !important;
+  }
+  
+  .intellipen-pulse {
+    animation: none !important;
+  }
+}

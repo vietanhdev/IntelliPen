@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test AI Namespaces</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <h1>Chrome AI API Namespace Test</h1>
+    <button onclick="testAllNamespaces()">Test All Possible Namespaces</button>
+    <div id="results"></div>
+
+    <script>
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.textContent = message;
+            document.getElementById('results').appendChild(div);
+            console.log(message);
+        }
+
+        async function testAllNamespaces() {
+            document.getElementById('results').innerHTML = '';
+            
+            log('Testing Chrome AI API namespaces...');
+            
+            // Test different namespace patterns
+            const tests = [
+                // Standard namespaces
+                { name: 'window.ai', test: () => window.ai },
+                { name: 'self.ai', test: () => self.ai },
+                { name: 'globalThis.ai', test: () => globalThis.ai },
+                
+                // Chrome-specific
+                { name: 'chrome.ai', test: () => chrome?.ai },
+                { name: 'window.chrome.ai', test: () => window.chrome?.ai },
+                
+                // Direct constructors
+                { name: 'LanguageModel', test: () => window.LanguageModel },
+                { name: 'Summarizer', test: () => window.Summarizer },
+                { name: 'Writer', test: () => window.Writer },
+                { name: 'Rewriter', test: () => window.Rewriter },
+                { name: 'Proofreader', test: () => window.Proofreader },
+                { name: 'Translator', test: () => window.Translator },
+                
+                // Alternative patterns
+                { name: 'navigator.ai', test: () => navigator.ai },
+                { name: 'window.AI', test: () => window.AI },
+                { name: 'self.AI', test: () => self.AI }
+            ];
+            
+            for (const test of tests) {
+                try {
+                    const result = test.test();
+                    if (result) {
+                        log(`✅ FOUND: ${test.name}`, 'success');
+                        
+                        // If it's an AI object, test its properties
+                        if (typeof result === 'object') {
+                            const props = Object.keys(result);
+                            log(`   Properties: ${props.join(', ')}`, 'success');
+                            
+                            // Test availability methods
+                            for (const prop of props) {
+                                if (result[prop] && typeof result[prop].availability === 'function') {
+                                    try {
+                                        const availability = await result[prop].availability();
+                                        log(`   ${prop}.availability(): ${availability}`, 
+                                            availability === 'available' ? 'success' : 'warning');
+                                    } catch (error) {
+                                        log(`   ${prop}.availability() error: ${error.message}`, 'error');
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // If it's a constructor, test availability
+                        if (typeof result === 'function' && result.availability) {
+                            try {
+                                const availability = await result.availability();
+                                log(`   ${test.name}.availability(): ${availability}`, 
+                                    availability === 'available' ? 'success' : 'warning');
+                            } catch (error) {
+                                log(`   ${test.name}.availability() error: ${error.message}`, 'error');
+                            }
+                        }
+                    } else {
+                        log(`❌ Not found: ${test.name}`, 'error');
+                    }
+                } catch (error) {
+                    log(`❌ Error testing ${test.name}: ${error.message}`, 'error');
+                }
+            }
+            
+            // Test if we're in the right context
+            log('\n--- Context Information ---');
+            log(`Location: ${location.href}`);
+            log(`User Agent: ${navigator.userAgent}`);
+            log(`Chrome version: ${navigator.userAgent.match(/Chrome\/(\d+)/)?.[1] || 'Unknown'}`);
+            
+            // Check if we need to enable flags
+            log('\n--- Recommendations ---');
+            log('If no APIs found, try:', 'warning');
+            log('1. Enable chrome://flags/#prompt-api-for-gemini-nano', 'warning');
+            log('2. Enable chrome://flags/#summarizer-api', 'warning');
+            log('3. Enable chrome://flags/#writer-api-for-gemini-nano', 'warning');
+            log('4. Restart Chrome completely', 'warning');
+            log('5. Check chrome://on-device-internals for model status', 'warning');
+        }
+
+        // Auto-run test
+        setTimeout(testAllNamespaces, 1000);
+    </script>
+</body>
+</html>
+</content>

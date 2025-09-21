@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Overlay Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .button {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .button:hover {
+            background: #005a87;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        
+        /* Direct overlay styles */
+        .test-popup {
+            position: fixed;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            padding: 0;
+            min-width: 250px;
+            max-width: 350px;
+            z-index: 1000000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .popup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .popup-content {
+            padding: 16px;
+        }
+        
+        .suggestion-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+        }
+        
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f8fafc;
+        }
+        
+        .suggestion-type {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .suggestion-content {
+            flex: 1;
+        }
+        
+        .suggestion-replacement {
+            color: #1e293b;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .suggestion-explanation {
+            color: #64748b;
+            font-size: 12px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>🖋️ Direct Overlay Test</h1>
+    
+    <div id="status" class="status info">Ready to test</div>
+    
+    <div>
+        <h3>Test Input</h3>
+        <input type="text" class="input-field" id="testInput" placeholder="Type here..." value="I seen him yesterday">
+        <br>
+        <button class="button" onclick="showDirectPopup()">Show Direct Popup</button>
+        <button class="button" onclick="hideDirectPopup()">Hide Popup</button>
+        <button class="button" onclick="testGrammarOverlay()">Test Grammar Overlay</button>
+    </div>
+    
+    <div>
+        <h3>Console</h3>
+        <div id="console" style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
+    </div>
+
+    <script src="content-scripts/grammar-overlay.js"></script>
+    
+    <script>
+        let currentPopup = null;
+        
+        // Simple console capture
+        const consoleDiv = document.getElementById('console');
+        const statusDiv = document.getElementById('status');
+        
+        function log(message) {
+            console.log(message);
+            consoleDiv.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        function setStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+        
+        function showDirectPopup() {
+            log('Creating direct popup...');
+            
+            // Remove existing popup
+            hideDirectPopup();
+            
+            // Create popup
+            const popup = document.createElement('div');
+            popup.className = 'test-popup';
+            popup.id = 'direct-test-popup';
+            
+            const input = document.getElementById('testInput');
+            const rect = input.getBoundingClientRect();
+            
+            popup.style.left = `${rect.left}px`;
+            popup.style.top = `${rect.bottom + 10}px`;
+            
+            popup.innerHTML = `
+                <div class="popup-header">
+                    <span>🖋️</span>
+                    <span>IntelliPen Suggestions</span>
+                    <button onclick="hideDirectPopup()" style="margin-left: auto; background: none; border: none; color: white; cursor: pointer; font-size: 16px;">×</button>
+                </div>
+                <div class="popup-content">
+                    <div class="suggestion-item" onclick="applySuggestion('I saw')">
+                        <div class="suggestion-type">grammar</div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-replacement">I saw him yesterday</div>
+                            <div class="suggestion-explanation">Use past tense "saw" instead of "seen"</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            currentPopup = popup;
+            
+            log('Direct popup created and shown');
+            setStatus('Direct popup shown!', 'success');
+        }
+        
+        function hideDirectPopup() {
+            if (currentPopup) {
+                currentPopup.remove();
+                currentPopup = null;
+                log('Direct popup hidden');
+                setStatus('Popup hidden', 'info');
+            }
+        }
+        
+        function applySuggestion(text) {
+            const input = document.getElementById('testInput');
+            input.value = text;
+            hideDirectPopup();
+            log('Suggestion applied: ' + text);
+            setStatus('Suggestion applied!', 'success');
+        }
+        
+        function testGrammarOverlay() {
+            log('Testing grammar overlay...');
+            
+            if (!window.IntelliPenGrammarOverlay) {
+                log('ERROR: Grammar overlay not found!');
+                setStatus('Grammar overlay not found!', 'error');
+                return;
+            }
+            
+            log('Grammar overlay found');
+            
+            const suggestions = [
+                {
+                    type: 'grammar',
+                    original: 'I seen',
+                    replacement: 'I saw',
+                    explanation: 'Use past tense "saw" instead of "seen"'
+                }
+            ];
+            
+            const input = document.getElementById('testInput');
+            const rect = input.getBoundingClientRect();
+            
+            try {
+                log('Calling showSuggestions...');
+                log('Suggestions:', JSON.stringify(suggestions));
+                log('Position:', JSON.stringify({ x: rect.left, y: rect.bottom + 10 }));
+                
+                window.IntelliPenGrammarOverlay.showSuggestions({
+                    element: input,
+                    suggestions: suggestions,
+                    position: { x: rect.left, y: rect.bottom + 10 }
+                });
+                
+                log('showSuggestions called - checking if popup was created...');
+                
+                // Check if popup was actually created
+                setTimeout(() => {
+                    const overlayContainer = document.getElementById('intellipen-grammar-overlay');
+                    if (overlayContainer) {
+                        log('Overlay container found with ' + overlayContainer.children.length + ' children');
+                        if (overlayContainer.children.length > 0) {
+                            log('Popup created successfully!');
+                            setStatus('Grammar overlay shown!', 'success');
+                        } else {
+                            log('No popup children found in container');
+                            setStatus('Popup not created', 'error');
+                        }
+                    } else {
+                        log('Overlay container not found');
+                        setStatus('Overlay container missing', 'error');
+                    }
+                }, 100);
+                
+            } catch (error) {
+                log('ERROR calling showSuggestions: ' + error.message);
+                setStatus('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Check initialization
+        setTimeout(() => {
+            if (window.IntelliPenGrammarOverlay) {
+                log('Grammar overlay initialized successfully!');
+                setStatus('Grammar overlay ready!', 'success');
+            } else {
+                log('Grammar overlay failed to initialize');
+                setStatus('Grammar overlay failed to initialize', 'error');
+            }
+        }, 1000);
+        
+        log('Direct test page loaded');
+    </script>
+</body>
+</html>
