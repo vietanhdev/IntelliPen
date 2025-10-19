@@ -22,23 +22,23 @@ var background$1 = {exports: {}};
 	    if (this.isInitialized) return;
 
 	    console.log('IntelliPen: Initializing extension...');
-	    
+
 	    try {
 	      // Check Chrome AI API availability
 	      await this.checkAPIAvailability();
-	      
+
 	      // Set up extension event listeners
 	      this.setupEventListeners();
-	      
+
 	      // Initialize privacy manager
 	      await this.initializePrivacyManager();
-	      
+
 	      this.isInitialized = true;
 	      console.log('IntelliPen: Extension initialized successfully');
-	      
+
 	      // Notify all tabs that extension is ready
 	      this.broadcastToTabs({ type: 'EXTENSION_READY' });
-	      
+
 	    } catch (error) {
 	      console.error('IntelliPen: Failed to initialize extension:', error);
 	      this.handleInitializationError(error);
@@ -47,12 +47,12 @@ var background$1 = {exports: {}};
 
 	  async checkAPIAvailability() {
 	    console.log('IntelliPen: Checking Chrome AI API availability...');
-	    
+
 	    // Note: Chrome AI APIs are accessed via window.ai in content scripts, not chrome.ai in background
 	    // We'll check availability when content scripts request it
 	    const apis = [
 	      'ai.languageModel',
-	      'ai.summarizer', 
+	      'ai.summarizer',
 	      'ai.writer',
 	      'ai.rewriter',
 	      'ai.proofreader',
@@ -63,7 +63,7 @@ var background$1 = {exports: {}};
 	    for (const apiPath of apis) {
 	      this.apiAvailability.set(apiPath, 'unknown');
 	    }
-	    
+
 	    console.log('IntelliPen: API availability will be checked by content scripts');
 	  }
 
@@ -103,7 +103,7 @@ var background$1 = {exports: {}};
 	  async initializePrivacyManager() {
 	    // Initialize encryption keys and privacy settings
 	    const privacySettings = await chrome.storage.local.get(['privacyInitialized']);
-	    
+
 	    if (!privacySettings.privacyInitialized) {
 	      await chrome.storage.local.set({
 	        privacyInitialized: true,
@@ -118,10 +118,10 @@ var background$1 = {exports: {}};
 
 	  handleInstallation(details) {
 	    console.log('IntelliPen: Extension installed/updated:', details.reason);
-	    
+
 	    // Create context menus
 	    this.createContextMenus();
-	    
+
 	    if (details.reason === 'install') {
 	      // First-time installation
 	      this.showWelcomeMessage();
@@ -134,92 +134,62 @@ var background$1 = {exports: {}};
 	  createContextMenus() {
 	    // Remove existing menus first
 	    chrome.contextMenus.removeAll(() => {
-	      // Create main IntelliPen menu
+	      // Primary actions - Edit and Translate
 	      chrome.contextMenus.create({
-	        id: 'intellipen-main',
-	        title: 'IntelliPen',
+	        id: 'intellipen-edit',
+	        title: '✏️ Edit with IntelliPen',
+	        contexts: ['selection']
+	      });
+
+	      chrome.contextMenus.create({
+	        id: 'intellipen-translate',
+	        title: '🌐 Translate with IntelliPen',
+	        contexts: ['selection']
+	      });
+
+	      // Separator
+	      chrome.contextMenus.create({
+	        id: 'intellipen-separator1',
+	        type: 'separator',
 	        contexts: ['selection', 'editable']
 	      });
 
-	      // Writing assistance submenu
+	      // Quick actions submenu
 	      chrome.contextMenus.create({
 	        id: 'intellipen-check-grammar',
-	        parentId: 'intellipen-main',
 	        title: '🖋️ Check Grammar & Style',
 	        contexts: ['selection', 'editable']
 	      });
 
 	      chrome.contextMenus.create({
 	        id: 'intellipen-improve-writing',
-	        parentId: 'intellipen-main',
 	        title: '✨ Improve Writing',
 	        contexts: ['selection', 'editable']
 	      });
 
 	      chrome.contextMenus.create({
-	        id: 'intellipen-rewrite-tone',
-	        parentId: 'intellipen-main',
-	        title: '🎭 Change Tone',
-	        contexts: ['selection', 'editable']
-	      });
-
-	      // Separator
-	      chrome.contextMenus.create({
-	        id: 'intellipen-separator1',
-	        parentId: 'intellipen-main',
-	        type: 'separator',
-	        contexts: ['selection', 'editable']
-	      });
-
-	      // Tone options
-	      chrome.contextMenus.create({
-	        id: 'intellipen-tone-formal',
-	        parentId: 'intellipen-main',
-	        title: '📝 Make More Formal',
-	        contexts: ['selection', 'editable']
-	      });
-
-	      chrome.contextMenus.create({
-	        id: 'intellipen-tone-casual',
-	        parentId: 'intellipen-main',
-	        title: '💬 Make More Casual',
-	        contexts: ['selection', 'editable']
-	      });
-
-	      chrome.contextMenus.create({
-	        id: 'intellipen-tone-professional',
-	        parentId: 'intellipen-main',
-	        title: '💼 Make Professional',
-	        contexts: ['selection', 'editable']
+	        id: 'intellipen-summarize',
+	        title: '📄 Summarize Text',
+	        contexts: ['selection']
 	      });
 
 	      // Separator
 	      chrome.contextMenus.create({
 	        id: 'intellipen-separator2',
-	        parentId: 'intellipen-main',
 	        type: 'separator',
 	        contexts: ['selection', 'editable']
 	      });
 
-	      // Utility options
+	      // Tone selection - opens virtual menu inside extension
 	      chrome.contextMenus.create({
-	        id: 'intellipen-summarize',
-	        parentId: 'intellipen-main',
-	        title: '📄 Summarize Text',
-	        contexts: ['selection']
-	      });
-
-	      chrome.contextMenus.create({
-	        id: 'intellipen-translate',
-	        parentId: 'intellipen-main',
-	        title: '🌐 Translate',
-	        contexts: ['selection']
+	        id: 'intellipen-select-tone',
+	        title: '🎨 Select Tone & Rewrite',
+	        contexts: ['selection', 'editable']
 	      });
 
 	      // Separator
 	      chrome.contextMenus.create({
 	        id: 'intellipen-separator3',
-	        parentId: 'intellipen-main',
 	        type: 'separator',
 	        contexts: ['selection', 'editable']
 	      });
@@ -227,16 +197,8 @@ var background$1 = {exports: {}};
 	      // Settings
 	      chrome.contextMenus.create({
 	        id: 'intellipen-show-overlay',
-	        parentId: 'intellipen-main',
 	        title: '👁️ Show Writing Overlay',
 	        contexts: ['editable']
-	      });
-
-	      chrome.contextMenus.create({
-	        id: 'intellipen-settings',
-	        parentId: 'intellipen-main',
-	        title: '⚙️ Settings',
-	        contexts: ['selection', 'editable']
 	      });
 
 	      console.log('IntelliPen: Context menus created');
@@ -248,44 +210,12 @@ var background$1 = {exports: {}};
 
 	    try {
 	      switch (info.menuItemId) {
-	        case 'intellipen-check-grammar':
-	          await this.handleGrammarCheck(info, tab);
-	          break;
-
-	        case 'intellipen-improve-writing':
-	          await this.handleImproveWriting(info, tab);
-	          break;
-
-	        case 'intellipen-rewrite-tone':
-	          await this.handleRewriteTone(info, tab, 'neutral');
-	          break;
-
-	        case 'intellipen-tone-formal':
-	          await this.handleRewriteTone(info, tab, 'formal');
-	          break;
-
-	        case 'intellipen-tone-casual':
-	          await this.handleRewriteTone(info, tab, 'casual');
-	          break;
-
-	        case 'intellipen-tone-professional':
-	          await this.handleRewriteTone(info, tab, 'professional');
-	          break;
-
-	        case 'intellipen-summarize':
-	          await this.handleSummarize(info, tab);
+	        case 'intellipen-edit':
+	          await this.handleEditWithIntelliPen(info, tab);
 	          break;
 
 	        case 'intellipen-translate':
-	          await this.handleTranslate(info, tab);
-	          break;
-
-	        case 'intellipen-show-overlay':
-	          await this.handleShowOverlay(info, tab);
-	          break;
-
-	        case 'intellipen-settings':
-	          await this.handleOpenSettings(info, tab);
+	          await this.handleTranslateWithIntelliPen(info, tab);
 	          break;
 
 	        default:
@@ -297,118 +227,72 @@ var background$1 = {exports: {}};
 	    }
 	  }
 
-	  async handleGrammarCheck(info, tab) {
+	  async handleEditWithIntelliPen(info, tab) {
 	    const selectedText = info.selectionText || '';
-	    
+
 	    if (!selectedText.trim()) {
-	      this.showErrorNotification('Please select some text to check');
+	      this.showErrorNotification('Please select some text to edit');
 	      return;
 	    }
 
-	    // Send message to content script to show grammar suggestions
-	    await chrome.tabs.sendMessage(tab.id, {
-	      type: 'SHOW_GRAMMAR_OVERLAY',
-	      data: {
-	        text: selectedText,
-	        action: 'grammar-check',
-	        position: { x: info.pageX || 100, y: info.pageY || 100 }
-	      }
-	    });
-	  }
+	    try {
+	      // Open sidebar
+	      await chrome.sidePanel.open({ tabId: tab.id });
 
-	  async handleImproveWriting(info, tab) {
-	    const selectedText = info.selectionText || '';
-	    
-	    if (!selectedText.trim()) {
-	      this.showErrorNotification('Please select some text to improve');
-	      return;
+	      // Wait a moment for sidebar to load
+	      await new Promise(resolve => setTimeout(resolve, 300));
+
+	      // Send selected text to sidebar editor
+	      await chrome.runtime.sendMessage({
+	        type: 'LOAD_TEXT_IN_EDITOR',
+	        data: {
+	          text: selectedText,
+	          tabId: tab.id
+	        }
+	      });
+
+	      console.log('IntelliPen: Text loaded in editor');
+	    } catch (error) {
+	      console.error('IntelliPen: Failed to open editor:', error);
+	      this.showErrorNotification('Failed to open editor');
 	    }
-
-	    // Send message to content script to show writing suggestions
-	    await chrome.tabs.sendMessage(tab.id, {
-	      type: 'SHOW_WRITING_SUGGESTIONS',
-	      data: {
-	        text: selectedText,
-	        action: 'improve-writing',
-	        position: { x: info.pageX || 100, y: info.pageY || 100 }
-	      }
-	    });
 	  }
 
-	  async handleRewriteTone(info, tab, tone) {
+	  async handleTranslateWithIntelliPen(info, tab) {
 	    const selectedText = info.selectionText || '';
-	    
-	    if (!selectedText.trim()) {
-	      this.showErrorNotification('Please select some text to rewrite');
-	      return;
-	    }
 
-	    // Send message to content script to rewrite with specific tone
-	    await chrome.tabs.sendMessage(tab.id, {
-	      type: 'REWRITE_WITH_TONE',
-	      data: {
-	        text: selectedText,
-	        tone: tone,
-	        position: { x: info.pageX || 100, y: info.pageY || 100 }
-	      }
-	    });
-	  }
-
-	  async handleSummarize(info, tab) {
-	    const selectedText = info.selectionText || '';
-	    
-	    if (!selectedText.trim()) {
-	      this.showErrorNotification('Please select some text to summarize');
-	      return;
-	    }
-
-	    // Send message to content script to show summary
-	    await chrome.tabs.sendMessage(tab.id, {
-	      type: 'SHOW_SUMMARY',
-	      data: {
-	        text: selectedText,
-	        position: { x: info.pageX || 100, y: info.pageY || 100 }
-	      }
-	    });
-	  }
-
-	  async handleTranslate(info, tab) {
-	    const selectedText = info.selectionText || '';
-	    
 	    if (!selectedText.trim()) {
 	      this.showErrorNotification('Please select some text to translate');
 	      return;
 	    }
 
-	    // Send message to content script to show translation
-	    await chrome.tabs.sendMessage(tab.id, {
-	      type: 'SHOW_TRANSLATION',
-	      data: {
-	        text: selectedText,
-	        position: { x: info.pageX || 100, y: info.pageY || 100 }
-	      }
-	    });
-	  }
+	    try {
+	      // Open sidebar
+	      await chrome.sidePanel.open({ tabId: tab.id });
 
-	  async handleShowOverlay(info, tab) {
-	    // Send message to content script to show overlay for current element
-	    await chrome.tabs.sendMessage(tab.id, {
-	      type: 'SHOW_WRITING_OVERLAY',
-	      data: {
-	        action: 'show-overlay'
-	      }
-	    });
-	  }
+	      // Wait a moment for sidebar to load
+	      await new Promise(resolve => setTimeout(resolve, 300));
 
-	  async handleOpenSettings(info, tab) {
-	    // Open extension options page
-	    await chrome.runtime.openOptionsPage();
+	      // Send selected text to sidebar translator
+	      await chrome.runtime.sendMessage({
+	        type: 'LOAD_TEXT_IN_TRANSLATOR',
+	        data: {
+	          text: selectedText,
+	          tabId: tab.id
+	        }
+	      });
+
+	      console.log('IntelliPen: Text loaded in translator');
+	    } catch (error) {
+	      console.error('IntelliPen: Failed to open translator:', error);
+	      this.showErrorNotification('Failed to open translator');
+	    }
 	  }
 
 	  showErrorNotification(message) {
 	    // Create a simple notification (could be enhanced with chrome.notifications API)
 	    console.error('IntelliPen Error:', message);
-	    
+
 	    // For now, just log the error. In a full implementation, 
 	    // you might want to show a toast notification or badge
 	  }
@@ -480,10 +364,16 @@ var background$1 = {exports: {}};
 
 	        case 'GET_CURRENT_TAB_ID':
 	          // Return the current tab ID
-	          sendResponse({ 
-	            success: true, 
-	            tabId: sender.tab ? sender.tab.id : null 
+	          sendResponse({
+	            success: true,
+	            tabId: sender.tab ? sender.tab.id : null
 	          });
+	          break;
+
+	        case 'SWITCH_SIDEPANEL_SCREEN':
+	          // Forward message to sidepanel
+	          this.forwardToSidePanel(message);
+	          sendResponse({ success: true });
 	          break;
 
 	        default:
@@ -539,7 +429,7 @@ var background$1 = {exports: {}};
 
 	    this.activeSessions.set(sessionId, session);
 	    console.log(`IntelliPen: Writing session ${sessionId} initialized`);
-	    
+
 	    return session;
 	  }
 
@@ -557,7 +447,7 @@ var background$1 = {exports: {}};
 
 	    this.meetingSessions.set(sessionId, session);
 	    console.log(`IntelliPen: Meeting session ${sessionId} initialized`);
-	    
+
 	    return session;
 	  }
 
@@ -602,16 +492,16 @@ var background$1 = {exports: {}};
 	  async toggleWritingIntelligence(enabled) {
 	    try {
 	      console.log(`IntelliPen: Toggling writing intelligence to ${enabled}`);
-	      
+
 	      // Save setting to storage
 	      await chrome.storage.local.set({ writingIntelligenceEnabled: enabled });
-	      
+
 	      // Broadcast to all content scripts
 	      await this.broadcastToTabs({
 	        type: 'WRITING_INTELLIGENCE_TOGGLED',
 	        data: { enabled }
 	      });
-	      
+
 	      // If disabling, clean up active writing sessions
 	      if (!enabled) {
 	        for (const [sessionId, session] of this.activeSessions) {
@@ -621,9 +511,9 @@ var background$1 = {exports: {}};
 	          }
 	        }
 	      }
-	      
+
 	      return { enabled, message: `Writing intelligence ${enabled ? 'enabled' : 'disabled'}` };
-	      
+
 	    } catch (error) {
 	      console.error('IntelliPen: Failed to toggle writing intelligence:', error);
 	      throw new Error('Failed to toggle writing intelligence');
@@ -633,16 +523,16 @@ var background$1 = {exports: {}};
 	  async toggleMeetingIntelligence(enabled) {
 	    try {
 	      console.log(`IntelliPen: Toggling meeting intelligence to ${enabled}`);
-	      
+
 	      // Save setting to storage
 	      await chrome.storage.local.set({ meetingIntelligenceEnabled: enabled });
-	      
+
 	      // Broadcast to all content scripts
 	      await this.broadcastToTabs({
 	        type: 'MEETING_INTELLIGENCE_TOGGLED',
 	        data: { enabled }
 	      });
-	      
+
 	      // If disabling, clean up active meeting sessions
 	      if (!enabled) {
 	        for (const [sessionId, session] of this.meetingSessions) {
@@ -650,9 +540,9 @@ var background$1 = {exports: {}};
 	          console.log(`IntelliPen: Deactivated meeting session ${sessionId}`);
 	        }
 	      }
-	      
+
 	      return { enabled, message: `Meeting intelligence ${enabled ? 'enabled' : 'disabled'}` };
-	      
+
 	    } catch (error) {
 	      console.error('IntelliPen: Failed to toggle meeting intelligence:', error);
 	      throw new Error('Failed to toggle meeting intelligence');
@@ -671,6 +561,25 @@ var background$1 = {exports: {}};
 	      }
 	    } catch (error) {
 	      console.warn('IntelliPen: Failed to broadcast to tabs:', error);
+	    }
+	  }
+
+	  async forwardToSidePanel(message) {
+	    try {
+	      // Get all tabs and try to send message to sidepanel
+	      const tabs = await chrome.tabs.query({});
+	      for (const tab of tabs) {
+	        if (tab.id) {
+	          try {
+	            await chrome.runtime.sendMessage(message);
+	            break; // Message sent successfully
+	          } catch (error) {
+	            // Continue to next tab
+	          }
+	        }
+	      }
+	    } catch (error) {
+	      console.warn('IntelliPen: Failed to forward to sidepanel:', error);
 	    }
 	  }
 

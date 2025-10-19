@@ -733,9 +733,12 @@ function initializeGrammarOverlay() {
 }
 
 // Auto-initialize when script loads
+console.log('IntelliPen: Grammar overlay script executing, document.readyState:', document.readyState);
 if (document.readyState === 'loading') {
+  console.log('IntelliPen: Document still loading, adding DOMContentLoaded listener');
   document.addEventListener('DOMContentLoaded', initializeGrammarOverlay);
 } else {
+  console.log('IntelliPen: Document ready, initializing immediately');
   initializeGrammarOverlay();
 }
 

@@ -724,48 +724,148 @@ class UniversalTextIntegration {
       return;
     }
 
+    // Prevent multiple simultaneous loads
+    if (this._loadingGrammarOverlay) {
+      console.log('IntelliPen: Grammar overlay already loading, waiting...');
+      while (this._loadingGrammarOverlay && !window.IntelliPenGrammarOverlay) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      return;
+    }
+
+    this._loadingGrammarOverlay = true;
     console.log('IntelliPen: Loading grammar overlay...');
 
     try {
+      console.log('IntelliPen: Starting grammar overlay loading process...');
+      console.log('IntelliPen: Checking Chrome extension APIs...');
+      console.log('IntelliPen: typeof chrome:', typeof chrome);
+      console.log('IntelliPen: chrome.runtime:', chrome?.runtime);
+      console.log('IntelliPen: chrome.runtime.getURL:', chrome?.runtime?.getURL);
+      
       // Check if Chrome extension APIs are available
       if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
-        const script = document.createElement('script');
-        script.src = chrome.runtime.getURL('content-scripts/grammar-overlay.js');
+        console.log('IntelliPen: Chrome extension APIs are available');
+        
+        let scriptUrl;
+        try {
+          scriptUrl = chrome.runtime.getURL('content-scripts/grammar-overlay.js');
+          console.log('IntelliPen: Script URL:', scriptUrl);
+        } catch (urlError) {
+          console.error('IntelliPen: Error getting script URL:', urlError);
+          throw urlError;
+        }
 
-        await new Promise((resolve, reject) => {
-          script.onload = async () => {
-            console.log('IntelliPen: Grammar overlay script loaded');
-            
-            // Force initialization if not already done
-            if (typeof window.initializeGrammarOverlay === 'function') {
-              console.log('IntelliPen: Calling initializeGrammarOverlay...');
-              window.initializeGrammarOverlay();
+        // Try two approaches: first try loading as external script, then fallback to fetch and inject
+        let scriptLoaded = false;
+        
+        // Approach 1: Load as external script
+        try {
+          const script = document.createElement('script');
+          script.src = scriptUrl;
+
+          console.log('IntelliPen: Created script element, about to load...');
+
+          await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              console.warn('IntelliPen: Script loading timeout after 5 seconds');
+              reject(new Error('Script loading timeout'));
+            }, 5000);
+
+            script.onload = async () => {
+              clearTimeout(timeout);
+              console.log('IntelliPen: Grammar overlay script loaded via external script');
+              console.log('IntelliPen: Available functions on window:', Object.keys(window).filter(k => k.includes('Grammar') || k.includes('initialize')));
+
+              // Force initialization if not already done
+              if (typeof window.initializeGrammarOverlay === 'function') {
+                console.log('IntelliPen: Calling initializeGrammarOverlay...');
+                try {
+                  const result = window.initializeGrammarOverlay();
+                  console.log('IntelliPen: initializeGrammarOverlay returned:', result);
+                } catch (initError) {
+                  console.error('IntelliPen: Error during initializeGrammarOverlay:', initError);
+                }
+              } else {
+                console.warn('IntelliPen: initializeGrammarOverlay function not found on window');
+              }
+
+              // Give a small delay for initialization
+              await new Promise(resolve => setTimeout(resolve, 50));
+              console.log('IntelliPen: After delay, window.IntelliPenGrammarOverlay:', window.IntelliPenGrammarOverlay);
+              console.log('IntelliPen: Type of window.IntelliPenGrammarOverlay:', typeof window.IntelliPenGrammarOverlay);
+
+              scriptLoaded = true;
+              resolve();
+            };
+            script.onerror = (error) => {
+              clearTimeout(timeout);
+              console.error('IntelliPen: Failed to load grammar overlay script via external script:', error);
+              console.error('IntelliPen: Script src was:', script.src);
+              console.error('IntelliPen: Script element:', script);
+              reject(error);
+            };
+
+            console.log('IntelliPen: Appending script to document head...');
+            (document.head || document.documentElement).appendChild(script);
+            console.log('IntelliPen: Script appended, waiting for load...');
+          });
+        } catch (scriptError) {
+          console.warn('IntelliPen: External script loading failed, trying fetch approach:', scriptError);
+          
+          // Approach 2: Fetch script content and inject directly
+          try {
+            console.log('IntelliPen: Fetching script content...');
+            const response = await fetch(scriptUrl);
+            if (!response.ok) {
+              throw new Error(`Failed to fetch script: ${response.status} ${response.statusText}`);
             }
             
-            // Give a small delay for initialization
-            await new Promise(resolve => setTimeout(resolve, 50));
-            console.log('IntelliPen: After delay, window.IntelliPenGrammarOverlay:', window.IntelliPenGrammarOverlay);
+            const scriptContent = await response.text();
+            console.log('IntelliPen: Script content fetched, length:', scriptContent.length);
             
-            resolve();
-          };
-          script.onerror = (error) => {
-            console.error('IntelliPen: Failed to load grammar overlay script:', error);
-            reject(error);
-          };
-          (document.head || document.documentElement).appendChild(script);
-        });
+            // Create and inject script
+            const inlineScript = document.createElement('script');
+            inlineScript.textContent = scriptContent;
+            
+            console.log('IntelliPen: Injecting inline script...');
+            (document.head || document.documentElement).appendChild(inlineScript);
+            
+            // Give time for execution
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            console.log('IntelliPen: After inline script injection, window.IntelliPenGrammarOverlay:', window.IntelliPenGrammarOverlay);
+            scriptLoaded = !!window.IntelliPenGrammarOverlay;
+            
+          } catch (fetchError) {
+            console.error('IntelliPen: Fetch approach also failed:', fetchError);
+          }
+        }
 
-        // Wait for the overlay to initialize with retries
-        let retries = 0;
-        const maxRetries = 10;
+        // Only do retries if the script was successfully loaded but overlay not yet available
+        if (scriptLoaded) {
+          // Wait for the overlay to initialize with retries
+          let retries = 0;
+          const maxRetries = 10;
 
-        while (!window.IntelliPenGrammarOverlay && retries < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          retries++;
-          console.log(`IntelliPen: Waiting for grammar overlay... attempt ${retries}`);
-          console.log(`IntelliPen: Current window.IntelliPenGrammarOverlay:`, window.IntelliPenGrammarOverlay);
-          console.log(`IntelliPen: Type:`, typeof window.IntelliPenGrammarOverlay);
-          console.log(`IntelliPen: Truthiness:`, !!window.IntelliPenGrammarOverlay);
+          while (retries < maxRetries) {
+            const overlayExists = window.IntelliPenGrammarOverlay;
+            console.log(`IntelliPen: Waiting for grammar overlay... attempt ${retries + 1}`);
+            console.log(`IntelliPen: Current window.IntelliPenGrammarOverlay:`, overlayExists);
+            console.log(`IntelliPen: Type:`, typeof overlayExists);
+            console.log(`IntelliPen: Truthiness:`, !!overlayExists);
+            console.log(`IntelliPen: Should continue:`, !overlayExists);
+
+            if (overlayExists) {
+              console.log('IntelliPen: Overlay found, breaking loop');
+              break;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retries++;
+          }
+        } else {
+          console.log('IntelliPen: Script loading failed, skipping retry loop');
         }
 
         console.log(`IntelliPen: Final check - window.IntelliPenGrammarOverlay:`, window.IntelliPenGrammarOverlay);
@@ -773,13 +873,109 @@ class UniversalTextIntegration {
           console.log('IntelliPen: Grammar overlay initialized successfully');
         } else {
           console.error('IntelliPen: Grammar overlay not found after loading and waiting');
+          console.log('IntelliPen: Creating fallback minimal overlay...');
+          // Create a minimal fallback overlay
+          this.createFallbackOverlay();
         }
       } else {
         console.warn('IntelliPen: Chrome extension APIs not available, cannot load grammar overlay');
+        console.warn('IntelliPen: Will create fallback overlay instead');
+        this.createFallbackOverlay();
       }
     } catch (error) {
       console.error('IntelliPen: Failed to load grammar overlay:', error);
+      console.error('IntelliPen: Error details:', error.message, error.stack);
+      console.log('IntelliPen: Creating fallback overlay due to error');
+      this.createFallbackOverlay();
+    } finally {
+      this._loadingGrammarOverlay = false;
     }
+  }
+
+  createFallbackOverlay() {
+    // Create a minimal fallback overlay when the main one fails to load
+    if (window.IntelliPenGrammarOverlay) return;
+
+    console.log('IntelliPen: Creating fallback grammar overlay...');
+    
+    const fallbackOverlay = {
+      initialize: () => console.log('IntelliPen: Fallback overlay initialized'),
+      showSuggestions: (element, suggestions) => {
+        console.log('IntelliPen: Fallback - showing suggestions for element:', element);
+        // Create a simple popup or form
+        this.showFallbackForm(element, suggestions);
+      },
+      hideSuggestions: () => console.log('IntelliPen: Fallback - hiding suggestions'),
+      isEnabled: true
+    };
+
+    window.IntelliPenGrammarOverlay = fallbackOverlay;
+    console.log('IntelliPen: Fallback overlay created and assigned to window');
+  }
+
+  showFallbackForm(element, suggestions = []) {
+    // Remove any existing fallback form
+    const existingForm = document.getElementById('intellipen-fallback-form');
+    if (existingForm) {
+      existingForm.remove();
+    }
+
+    // Create a simple form as fallback
+    const form = document.createElement('div');
+    form.id = 'intellipen-fallback-form';
+    form.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 2px solid #007bff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 999999;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 400px;
+        min-width: 300px;
+      ">
+        <h3 style="margin: 0 0 15px 0; color: #333;">IntelliPen Writing Assistant</h3>
+        <p style="margin: 0 0 15px 0; color: #666;">Grammar overlay loaded successfully! This is a fallback interface.</p>
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">Current text:</label>
+          <textarea readonly style="
+            width: 100%;
+            height: 60px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            box-sizing: border-box;
+          ">${element.value || element.textContent || 'No text'}</textarea>
+        </div>
+        <div style="text-align: right;">
+          <button onclick="document.getElementById('intellipen-fallback-form').remove()" style="
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+          ">Close</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(form);
+    console.log('IntelliPen: Fallback form displayed');
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (document.getElementById('intellipen-fallback-form')) {
+        document.getElementById('intellipen-fallback-form').remove();
+      }
+    }, 5000);
   }
 
   createDemoGrammarSuggestions(text) {
@@ -988,7 +1184,7 @@ class UniversalAdapter {
 
     // Skip IntelliPen overlay containers
     if (element.id && element.id.includes('intellipen')) return false;
-    if (element.className && element.className.includes('intellipen')) return false;
+    if (element.className && (typeof element.className === 'string' ? element.className.includes('intellipen') : element.className.toString().includes('intellipen'))) return false;
 
     // Skip hidden elements
     const style = window.getComputedStyle(element);

@@ -27,11 +27,19 @@ export default [
           // Copy HTML and CSS files
           { src: 'popup/index.html', dest: 'dist/popup' },
           { src: 'popup/index.css', dest: 'dist/popup' },
+          { src: 'popup/menu.html', dest: 'dist/popup' },
+          { src: 'popup/menu.css', dest: 'dist/popup' },
+          { src: 'popup/menu.js', dest: 'dist/popup' },
           { src: 'sidepanel/index.html', dest: 'dist/sidepanel' },
           { src: 'sidepanel/index.css', dest: 'dist/sidepanel' },
           
           // Copy styles
           { src: 'styles', dest: 'dist' },
+          
+          // Copy AI API modules
+          { src: 'src/ai-apis', dest: 'dist/src' },
+          { src: 'src/editor', dest: 'dist/src' },
+          { src: 'src/meeting', dest: 'dist/src' },
           
           // Copy content scripts and platform adapters
           { src: 'content-scripts/grammar-overlay.js', dest: 'dist/content-scripts' },
