@@ -19,11 +19,6 @@
         <span class="title-icon">🖋️</span>
         <h1>IntelliPen</h1>
       </div>
-      <div class="header-controls">
-        <button class="control-btn" id="minimizeBtn" title="Minimize">
-          <span>−</span>
-        </button>
-      </div>
     </header>
 
     <!-- Navigation Tabs -->
@@ -41,6 +36,41 @@
         <span class="nav-label">Meeting</span>
       </button>
     </nav>
+
+    <!-- Tone Selection Modal -->
+    <div class="modal-overlay hidden" id="toneModalOverlay">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Select Writing Tone</h3>
+          <button class="modal-close" id="closeToneModal">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-description">Choose how you'd like to adjust the tone of your text</p>
+          <div class="tone-options">
+            <button class="tone-option" data-tone="formal">
+              <span class="tone-icon">👔</span>
+              <span class="tone-name">Formal</span>
+              <span class="tone-desc">Professional and polished</span>
+            </button>
+            <button class="tone-option" data-tone="casual">
+              <span class="tone-icon">😊</span>
+              <span class="tone-name">Casual</span>
+              <span class="tone-desc">Relaxed and conversational</span>
+            </button>
+            <button class="tone-option" data-tone="professional">
+              <span class="tone-icon">💼</span>
+              <span class="tone-name">Professional</span>
+              <span class="tone-desc">Business-appropriate</span>
+            </button>
+            <button class="tone-option" data-tone="friendly">
+              <span class="tone-icon">🤝</span>
+              <span class="tone-name">Friendly</span>
+              <span class="tone-desc">Warm and approachable</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- IntelliPen Editor Screen -->
     <div class="screen" id="editorScreen">

@@ -1,27 +1,38 @@
 # IntelliPen Chrome Extension
 
-IntelliPen is an intelligent Chrome extension that serves as a comprehensive writing and meeting companion. It provides real-time grammar correction, style improvements, and intelligent writing assistance across all web platforms, while also offering advanced meeting transcription and analysis capabilities.
+IntelliPen is an intelligent Chrome extension that provides AI-powered writing assistance and meeting intelligence. Built on Chrome's built-in AI APIs (Gemini Nano), it offers a dual-screen interface with an IntelliPen Editor for writing tasks and a Meeting Dashboard for audio recording and analysis.
 
 ## Features
 
 ### ✍️ IntelliPen Editor
-A powerful rich-text editor with AI-powered writing assistance:
+A rich-text editor with comprehensive AI-powered writing assistance:
 
 - **Grammar Checking** (Proofreader API): Real-time grammar, spelling, and punctuation correction with detailed explanations
 - **Writing Improvement** (Writer API): AI-powered content enhancement for clarity, conciseness, and readability
 - **Tone Adjustment** (Rewriter API): Transform text tone (formal, casual, professional, friendly)
-- **Text Summarization** (Summarizer API): Generate TL;DR, key points, teasers, or headlines
-- **Translation** (Translator API): Translate text to/from multiple languages with auto-detection
-- **Content Generation** (Writer API): Create content from prompts with customizable style
 - **Document Management**: New, open, save documents with auto-save functionality
 - **Real-time Stats**: Word count, character count, and reading time tracking
-- **Export Options**: Save as .txt or .md files
+- **Export Options**: Save as .txt files
+
+### 🌐 Translator
+Dedicated translation interface with advanced features:
+
+- **Multi-language Support**: Translate between 25+ languages
+- **Auto-detection** (Language Detector API): Automatic source language identification
+- **Real-time Translation**: Instant translation as you type
+- **Text-to-Speech**: Listen to source and translated text
+- **Character Counter**: Track text length with visual warnings
+- **Language Swap**: Quick swap between source and target languages
+- **Context Menu Integration**: Right-click to translate selected text on any webpage
+- **Export Options**: Save translations for later use
 
 ### 🎙️ Meeting Dashboard
-Comprehensive meeting transcription and analysis:
+Comprehensive meeting recording and AI-powered analysis:
 
 - **Audio Recording**: Professional recording with microphone permission management
-- **Live Transcription**: Real-time transcript display (ready for API integration)
+- **Device Selection**: Choose microphone and speaker with test functionality
+- **Language Selection**: Support for 15+ recognition languages
+- **Live Transcription**: Real-time transcript display using Web Speech API
 - **Speaker Identification** (Prompt API): Automatic speaker detection and labeling
 - **Executive Summaries** (Summarizer API): AI-generated meeting overviews
 - **Action Item Extraction** (Prompt API): Automatic task identification with owner assignment
@@ -29,16 +40,19 @@ Comprehensive meeting transcription and analysis:
 - **Follow-up Email Generation** (Writer API): Professional email drafts with meeting summary
 - **Language Detection** (Language Detector API): Automatic meeting language identification
 - **Transcript Translation** (Translator API): Translate entire transcripts to other languages
-- **Export Options**: Save transcripts and analysis as text files
+- **Export Options**: Save trripts and alysis as text fi
 
-### 🔒 Privacy-First Architecture
-- **Local Processing**: All AI processing happens locally using Chrome's built-in AI APIs (Gemini Nano)
-- **No External Servers**: Your data never leaves your device
+### 🎨 Modernponents
+- **Icon Syonsistent Son library wcons
+- **Reu Components**: Buttonsrds, toggles, t context menus
+## Requirent Branding**: Beautifmentsadient effectsimary UI elements
+- **Rve Designd for sidepanel and rfaces
+
+### 🔒y-First Architecture
+ocal Processing*All AI processis locally using Chromet-in Aemini Nano)
+- *xternal Server*: Your data never leaves your device
 - **Encrypted Storage**: Local data is encrypted and stored securely
 - **Transparent Privacy**: Clear indicators showing local processing status on all screens
-
-## Requirements
-
 ### System Requirements
 - **Chrome Version**: 138+ (stable)
 - **Operating System**: Windows 10+, macOS 13+, Linux, or ChromeOS (Chromebook Plus)
@@ -47,8 +61,8 @@ Comprehensive meeting transcription and analysis:
 - **Network**: Unmetered connection for initial model download
 
 ### Chrome AI APIs
-IntelliPen leverages all 7 Chrome built-in AI APIs:
-- ✅ **Prompt API** (Gemini Nano) - General AI interactions, action items, decisions
+IntelliPen leverages Chrome's built-in AI APIs:
+- ✅ **Prompt API** (LanguageModel) - General AI interactions, action items, decisions
 - ✅ **Proofreader API** - Grammar, spelling, and punctuation correction
 - ✅ **Writer API** - Content generation and writing improvement
 - ✅ **Rewriter API** - Tone adjustment and style transformation
@@ -56,19 +70,9 @@ IntelliPen leverages all 7 Chrome built-in AI APIs:
 - ✅ **Translator API** - Multi-language translation
 - ✅ **Language Detector API** - Automatic language detection
 
-> **⚠️ APIs Currently Unavailable?** If Chrome AI APIs show as unavailable, see the [Chrome AI Setup Guide](CHROME_AI_SETUP.md) for step-by-step fix instructions.
+> **Note:** API availability is checked automatically on extension load. The popup shows real-time status for each API.
 
 ## Installation
-
-### Quick Fix for Chrome AI APIs
-If Chrome AI APIs are showing as unavailable:
-
-1. **Run Diagnostic**: Open `chrome-ai-diagnostic.html` in Chrome
-2. **Enable Flags**: Go to `chrome://flags/` and enable AI API flags
-3. **Restart Chrome**: Completely restart Chrome after enabling flags
-4. **Download Models**: APIs will trigger Gemini Nano download on first use
-
-See [CHROME_AI_SETUP.md](CHROME_AI_SETUP.md) for detailed instructions.
 
 ### Development Installation
 1. Clone this repository:
@@ -87,11 +91,7 @@ See [CHROME_AI_SETUP.md](CHROME_AI_SETUP.md) for detailed instructions.
    npm run build
    ```
 
-4. **Fix Chrome AI APIs** (if needed):
-   - Open `chrome-ai-diagnostic.html` in Chrome
-   - Follow the setup instructions in [CHROME_AI_SETUP.md](CHROME_AI_SETUP.md)
-
-5. Load the extension in Chrome:
+4. Load the extension in Chrome:
    - Open Chrome and navigate to `chrome://extensions/`
    - Enable "Developer mode" in the top right
    - Click "Load unpacked" and select the `dist` folder
@@ -101,38 +101,37 @@ IntelliPen will be available on the Chrome Web Store once development is complet
 
 ## Usage
 
-### 🔧 Fixing "Active Fields: 0" Issue
+### Opening IntelliPen
+1. **Click Extension Icon**: Opens the sidepanel with dual-screen interface
+2. **Right-click Menu**: Select text on any webpage and choose "Edit with IntelliPen" or "Translate with IntelliPen"
+3. **Popup Menu**: Click the extension icon to see API status and quick actions
 
-If you see "Active Fields: 0" and "Suggestions: 0", the text field detection isn't working. Here's how to fix it:
+### IntelliPen Editor
+1. **Start Writing**: Type or paste text into the editor
+2. **Grammar Check**: Click the grammar button to check for errors
+3. **Improve Writing**: Get AI-powered suggestions for clarity and conciseness
+4. **Change Tone**: Select from formal, casual, professional, or friendly tones
+5. **Document Management**: Save, open, and auto-save your documents
+6. **Real-time Stats**: Monitor word count, character count, and reading time
 
-#### Quick Fix
-1. **Open test page**: Load `test-text-field-detection.html` in Chrome
-2. **Load enhanced integration**: Click "🚀 Load Enhanced Integration"
-3. **Check status panel**: Look for IntelliPen status in top-right corner
-4. **Test fields**: Click "🧪 Test All Fields" to generate sample suggestions
+### Translator
+1. **Select Languages**: Choose source (or auto-detect) and target languages
+2. **Enter Text**: Type or paste text to translate (up to 5000 characters)
+3. **Auto-translate**: Translation happens automatically as you type
+4. **Listen**: Click speaker icons to hear text-to-speech
+5. **Quick Translate**: Right-click selected text on any webpage and choose "Translate with IntelliPen" for instant translation overlay
+6. **Save Settings**: Language preferences are saved automatically
 
-#### Manual Fix
-1. **Load the fix script**: Include `fix-text-field-detection.js` in your page
-2. **Check console**: Look for IntelliPen initialization messages
-3. **Use keyboard shortcuts**: Press `Ctrl+Shift+I` to open suggestion menu
-
-### Writing Intelligence
-1. **Automatic Activation**: IntelliPen automatically detects text fields on any website
-2. **Real-time Suggestions**: See grammar and style suggestions as you type
-3. **Visual Indicators**: Color-coded highlights show different types of improvements
-4. **One-click Application**: Click suggestions to apply improvements instantly
-5. **Status Panel**: Monitor active fields and suggestions in real-time
-
-### Meeting Intelligence
-1. **Start Recording**: Click the record button in the sidepanel or popup
-2. **Live Transcript**: View real-time transcription with speaker identification
-3. **Automatic Analysis**: Get executive summaries and action items when recording stops
-4. **Export Options**: Save transcripts and analysis in multiple formats
-
-### Privacy Controls
-- **Status Indicators**: Always see when local processing is active
-- **Data Management**: One-click data deletion and export options
-- **Encryption Settings**: Configure local data encryption preferences
+### Meeting Dashboard
+1. **Grant Permissions**: Allow microphone access when prompted
+2. **Select Devices**: Choose your microphone and speaker from dropdowns
+3. **Test Audio**: Use test buttons to verify device functionality
+4. **Choose Language**: Select recognition language (15+ languages supported)
+5. **Start Recording**: Click the record button to begin
+6. **Live Transcript**: View real-time transcription with timestamps
+7. **Stop Recording**: Click stop to end recording and trigger AI analysis
+8. **Review Analysis**: Get executive summary, action items, key decisions, and follow-up email
+9. **Export**: Save transcript and analysis as text files
 
 ## Development
 
@@ -160,61 +159,97 @@ intellipen/
 │   │   └── EditorAIFeatures.js # Editor AI features
 │   └── meeting/
 │       └── MeetingAIFeatures.js # Meeting AI features
-├── styles/                    # Shared CSS for overlays
-│   └── overlay.css
-├── images/                    # Extension icons
+├── styles/                    # Source SVG icon
+│   ├── icon16.png             # 16x16 toolbar icon
+│   ├── icon32.png             # 32x32 Windows icon
+│   ├── icon48.png             # 48x48 management icon
+│   └── icon128.png            # 128x128 store icon
+├── scripts/                   # Build and utility scripts
+│   └── generate-icons.js      # PNG icon generation
+├── docs/                      # Documentation
+│   ├── icon-showcase.html     # Interactive icon showcase
+│   └── ICON_SYSTEM.md         # Design system docs
+└── dist/                      # Build output (generated)
+```
+
+### Design System
+IntelliPen features a comprehensive, consistent design system:
+
+- **🎭 Brandn Tokens* C Unified sizinolorpacing, as***🎨 Iconstem
+all icons and cs.con.svg`, r
+```bash
+npm run geneons
+```
+**Gens**: After editing
+
+### Buinds
+*ee [Design System D*View th Lia](docs/ICON_SYSdient ) for complete(#tem**: Open `667brary**showcase.html` to:764ba2) throughout
+- 20+ custom SVG icons│   └── osistent styland more
+iverlay.css
+├ **🧩 UI Comp── images/               s, menus, cards,      # Extension icons
 └── dist/                      # Build output (generated)
 ```
 
 ### Build Commands
 ```bash
-# Development build
-npm run dev
-
 # Production build
 npm run build
 
 # Watch mode for development
 npm run build:watch
 
+# Development build
+npm run dev
+
 # Clean build directory
 npm run clean
 
-# Run linting
-npm run lint
-
-# Run tests
-npm run test
+# Generate icons from SVG
+npm run generate-icons
 ```
 
 ### Chrome AI API Integration
-IntelliPen uses Chrome's built-in AI APIs for all processing:
+IntelliPen uses Chrome's built-in AI APIs through the AIAPIManager:
 
 ```javascript
 // Example: Grammar checking with Proofreader API
-const proofreader = await chrome.ai.proofreader.create();
-const result = await proofreader.proofread(text);
+const result = await aiAPIManager.proofread(text);
 
 // Example: Meeting summarization with Summarizer API
-const summarizer = await chrome.ai.summarizer.create();
-const summary = await summarizer.summarize(transcript);
+const summary = await aiAPIManager.summarize(transcript, {
+  type: 'tldr',
+  length: 'medium'
+});
+
+// Example: Translation with Translator API
+const translated = await aiAPIManager.translate(text, 'en', 'es');
+
+// Example: Streaming responses
+await aiAPIManager.writeStreaming(prompt, options, (chunk) => {
+  console.log('Received chunk:', chunk);
+});
 ```
 
 ## Architecture
 
 ### Core Components
-- **Service Worker**: Manages extension lifecycle and API coordination
-- **Content Scripts**: Handle text field detection and platform integration
-- **Writing Intelligence Engine**: Provides real-time grammar and style analysis
-- **Meeting Intelligence System**: Manages audio processing and transcription
+- **Service Worker** (`background.js`): Manages extension lifecycle, API coordination, and context menu integration
+- **Content Scripts**: Handle Chrome AI API detection and quick translate overlay
+- **AI API Manager**: Centralized management for all Chrome built-in AI APIs with availability checking
+- **Editor AI Features**: Grammar checking, writing improvement, tone adjustment, and content generation
+- **Meeting AI Features**: Meeting analysis, speaker identification, action item extraction, and follow-up email generation
+- **UI Components**: Reusable components (buttons, badges, cards, toasts) with consistent styling
+- **Icon Library**: SVG-based icon system with 20+ icons and gradient support
 - **Privacy Manager**: Handles encryption and local data management
 
-### Platform Adapters
-- **Gmail Adapter**: Optimized integration for Gmail compose windows
-- **LinkedIn Adapter**: Enhanced support for LinkedIn posts and messages
-- **Notion Adapter**: Seamless integration with Notion pages and comments
-- **Google Docs Adapter**: Native-feeling integration with Google Docs
-- **Universal Adapter**: Fallback support for any website with text fields
+### Key Features
+- **Dual-Screen Interface**: Seamless switching between Editor, Translator, and Meeting screens
+- **Context Menu Integration**: Right-click to translate or edit selected text on any webpage
+- **Real-time API Status**: Popup shows availability status for all Chrome AI APIs
+- **Streaming Support**: Progressive rendering for long AI responses
+- **Fallback Mechanisms**: Graceful degradation when APIs are unavailable
+- **Auto-save**: Automatic content saving in editor
+- **Device Management**: Microphone and speaker selection with testing
 
 ## Contributing
 
@@ -249,39 +284,35 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Issues**: [GitHub Issues](https://github.com/intellipen/intellipen-extension/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/intellipen/intellipen-extension/discussions)
 
-## Roadmap
+## Current Status
 
-### ✅ Version 1.0 (COMPLETE)
-- ✅ Chrome extension foundation and architecture
-- ✅ Dual-screen interface (Editor + Meeting Dashboard)
-- ✅ Complete Chrome AI API integration (all 7 APIs)
-- ✅ Universal text field detection system
-- ✅ Real-time writing intelligence engine
-- ✅ Meeting intelligence and audio processing
-- ✅ Grammar checking with Proofreader API
-- ✅ Writing improvement with Writer API
-- ✅ Tone adjustment with Rewriter API
-- ✅ Text summarization with Summarizer API
-- ✅ Translation with Translator API
-- ✅ Language detection with Language Detector API
-- ✅ Meeting analysis with Prompt API
-- ✅ Action item extraction
-- ✅ Key decision identification
-- ✅ Follow-up email generation
-- ✅ Speaker identification
-- ✅ Document management and export
-- ✅ Auto-save functionality
-- ✅ Privacy-first architecture
+### ✅ Implemented Features
+- ✅ Chrome extension foundation (Manifest V3)
+- ✅ Dual-screen interface (Editor + Translator + Meeting Dashboard)
+- ✅ Complete Chrome AI API integration (7 APIs)
+- ✅ AI API Manager with availability checking
+- ✅ Editor with grammar checking, writing improvement, and tone adjustment
+- ✅ Dedicated translator with 25+ languages and auto-detection
+- ✅ Meeting recording with device selection and language support
+- ✅ Meeting analysis (summaries, action items, decisions, follow-up emails)
+- ✅ Context menu integration for quick translate and edit
+- ✅ Icon system with 20+ SVG icons and gradient support
+- ✅ Reusable UI components library
+- ✅ Document management with auto-save
+- ✅ Real-time stats (word count, character count, reading time)
+- ✅ Export functionality for documents, translations, and transcripts
+- ✅ Privacy-first architecture with local processing
+- ✅ Streaming support for progressive AI responses
+- ✅ Fallback mechanisms for unavailable APIs
 
-### Future Enhancements
-- Real-time audio transcription API integration
-- Multi-modal support (images, video)
-- Collaborative editing features
+### 🚧 Future Enhancements
+- Universal text field detection for inline writing assistance
+- Real-time grammar overlay on web pages
+- Platform-specific adapters (Gmail, LinkedIn, Notion, Google Docs)
 - Advanced speaker diarization
 - Meeting templates and presets
-- Custom AI model fine-tuning
+- Collaborative editing features
 - Cloud sync (optional, privacy-preserving)
-- Mobile support
 - Advanced analytics dashboard
 
 ## Acknowledgments

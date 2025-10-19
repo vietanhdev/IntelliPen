@@ -129,9 +129,9 @@ class IntelliPenExtension {
     }
   }
 
-  createContextMenus() {
+  async createContextMenus() {
     // Remove existing menus first
-    chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.removeAll(async () => {
       // Primary actions - Edit and Translate
       chrome.contextMenus.create({
         id: 'intellipen-edit',
@@ -145,74 +145,42 @@ class IntelliPenExtension {
         contexts: ['selection']
       });
 
-      // Separator
-      chrome.contextMenus.create({
-        id: 'intellipen-separator1',
-        type: 'separator',
-        contexts: ['selection', 'editable']
-      });
-
-      // Quick actions submenu
-      chrome.contextMenus.create({
-        id: 'intellipen-check-grammar',
-        title: '🖋️ Check Grammar & Style',
-        contexts: ['selection', 'editable']
-      });
-
-      chrome.contextMenus.create({
-        id: 'intellipen-improve-writing',
-        title: '✨ Improve Writing',
-        contexts: ['selection', 'editable']
-      });
-
-      chrome.contextMenus.create({
-        id: 'intellipen-summarize',
-        title: '📄 Summarize Text',
-        contexts: ['selection']
-      });
-
-      // Separator
-      chrome.contextMenus.create({
-        id: 'intellipen-separator2',
-        type: 'separator',
-        contexts: ['selection', 'editable']
-      });
-
-      // Tone options
-      chrome.contextMenus.create({
-        id: 'intellipen-tone-formal',
-        title: '📝 Make More Formal',
-        contexts: ['selection', 'editable']
-      });
-
-      chrome.contextMenus.create({
-        id: 'intellipen-tone-casual',
-        title: '� Make Mrore Casual',
-        contexts: ['selection', 'editable']
-      });
-
-      chrome.contextMenus.create({
-        id: 'intellipen-tone-professional',
-        title: '💼 Make Professional',
-        contexts: ['selection', 'editable']
-      });
-
-      // Separator
-      chrome.contextMenus.create({
-        id: 'intellipen-separator3',
-        type: 'separator',
-        contexts: ['selection', 'editable']
-      });
-
-      // Settings
-      chrome.contextMenus.create({
-        id: 'intellipen-show-overlay',
-        title: '👁️ Show Writing Overlay',
-        contexts: ['editable']
-      });
-
       console.log('IntelliPen: Context menus created');
     });
+  }
+
+  getLanguageName(code) {
+    const languages = {
+      'auto': 'Auto-detect',
+      'en': 'English',
+      'es': 'Spanish',
+      'fr': 'French',
+      'de': 'German',
+      'it': 'Italian',
+      'pt': 'Portuguese',
+      'ru': 'Russian',
+      'ja': 'Japanese',
+      'ko': 'Korean',
+      'zh': 'Chinese',
+      'ar': 'Arabic',
+      'hi': 'Hindi',
+      'vi': 'Vietnamese',
+      'th': 'Thai',
+      'nl': 'Dutch',
+      'pl': 'Polish',
+      'tr': 'Turkish',
+      'sv': 'Swedish',
+      'da': 'Danish',
+      'no': 'Norwegian',
+      'fi': 'Finnish',
+      'cs': 'Czech',
+      'hu': 'Hungarian',
+      'ro': 'Romanian',
+      'uk': 'Ukrainian',
+      'id': 'Indonesian',
+      'ms': 'Malay'
+    };
+    return languages[code] || code;
   }
 
   async handleContextMenuClick(info, tab) {
@@ -225,35 +193,7 @@ class IntelliPenExtension {
           break;
 
         case 'intellipen-translate':
-          await this.handleTranslateWithIntelliPen(info, tab);
-          break;
-
-        case 'intellipen-check-grammar':
-          await this.handleGrammarCheck(info, tab);
-          break;
-
-        case 'intellipen-improve-writing':
-          await this.handleImproveWriting(info, tab);
-          break;
-
-        case 'intellipen-tone-formal':
-          await this.handleRewriteTone(info, tab, 'formal');
-          break;
-
-        case 'intellipen-tone-casual':
-          await this.handleRewriteTone(info, tab, 'casual');
-          break;
-
-        case 'intellipen-tone-professional':
-          await this.handleRewriteTone(info, tab, 'professional');
-          break;
-
-        case 'intellipen-summarize':
-          await this.handleSummarize(info, tab);
-          break;
-
-        case 'intellipen-show-overlay':
-          await this.handleShowOverlay(info, tab);
+          await this.handleQuickTranslate(info, tab);
           break;
 
         default:
@@ -263,81 +203,6 @@ class IntelliPenExtension {
       console.error('IntelliPen: Error handling context menu click:', error);
       this.showErrorNotification('Failed to process request');
     }
-  }
-
-  async handleGrammarCheck(info, tab) {
-    const selectedText = info.selectionText || '';
-
-    if (!selectedText.trim()) {
-      this.showErrorNotification('Please select some text to check');
-      return;
-    }
-
-    // Send message to content script to show grammar suggestions
-    await chrome.tabs.sendMessage(tab.id, {
-      type: 'SHOW_GRAMMAR_OVERLAY',
-      data: {
-        text: selectedText,
-        action: 'grammar-check',
-        position: { x: info.pageX || 100, y: info.pageY || 100 }
-      }
-    });
-  }
-
-  async handleImproveWriting(info, tab) {
-    const selectedText = info.selectionText || '';
-
-    if (!selectedText.trim()) {
-      this.showErrorNotification('Please select some text to improve');
-      return;
-    }
-
-    // Send message to content script to show writing suggestions
-    await chrome.tabs.sendMessage(tab.id, {
-      type: 'SHOW_WRITING_SUGGESTIONS',
-      data: {
-        text: selectedText,
-        action: 'improve-writing',
-        position: { x: info.pageX || 100, y: info.pageY || 100 }
-      }
-    });
-  }
-
-  async handleRewriteTone(info, tab, tone) {
-    const selectedText = info.selectionText || '';
-
-    if (!selectedText.trim()) {
-      this.showErrorNotification('Please select some text to rewrite');
-      return;
-    }
-
-    // Send message to content script to rewrite with specific tone
-    await chrome.tabs.sendMessage(tab.id, {
-      type: 'REWRITE_WITH_TONE',
-      data: {
-        text: selectedText,
-        tone: tone,
-        position: { x: info.pageX || 100, y: info.pageY || 100 }
-      }
-    });
-  }
-
-  async handleSummarize(info, tab) {
-    const selectedText = info.selectionText || '';
-
-    if (!selectedText.trim()) {
-      this.showErrorNotification('Please select some text to summarize');
-      return;
-    }
-
-    // Send message to content script to show summary
-    await chrome.tabs.sendMessage(tab.id, {
-      type: 'SHOW_SUMMARY',
-      data: {
-        text: selectedText,
-        position: { x: info.pageX || 100, y: info.pageY || 100 }
-      }
-    });
   }
 
   async handleEditWithIntelliPen(info, tab) {
@@ -353,7 +218,7 @@ class IntelliPenExtension {
       await chrome.sidePanel.open({ tabId: tab.id });
 
       // Wait a moment for sidebar to load
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Send selected text to sidebar editor
       await chrome.runtime.sendMessage({
@@ -371,7 +236,7 @@ class IntelliPenExtension {
     }
   }
 
-  async handleTranslateWithIntelliPen(info, tab) {
+  async handleQuickTranslate(info, tab) {
     const selectedText = info.selectionText || '';
 
     if (!selectedText.trim()) {
@@ -384,7 +249,7 @@ class IntelliPenExtension {
       await chrome.sidePanel.open({ tabId: tab.id });
 
       // Wait a moment for sidebar to load
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Send selected text to sidebar translator
       await chrome.runtime.sendMessage({
@@ -402,15 +267,7 @@ class IntelliPenExtension {
     }
   }
 
-  async handleShowOverlay(_info, tab) {
-    // Send message to content script to show overlay for current element
-    await chrome.tabs.sendMessage(tab.id, {
-      type: 'SHOW_WRITING_OVERLAY',
-      data: {
-        action: 'show-overlay'
-      }
-    });
-  }
+
 
   async handleActionClick(tab) {
     console.log('IntelliPen: Extension icon clicked');
@@ -551,6 +408,8 @@ class IntelliPenExtension {
           sendResponse({ success: true });
           break;
 
+
+
         default:
           console.warn('IntelliPen: Unknown message type:', message.type);
           sendResponse({ success: false, error: 'Unknown message type' });
@@ -580,7 +439,7 @@ class IntelliPenExtension {
         // Inject content scripts
         await chrome.scripting.executeScript({
           target: { tabId },
-          files: ['content-scripts/universal-integration.js']
+          files: ['content-scripts/content-script.js']
         });
 
         console.log(`IntelliPen: Content scripts injected into tab ${tabId}`);

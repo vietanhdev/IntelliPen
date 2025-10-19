@@ -1,0 +1,187 @@
+/**
+ * IntelliPen Icon Styles
+ * Consistent styling for all icons across the extension
+ * 
+ * Design System:
+ * - All icons use currentColor for dynamic theming
+ * - Standard sizes: xs(14px), sm(16px), md(20px), lg(24px), xl(32px)
+ * - Consistent stroke-width: 2px (primary), 1.5px (secondary)
+ * - Smooth edges: stroke-linecap and stroke-linejoin set to round
+ */
+
+:root {
+  --icon-check-color: #ffffff;
+  --icon-primary: #667eea;
+  --icon-secondary: #764ba2;
+  --icon-success: #10b981;
+  --icon-warning: #f59e0b;
+  --icon-error: #ef4444;
+  --icon-muted: #6b7280;
+}
+
+.intellipen-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+  line-height: 1;
+}
+
+.intellipen-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Icon sizes */
+.intellipen-icon-xs {
+  width: 14px;
+  height: 14px;
+}
+
+.intellipen-icon-sm {
+  width: 16px;
+  height: 16px;
+}
+
+.intellipen-icon-md {
+  width: 20px;
+  height: 20px;
+}
+
+.intellipen-icon-lg {
+  width: 24px;
+  height: 24px;
+}
+
+.intellipen-icon-xl {
+  width: 32px;
+  height: 32px;
+}
+
+/* Icon colors - using CSS variables for consistency */
+.intellipen-icon-primary {
+  color: var(--icon-primary);
+}
+
+.intellipen-icon-secondary {
+  color: var(--icon-secondary);
+}
+
+.intellipen-icon-success {
+  color: var(--icon-success);
+}
+
+.intellipen-icon-warning {
+  color: var(--icon-warning);
+}
+
+.intellipen-icon-error {
+  color: var(--icon-error);
+}
+
+.intellipen-icon-muted {
+  color: var(--icon-muted);
+}
+
+/* Interactive icons */
+.intellipen-icon-button {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.intellipen-icon-button:hover {
+  background: color-mix(in srgb, var(--icon-primary) 10%, transparent);
+  color: var(--icon-primary);
+  transform: scale(1.05);
+}
+
+.intellipen-icon-button:active {
+  transform: scale(0.95);
+  transition-duration: 0.1s;
+}
+
+.intellipen-icon-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.intellipen-icon-button:disabled:hover {
+  background: transparent;
+  color: inherit;
+  transform: none;
+}
+
+/* Animated icons */
+.intellipen-icon-spin {
+  animation: intellipen-icon-spin 1s linear infinite;
+}
+
+@keyframes intellipen-icon-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.intellipen-icon-pulse {
+  animation: intellipen-icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes intellipen-icon-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Icon with badge */
+.intellipen-icon-badge {
+  position: relative;
+}
+
+.intellipen-icon-badge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+/* Menu icons */
+.intellipen-menu-icon {
+  margin-right: 8px;
+  color: var(--icon-muted);
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.intellipen-menu-item:hover .intellipen-menu-icon {
+  color: var(--icon-primary);
+}
+
+/* Gradient icons */
+.intellipen-icon-gradient {
+  background: linear-gradient(135deg, var(--icon-primary) 0%, var(--icon-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Ensure gradient works in all browsers */
+@supports not (background-clip: text) {
+  .intellipen-icon-gradient {
+    color: var(--icon-primary);
+  }
+}

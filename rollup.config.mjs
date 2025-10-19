@@ -40,10 +40,11 @@ export default [
           { src: 'src/ai-apis', dest: 'dist/src' },
           { src: 'src/editor', dest: 'dist/src' },
           { src: 'src/meeting', dest: 'dist/src' },
+          { src: 'src/icons', dest: 'dist/src' },
+          { src: 'src/components', dest: 'dist/src' },
           
-          // Copy content scripts and platform adapters
-          { src: 'content-scripts/grammar-overlay.js', dest: 'dist/content-scripts' },
-          { src: 'content-scripts/platform-adapters', dest: 'dist/content-scripts' },
+          // Copy quick translate overlay
+          { src: 'content-scripts/quick-translate.js', dest: 'dist/content-scripts' },
           
           // Copy images (when they exist)
           { src: 'images', dest: 'dist', copyOnce: true },
@@ -75,49 +76,13 @@ export default [
       warn(warning);
     }
   },
-  // Content scripts - IIFE format (content scripts can't use ES modules)
+  // Content script - IIFE format (content scripts can't use ES modules)
   {
-    input: 'content-scripts/universal-integration.js',
+    input: 'content-scripts/content-script.js',
     output: {
-      file: 'dist/content-scripts/universal-integration.js',
+      file: 'dist/content-scripts/content-script.js',
       format: 'iife',
-      name: 'IntelliPenUniversalIntegration'
-    },
-    plugins: [
-      nodeResolve({
-        browser: true,
-        preferBuiltins: false
-      }),
-      commonjs(),
-      // Only minify in production
-      isProduction && terser({
-        format: {
-          comments: false
-        },
-        compress: {
-          drop_console: true,
-          drop_debugger: true
-        }
-      })
-    ].filter(Boolean),
-    external: [
-      // Chrome extension APIs are external
-      'chrome'
-    ],
-    onwarn(warning, warn) {
-      // Suppress certain warnings
-      if (warning.code === 'THIS_IS_UNDEFINED') return;
-      if (warning.code === 'CIRCULAR_DEPENDENCY') return;
-      warn(warning);
-    }
-  },
-  // Grammar overlay - IIFE format
-  {
-    input: 'content-scripts/grammar-overlay.js',
-    output: {
-      file: 'dist/content-scripts/grammar-overlay.js',
-      format: 'iife',
-      name: 'IntelliPenGrammarOverlay'
+      name: 'IntelliPenContentScript'
     },
     plugins: [
       nodeResolve({

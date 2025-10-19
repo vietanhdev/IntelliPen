@@ -27,10 +27,10 @@
         "<all_urls>"
       ],
       "js": [
-        "content-scripts/universal-integration.js"
+        "content-scripts/content-script.js"
       ],
       "run_at": "document_idle",
-      "all_frames": true
+      "all_frames": false
     }
   ],
   "side_panel": {
@@ -55,14 +55,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "content-scripts/grammar-overlay.js",
-        "content-scripts/meeting-interface.js",
-        "content-scripts/platform-adapters/AdapterLoader.js",
-        "content-scripts/platform-adapters/GmailAdapter.js",
-        "content-scripts/platform-adapters/LinkedInAdapter.js",
-        "content-scripts/platform-adapters/NotionAdapter.js",
-        "content-scripts/platform-adapters/GoogleDocsAdapter.js",
-        "content-scripts/platform-adapters/UniversalAdapter.js",
+        "content-scripts/quick-translate.js",
         "styles/overlay.css"
       ],
       "matches": [

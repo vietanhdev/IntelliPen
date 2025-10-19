@@ -1,53 +1,107 @@
 # Project Structure
 
-## Root Directory
-- **.kiro/specs/intellipen/**: IntelliPen feature specification with requirements, design, and implementation tasks
-- **chrome_ai_docs/**: Reference documentation for Chrome's built-in AI APIs (for development guidance)
-- **examples/**: Reference Chrome extension examples demonstrating AI capabilities (for implementation patterns)
-- **docs/**: Additional project documentation
-
 ## IntelliPen Extension Structure
-The main IntelliPen extension follows Chrome Extension Manifest V3 standards:
+The IntelliPen extension follows Chrome Extension Manifest V3 standards with a focus on local AI processing.
 
 ### Core Files
-- **manifest.json**: Extension configuration with Chrome AI API permissions
-- **background.js**: Service worker handling extension lifecycle, API coordination, and cross-tab synchronization
-- **package.json**: Build configuration and dependencies
-- **rollup.config.mjs**: Build system configuration
+- **manifest.json**: Extension configuration with Chrome AI API trial tokens and permissions
+- **background.js**: Service worker handling extension lifecycle, API coordination, context menu integration
+- **package.json**: Build configuration and dependencies (Rollup, DOMPurify)
+- **rollup.config.mjs**: Build system configuration for bundling
 
 ### Content Scripts (`content-scripts/`)
-- **universal-integration.js**: Main content script for text field detection across all websites
-- **grammar-overlay.js**: Real-time writing assistance overlay system
-- **meeting-interface.js**: Meeting transcription UI management
-- **platform-adapters/**: Platform-specific integration adapters (Gmail, LinkedIn, Notion, Google Docs)
+- **content-script.js**: Main content script for Chrome AI API detection and availability checking
+- **quick-translate.js**: Quick translate overlay for right-click translation on any webpage
 
 ### User Interface Components
-- **popup/**: Quick access controls and status indicators
-  - `index.html`, `index.js`, `index.css`
-- **sidepanel/**: Primary meeting interface and transcript display
-  - `index.html`, `index.js`, `index.css`
-- **options/**: Advanced settings and privacy controls
-  - `index.html`, `index.js`, `index.css`
+
+#### Popup (`popup/`)
+- **menu.html**: Main popup menu with API status and quick actions
+- **menu.js**: Popup logic for opening sidepanel and checking API availability
+- **menu.css**: Popup styles with gradient branding
+- **index.html**: Alternative popup view
+- **index.js**: Alternative popup logic with icon integration
+- **index.css**: Alternative popup styles
+
+#### Sidepanel (`sidepanel/`)
+- **index.html**: Dual-screen interface (Editor + Translator + Meeting Dashboard)
+- **index.js**: Sidepanel logic with screen switching, AI features, and device management
+- **index.css**: Sidepanel styles with modern UI components
 
 ### Core Modules (`src/`)
-- **writing-intelligence/**: Writing analysis and suggestion engine
-- **meeting-intelligence/**: Audio processing and meeting analysis
-- **privacy-manager/**: Encryption and local data management
-- **api-manager/**: Chrome AI API integration and availability checking
-- **platform-adapters/**: Website-specific integration logic
+
+#### AI APIs (`src/ai-apis/`)
+- **AIAPIManager.js**: Centralized management for all Chrome built-in AI APIs with availability checking, session management, and streaming support
+
+#### API Manager (`src/api-manager/`)
+- **index.js**: Main API manager exports
+- **APIAvailabilityManager.js**: API availability checking and monitoring
+- **SessionManager.js**: Session lifecycle management
+- **ErrorRecoveryManager.js**: Error handling and recovery strategies
+
+#### Components (`src/components/`)
+- **ui-components.js**: Reusable UI components (buttons, badges, cards, toggles, toasts, context menus)
+
+#### Icons (`src/icons/`)
+- **icon-library.js**: SVG icon library with 20+ icons (pen, sparkle, grammar, rewrite, translate, etc.)
+- **README.md**: Icon system documentation
+
+#### Editor (`src/editor/`)
+- **EditorAIFeatures.js**: Grammar checking, writing improvement, tone adjustment, summarization, translation, content generation
+
+#### Meeting (`src/meeting/`)
+- **MeetingAIFeatures.js**: Meeting analysis, speaker identification, action item extraction, key decision identification, follow-up email generation
+
+#### Privacy Manager (`src/privacy-manager/`)
+- **index.js**: Privacy manager exports
+- **PrivacyManager.js**: Encryption and local data management
+- **PrivacyIndicatorUI.js**: Privacy status indicators
+
+#### Writing Intelligence (`src/writing-intelligence/`)
+- **index.js**: Writing intelligence exports
+- **WritingIntelligenceEngine.js**: Core writing analysis engine
+- **TextAnalysisPipeline.js**: Text analysis pipeline
+- **ContextAnalyzer.js**: Context-aware analysis
+- **SuggestionApplicationManager.js**: Suggestion application logic
+- **UserPreferenceLearning.js**: User preference learning
 
 ### Assets
-- **images/**: Extension icons (16, 32, 48, 128px)
-- **styles/**: Shared CSS for overlays and UI components
-- **dist/**: Build output directory (generated)
 
-## Reference Resources
-- **chrome_ai_docs/**: Documentation for Chrome AI APIs (Prompt, Proofreader, Writer, Rewriter, Summarizer, Translator)
-- **examples/**: Reference implementations showing AI API usage patterns in Chrome extensions
+#### Images (`images/`)
+- **icon.svg**: Source SVG icon
+- **icon16.png**, **icon32.png**, **icon48.png**, **icon128.png**: Generated PNG icons
 
-## Extension Conventions
+#### Styles (`styles/`)
+- **components.css**: Component styles with gradient support
+- **icons.css**: Icon styles with animations (spin, pulse, gradient)
+- **overlay.css**: Overlay styles for content scripts
+
+#### Scripts (`scripts/`)
+- **generate-icons.js**: Icon generation script using Sharp
+
+#### Documentation (`docs/`)
+- **ICON_SYSTEM.md**: Icon system documentation
+- **icon-showcase.html**: Icon showcase page
+
+### Build Output
+- **dist/**: Build output directory (generated by Rollup)
+
+## Extension Architecture
+
+### Key Features
+- **Dual-Screen Interface**: Seamless switching between Editor, Translator, and Meeting screens
+- **Context Menu Integration**: Right-click to translate or edit selected text on any webpage
+- **Real-time API Status**: Popup shows availability status for all Chrome AI APIs
+- **Streaming Support**: Progressive rendering for long AI responses
+- **Fallback Mechanisms**: Graceful degradation when APIs are unavailable
+- **Auto-save**: Automatic content saving in editor
+- **Device Management**: Microphone and speaker selection with testing
+
+### Extension Conventions
 - **Manifest V3** with service worker architecture
 - **Local-first processing** using Chrome's built-in AI APIs
 - **Privacy-by-design** with encrypted local storage
-- **Universal compatibility** across all websites
-- **Platform-specific optimizations** for major platforms (Gmail, LinkedIn, Notion, Google Docs)
+- **Modular architecture** with reusable components
+- **SVG-based icon system** with gradient support
+- **Streaming API support** for progressive responses
+- **Error handling** with fallback mechanisms

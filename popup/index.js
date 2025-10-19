@@ -3,6 +3,8 @@
  * Provides quick access controls and status indicators
  */
 
+import { createIcon, icons } from '../src/icons/icon-library.js';
+
 class IntelliPenPopup {
   constructor() {
     this.apiAvailability = {};
@@ -15,6 +17,9 @@ class IntelliPenPopup {
     console.log('IntelliPen Popup: Initializing...');
     
     try {
+      // Initialize icons
+      this.initializeIcons();
+      
       // Set up event listeners
       this.setupEventListeners();
       
@@ -32,6 +37,24 @@ class IntelliPenPopup {
       this.updateUI();
       this.isInitialized = true;
     }
+  }
+
+  initializeIcons() {
+    // Logo icon
+    const logoIcon = document.getElementById('logoIcon');
+    logoIcon.appendChild(createIcon('pen', { size: 24, className: 'intellipen-icon-gradient' }));
+
+    // Refresh icon
+    const refreshIcon = document.getElementById('refreshIcon');
+    refreshIcon.appendChild(createIcon('download', { size: 16 }));
+
+    // Side panel icon
+    const sidePanelIcon = document.getElementById('sidePanelIcon');
+    sidePanelIcon.appendChild(createIcon('pen', { size: 18 }));
+
+    // Settings icon
+    const settingsIcon = document.getElementById('settingsIcon');
+    settingsIcon.appendChild(createIcon('settings', { size: 18 }));
   }
 
   setupEventListeners() {
@@ -91,28 +114,55 @@ class IntelliPenPopup {
     apiList.innerHTML = '';
 
     const apis = [
-      { key: 'ai.languageModel', name: 'Prompt API' },
-      { key: 'ai.proofreader', name: 'Proofreader' },
-      { key: 'ai.writer', name: 'Writer' },
-      { key: 'ai.rewriter', name: 'Rewriter' },
-      { key: 'ai.summarizer', name: 'Summarizer' }
+      { key: 'ai.languageModel', name: 'Prompt API', icon: 'sparkle' },
+      { key: 'ai.proofreader', name: 'Proofreader', icon: 'grammar' },
+      { key: 'ai.writer', name: 'Writer', icon: 'pen' },
+      { key: 'ai.rewriter', name: 'Rewriter', icon: 'rewrite' },
+      { key: 'ai.summarizer', name: 'Summarizer', icon: 'summarize' }
     ];
 
     apis.forEach(api => {
       const item = document.createElement('div');
       item.className = 'api-item';
 
+      const nameWrapper = document.createElement('div');
+      nameWrapper.style.display = 'flex';
+      nameWrapper.style.alignItems = 'center';
+      nameWrapper.style.gap = '8px';
+
+      const iconEl = createIcon(api.icon, { size: 16, className: 'intellipen-icon-muted' });
+      nameWrapper.appendChild(iconEl);
+
       const name = document.createElement('span');
       name.className = 'api-name';
       name.textContent = api.name;
+      nameWrapper.appendChild(name);
+
+      const availability = this.apiAvailability[api.key] || 'checking';
+      const statusWrapper = document.createElement('div');
+      statusWrapper.style.display = 'flex';
+      statusWrapper.style.alignItems = 'center';
+      statusWrapper.style.gap = '6px';
+
+      const statusIcon = createIcon(
+        availability === 'available' ? 'check' : 
+        availability === 'checking' ? 'download' : 'warning',
+        { 
+          size: 14, 
+          className: availability === 'available' ? 'intellipen-icon-success' : 
+                     availability === 'checking' ? 'intellipen-icon-muted intellipen-icon-pulse' : 
+                     'intellipen-icon-warning'
+        }
+      );
+      statusWrapper.appendChild(statusIcon);
 
       const status = document.createElement('span');
-      const availability = this.apiAvailability[api.key] || 'checking';
       status.className = `api-status ${availability}`;
       status.textContent = availability;
+      statusWrapper.appendChild(status);
 
-      item.appendChild(name);
-      item.appendChild(status);
+      item.appendChild(nameWrapper);
+      item.appendChild(statusWrapper);
       apiList.appendChild(item);
     });
   }
@@ -141,9 +191,9 @@ class IntelliPenPopup {
 
   async refreshAPIStatus() {
     const refreshBtn = document.getElementById('refreshApis');
-    const refreshIcon = refreshBtn.querySelector('.refresh-icon');
+    const refreshIcon = refreshBtn.querySelector('.intellipen-icon');
     
-    refreshIcon.style.animation = 'spin 1s linear infinite';
+    refreshIcon.classList.add('intellipen-icon-spin');
     refreshBtn.disabled = true;
     
     try {
@@ -153,21 +203,11 @@ class IntelliPenPopup {
     } catch (error) {
       console.error('Failed to refresh API status:', error);
     } finally {
-      refreshIcon.style.animation = '';
+      refreshIcon.classList.remove('intellipen-icon-spin');
       refreshBtn.disabled = false;
     }
   }
 }
-
-// Add CSS animation for refresh button
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-`;
-document.head.appendChild(style);
 
 // Initialize popup when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

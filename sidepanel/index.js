@@ -36,7 +36,7 @@ class IntelliPenSidepanel {
     this.analyser = null;
     this.micTestStream = null;
     this.micTestInterval = null;
-    
+
     // Selected devices
     this.selectedMicrophone = null;
     this.selectedSpeaker = null;
@@ -143,10 +143,12 @@ class IntelliPenSidepanel {
     // Translator controls
     document.getElementById('sourceLanguage')?.addEventListener('change', (e) => {
       this.sourceLanguage = e.target.value;
+      this.saveTranslationLanguages();
     });
 
     document.getElementById('targetLanguage')?.addEventListener('change', (e) => {
       this.targetLanguage = e.target.value;
+      this.saveTranslationLanguages();
     });
 
     document.getElementById('swapLanguages')?.addEventListener('click', () => {
@@ -209,7 +211,7 @@ class IntelliPenSidepanel {
     document.getElementById('recognitionLanguage')?.addEventListener('change', (e) => {
       this.recognitionLanguage = e.target.value;
       console.log('Selected recognition language:', this.recognitionLanguage);
-      
+
       // If recording, restart with new language
       if (this.isRecording && this.speechRecognition) {
         this.showInfo(`Switching to ${this.getLanguageName(this.recognitionLanguage)}...`);
@@ -242,11 +244,6 @@ class IntelliPenSidepanel {
 
     document.getElementById('editEmail')?.addEventListener('click', () => {
       this.editEmailDraft();
-    });
-
-    // Minimize button
-    document.getElementById('minimizeBtn')?.addEventListener('click', () => {
-      this.minimizePanel();
     });
 
     // Permission banner buttons
@@ -675,16 +672,47 @@ class IntelliPenSidepanel {
   }
 
   async selectTone() {
-    // Simple tone selection using prompt
-    const tones = ['formal', 'casual', 'professional', 'friendly'];
-    const selection = prompt(`Select tone:\n1. Formal\n2. Casual\n3. Professional\n4. Friendly\n\nEnter number (1-4):`);
+    return new Promise((resolve) => {
+      const overlay = document.getElementById('toneModalOverlay');
+      const closeBtn = document.getElementById('closeToneModal');
+      const toneOptions = document.querySelectorAll('.tone-option');
 
-    const toneIndex = parseInt(selection) - 1;
-    if (toneIndex >= 0 && toneIndex < tones.length) {
-      return tones[toneIndex];
-    }
+      // Show modal
+      overlay.classList.remove('hidden');
 
-    return null;
+      // Handle tone selection
+      const handleToneSelect = (e) => {
+        const tone = e.currentTarget.dataset.tone;
+        cleanup();
+        resolve(tone);
+      };
+
+      // Handle close
+      const handleClose = () => {
+        cleanup();
+        resolve(null);
+      };
+
+      // Handle overlay click
+      const handleOverlayClick = (e) => {
+        if (e.target === overlay) {
+          handleClose();
+        }
+      };
+
+      // Cleanup function
+      const cleanup = () => {
+        overlay.classList.add('hidden');
+        toneOptions.forEach(btn => btn.removeEventListener('click', handleToneSelect));
+        closeBtn.removeEventListener('click', handleClose);
+        overlay.removeEventListener('click', handleOverlayClick);
+      };
+
+      // Add event listeners
+      toneOptions.forEach(btn => btn.addEventListener('click', handleToneSelect));
+      closeBtn.addEventListener('click', handleClose);
+      overlay.addEventListener('click', handleOverlayClick);
+    });
   }
 
   showSuggestionsPanel() {
@@ -768,17 +796,17 @@ class IntelliPenSidepanel {
     if (!editorArea) return;
 
     // For "Improved Version" or similar, replace entire content
-    if (suggestion.type === 'Improved Version' || 
-        suggestion.type.includes('Tone') || 
-        suggestion.type === 'Rewritten') {
+    if (suggestion.type === 'Improved Version' ||
+      suggestion.type.includes('Tone') ||
+      suggestion.type === 'Rewritten') {
       editorArea.textContent = suggestion.text;
       this.editorContent = editorArea.innerHTML;
       this.updateEditorStats();
       this.autoSaveContent();
-      
+
       // Show success feedback
       this.showSuccessFeedback('Applied successfully!');
-      
+
       // Close suggestions panel after a moment
       setTimeout(() => {
         this.hideSuggestionsPanel();
@@ -818,9 +846,9 @@ class IntelliPenSidepanel {
       animation: fadeInOut 2s ease-in-out;
     `;
     feedback.textContent = message;
-    
+
     content.appendChild(feedback);
-    
+
     setTimeout(() => {
       feedback.remove();
     }, 2000);
@@ -828,19 +856,61 @@ class IntelliPenSidepanel {
 
   // ===== Translator Methods =====
 
-  initializeTranslator() {
+  async initializeTranslator() {
     console.log('Initializing translator...');
     this.updateSourceCharCount();
+    
+    // Load saved language preferences
+    await this.loadTranslationLanguages();
+  }
+
+  async loadTranslationLanguages() {
+    try {
+      const settings = await chrome.storage.local.get(['translationFromLang', 'translationToLang']);
+      
+      if (settings.translationFromLang) {
+        this.sourceLanguage = settings.translationFromLang;
+        const sourceSelect = document.getElementById('sourceLanguage');
+        if (sourceSelect) {
+          sourceSelect.value = this.sourceLanguage;
+        }
+      }
+      
+      if (settings.translationToLang) {
+        this.targetLanguage = settings.translationToLang;
+        const targetSelect = document.getElementById('targetLanguage');
+        if (targetSelect) {
+          targetSelect.value = this.targetLanguage;
+        }
+      }
+      
+      console.log('Loaded translation languages:', this.sourceLanguage, '→', this.targetLanguage);
+    } catch (error) {
+      console.error('Failed to load translation languages:', error);
+    }
+  }
+
+  async saveTranslationLanguages() {
+    try {
+      await chrome.storage.local.set({
+        translationFromLang: this.sourceLanguage,
+        translationToLang: this.targetLanguage
+      });
+      
+      console.log('Saved translation languages:', this.sourceLanguage, '→', this.targetLanguage);
+    } catch (error) {
+      console.error('Failed to save translation languages:', error);
+    }
   }
 
   updateSourceCharCount() {
     const sourceText = document.getElementById('sourceText');
     const charCount = document.getElementById('sourceCharCount');
-    
+
     if (sourceText && charCount) {
       const count = sourceText.value.length;
       charCount.textContent = count;
-      
+
       // Warn if approaching limit
       if (count > 4500) {
         charCount.style.color = '#ef4444';
@@ -867,7 +937,7 @@ class IntelliPenSidepanel {
     const sourceText = document.getElementById('sourceText');
     const targetText = document.getElementById('targetText');
     const translationStatus = document.getElementById('translationStatus');
-    
+
     if (!sourceText || !targetText) return;
 
     const text = sourceText.value.trim();
@@ -906,7 +976,7 @@ class IntelliPenSidepanel {
             if (detection) {
               sourceLanguage = detection.language;
               this.detectedLanguage = sourceLanguage;
-              document.getElementById('detectedLanguage').textContent = 
+              document.getElementById('detectedLanguage').textContent =
                 `Detected: ${this.getLanguageName(sourceLanguage)}`;
             }
           } catch (detectionError) {
@@ -925,19 +995,19 @@ class IntelliPenSidepanel {
       this.currentTranslation = translated;
       targetText.textContent = translated;
       translationStatus.textContent = '✓ Translated';
-      
+
       // Clear status after 2 seconds
       setTimeout(() => {
         translationStatus.textContent = '';
       }, 2000);
-      
+
     } catch (error) {
       console.error('Translation failed:', error);
-      
+
       // Show user-friendly error message
       let errorMessage = error.message;
       let helpText = '';
-      
+
       if (error.message === 'TRANSLATOR_NOT_AVAILABLE' || error.message.includes('Translator API not available')) {
         errorMessage = 'Translator API not available';
         helpText = `
@@ -953,7 +1023,7 @@ class IntelliPenSidepanel {
           </div>
         `;
       }
-      
+
       targetText.innerHTML = `
         <div style="padding: 20px; text-align: center;">
           <p style="color: #ef4444; font-size: 16px; margin-bottom: 8px;">❌ Translation failed</p>
@@ -989,11 +1059,11 @@ class IntelliPenSidepanel {
     // Swap text content
     const sourceText = document.getElementById('sourceText');
     const targetText = document.getElementById('targetText');
-    
+
     if (sourceText && targetText) {
       const tempText = sourceText.value;
       sourceText.value = this.currentTranslation;
-      
+
       // Trigger translation
       this.updateSourceCharCount();
       this.translateText();
@@ -1004,12 +1074,12 @@ class IntelliPenSidepanel {
     const sourceText = document.getElementById('sourceText');
     const targetText = document.getElementById('targetText');
     const detectedLanguage = document.getElementById('detectedLanguage');
-    
+
     if (sourceText) {
       sourceText.value = '';
       this.updateSourceCharCount();
     }
-    
+
     if (targetText) {
       targetText.innerHTML = `
         <div class="translation-placeholder">
@@ -1018,11 +1088,11 @@ class IntelliPenSidepanel {
         </div>
       `;
     }
-    
+
     if (detectedLanguage) {
       detectedLanguage.textContent = '';
     }
-    
+
     this.currentTranslation = '';
     this.detectedLanguage = '';
   }
@@ -1030,7 +1100,7 @@ class IntelliPenSidepanel {
   async speakText(type) {
     try {
       const button = document.getElementById(type === 'source' ? 'speakSource' : 'speakTarget');
-      
+
       // Stop if already speaking
       if (this.isSpeaking) {
         this.speechSynthesis.cancel();
@@ -1042,7 +1112,7 @@ class IntelliPenSidepanel {
       // Get text to speak
       let text = '';
       let lang = '';
-      
+
       if (type === 'source') {
         const sourceText = document.getElementById('sourceText');
         text = sourceText?.value || '';
@@ -1082,7 +1152,7 @@ class IntelliPenSidepanel {
 
       // Speak
       this.speechSynthesis.speak(utterance);
-      
+
     } catch (error) {
       console.error('Text-to-speech failed:', error);
       this.showError('Text-to-speech failed: ' + error.message);
@@ -1098,13 +1168,13 @@ class IntelliPenSidepanel {
     navigator.clipboard.writeText(this.currentTranslation).then(() => {
       const button = document.getElementById('copyTranslation');
       const originalHTML = button.innerHTML;
-      
+
       // Show success feedback
       button.innerHTML = '<span>✓</span>';
       setTimeout(() => {
         button.innerHTML = originalHTML;
       }, 1000);
-      
+
       console.log('Translation copied to clipboard');
     }).catch(error => {
       console.error('Failed to copy translation:', error);
@@ -1115,14 +1185,14 @@ class IntelliPenSidepanel {
   saveTranslation() {
     const sourceText = document.getElementById('sourceText')?.value || '';
     const translation = this.currentTranslation;
-    
+
     if (!sourceText || !translation) {
       this.showError('No translation to save');
       return;
     }
 
     const content = `Source (${this.getLanguageName(this.sourceLanguage)}):\n${sourceText}\n\nTranslation (${this.getLanguageName(this.targetLanguage)}):\n${translation}`;
-    
+
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1132,7 +1202,7 @@ class IntelliPenSidepanel {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     console.log('Translation saved');
   }
 
@@ -1434,7 +1504,7 @@ class IntelliPenSidepanel {
       this.speechRecognition.interimResults = true; // Get partial results
       this.speechRecognition.maxAlternatives = 1;
       this.speechRecognition.lang = this.recognitionLanguage; // Use selected language
-      
+
       console.log('Speech recognition language set to:', this.recognitionLanguage);
 
       // Handle results
@@ -1710,11 +1780,6 @@ class IntelliPenSidepanel {
     this.showError('Email editing feature coming soon');
   }
 
-  minimizePanel() {
-    // This would minimize the panel - placeholder for now
-    console.log('Panel minimization not yet implemented');
-  }
-
   downloadFile(filename, content) {
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -1794,7 +1859,7 @@ class IntelliPenSidepanel {
     try {
       // Stop current recognition
       this.speechRecognition.stop();
-      
+
       // Wait a bit then restart with new language
       setTimeout(() => {
         if (this.isRecording) {
@@ -1824,7 +1889,7 @@ class IntelliPenSidepanel {
 
       // Get all devices
       const devices = await navigator.mediaDevices.enumerateDevices();
-      
+
       const microphones = devices.filter(device => device.kind === 'audioinput');
       const speakers = devices.filter(device => device.kind === 'audiooutput');
 
@@ -1835,7 +1900,7 @@ class IntelliPenSidepanel {
       const micSelect = document.getElementById('microphoneSelect');
       if (micSelect) {
         micSelect.innerHTML = '';
-        
+
         if (microphones.length === 0) {
           micSelect.innerHTML = '<option value="">No microphones found</option>';
         } else {
@@ -1845,7 +1910,7 @@ class IntelliPenSidepanel {
             option.textContent = device.label || `Microphone ${index + 1}`;
             micSelect.appendChild(option);
           });
-          
+
           // Select first microphone by default
           this.selectedMicrophone = microphones[0].deviceId;
         }
@@ -1855,7 +1920,7 @@ class IntelliPenSidepanel {
       const speakerSelect = document.getElementById('speakerSelect');
       if (speakerSelect) {
         speakerSelect.innerHTML = '';
-        
+
         if (speakers.length === 0) {
           speakerSelect.innerHTML = '<option value="">No speakers found</option>';
         } else {
@@ -1865,7 +1930,7 @@ class IntelliPenSidepanel {
             option.textContent = device.label || `Speaker ${index + 1}`;
             speakerSelect.appendChild(option);
           });
-          
+
           // Select first speaker by default
           this.selectedSpeaker = speakers[0].deviceId;
         }
@@ -1876,11 +1941,11 @@ class IntelliPenSidepanel {
     } catch (error) {
       console.error('Failed to enumerate audio devices:', error);
       this.showError('Failed to load audio devices. Please check permissions.');
-      
+
       // Show error in selects
       const micSelect = document.getElementById('microphoneSelect');
       const speakerSelect = document.getElementById('speakerSelect');
-      
+
       if (micSelect) {
         micSelect.innerHTML = '<option value="">Permission denied</option>';
       }
@@ -1893,25 +1958,25 @@ class IntelliPenSidepanel {
   async testMicrophone() {
     try {
       console.log('Testing microphone:', this.selectedMicrophone);
-      
+
       // Stop any existing test
       this.stopMicrophoneTest();
 
       // Get microphone stream
       const constraints = {
-        audio: this.selectedMicrophone ? 
-          { deviceId: { exact: this.selectedMicrophone } } : 
+        audio: this.selectedMicrophone ?
+          { deviceId: { exact: this.selectedMicrophone } } :
           true
       };
 
       this.micTestStream = await navigator.mediaDevices.getUserMedia(constraints);
-      
+
       // Create audio context and analyser
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
       this.analyser = this.audioContext.createAnalyser();
       const source = this.audioContext.createMediaStreamSource(this.micTestStream);
       source.connect(this.analyser);
-      
+
       this.analyser.fftSize = 256;
       const bufferLength = this.analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
@@ -1925,7 +1990,7 @@ class IntelliPenSidepanel {
       // Update mic level indicator
       this.micTestInterval = setInterval(() => {
         this.analyser.getByteFrequencyData(dataArray);
-        
+
         // Calculate average volume
         let sum = 0;
         for (let i = 0; i < bufferLength; i++) {
@@ -1937,7 +2002,7 @@ class IntelliPenSidepanel {
         // Update UI
         const micLevelFill = document.getElementById('micLevelFill');
         const micLevelText = document.getElementById('micLevelText');
-        
+
         if (micLevelFill) {
           micLevelFill.style.width = `${percentage}%`;
         }
@@ -1999,7 +2064,7 @@ class IntelliPenSidepanel {
   async testSpeaker() {
     try {
       console.log('Testing speaker:', this.selectedSpeaker);
-      
+
       // Create a test tone
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const oscillator = audioContext.createOscillator();

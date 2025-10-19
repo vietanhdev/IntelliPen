@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IntelliPen</title>
+  <link rel="stylesheet" href="../styles/icons.css">
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -11,7 +12,7 @@
     <!-- Header -->
     <header class="popup-header">
       <div class="logo">
-        <span class="logo-icon">🖋️</span>
+        <span class="logo-icon" id="logoIcon"></span>
         <h1 class="logo-text">IntelliPen</h1>
       </div>
     </header>
@@ -22,8 +23,8 @@
       <section class="api-section">
         <div class="api-header">
           <h3>Chrome AI Status</h3>
-          <button class="refresh-btn" id="refreshApis" title="Refresh API Status">
-            <span class="refresh-icon">🔄</span>
+          <button class="refresh-btn intellipen-icon-button" id="refreshApis" title="Refresh API Status">
+            <span class="refresh-icon" id="refreshIcon"></span>
           </button>
         </div>
         <div class="api-list" id="apiList">
@@ -35,16 +36,16 @@
     <!-- Footer Actions -->
     <footer class="popup-footer">
       <button class="action-btn primary" id="openSidePanel">
-        <span class="btn-icon">📝</span>
+        <span class="btn-icon" id="sidePanelIcon"></span>
         <span class="btn-text">Open IntelliPen</span>
       </button>
       <button class="action-btn secondary" id="openOptions">
-        <span class="btn-icon">⚙️</span>
+        <span class="btn-icon" id="settingsIcon"></span>
         <span class="btn-text">Settings</span>
       </button>
     </footer>
   </div>
 
-  <script src="index.js"></script>
+  <script type="module" src="index.js"></script>
 </body>
 </html>

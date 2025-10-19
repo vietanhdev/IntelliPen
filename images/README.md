@@ -6,28 +6,39 @@ This directory contains the extension icons in the required sizes for Chrome ext
 - `icon32.png` - 32x32 pixels (Windows computers often use this size)
 - `icon48.png` - 48x48 pixels (extension management page)
 - `icon128.png` - 128x128 pixels (Chrome Web Store and installation)
+- `icon.svg` - Source SVG file for all icon sizes
 
-## Icon Design Guidelines
+## Icon Design
 
-The IntelliPen icons should:
-- Use the pen/writing theme with the 🖋️ emoji as inspiration
-- Maintain consistent branding with the purple gradient theme (#667eea to #764ba2)
-- Be clearly visible at all sizes
+The IntelliPen icon features:
+- **Pen symbol** - Represents writing and editing capabilities
+- **Purple gradient** - Brand colors (#667eea to #764ba2) for the pen
+- **AI sparkles** - Golden sparkles indicating AI-powered intelligence
+- **Writing lines** - Subtle curved lines suggesting text and writing
+- **Flat design** - Modern, clean aesthetic that scales well
+
+## Regenerating Icons
+
+To regenerate PNG icons from the SVG source:
+
+```bash
+npm run generate-icons
+```
+
+This script uses the `sharp` library to convert `icon.svg` to all required PNG sizes with optimal quality.
+
+## Design Guidelines
+
+The IntelliPen icons:
+- Use flat colors for clarity at all sizes
+- Maintain consistent branding with the purple gradient theme
+- Include AI indicators (sparkles) to communicate intelligent features
 - Follow Chrome extension icon best practices
+- Ensure good contrast and readability at small sizes (16x16)
 
-## Temporary Placeholder
+## Customization
 
-For development purposes, you can create simple placeholder icons or use the emoji 🖋️ as a temporary solution until proper icons are designed.
-
-To create placeholder icons quickly:
-1. Create a 128x128 PNG with the IntelliPen logo/text
-2. Resize to create the smaller versions
-3. Ensure good contrast and readability at small sizes
-
-## Production Icons
-
-For production, consider:
-- Professional icon design
-- SVG source files for scalability
-- Multiple color variants if needed
-- Accessibility considerations (contrast, clarity)
+To modify the icon design:
+1. Edit `icon.svg` with any SVG editor
+2. Run `npm run generate-icons` to regenerate all PNG sizes
+3. Test the icons at all sizes, especially 16x16 for toolbar visibility
