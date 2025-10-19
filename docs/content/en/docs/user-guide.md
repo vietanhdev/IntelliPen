@@ -1,20 +1,12 @@
 ---
-layout: default
-title: User Guide
-nav_order: 3
+title: "User Guide"
+linkTitle: "User Guide"
+weight: 2
+description: >
+  Complete guide to using all IntelliPen features
 ---
 
-# IntelliPen User Guide
-
 Complete guide to using all IntelliPen features.
-
-## Table of Contents
-
-- [IntelliPen Editor](#intellipen-editor)
-- [Translator](#translator)
-- [Meeting Dashboard](#meeting-dashboard)
-- [Context Menu Integration](#context-menu-integration)
-- [Tips and Best Practices](#tips-and-best-practices)
 
 ## IntelliPen Editor
 
@@ -94,25 +86,6 @@ Powered by Chrome's Rewriter API:
 - Formal: "I would appreciate your assistance with this matter"
 - Casual: "Could you help me out with this?"
 
-### Content Generation
-
-Create new content with AI assistance:
-
-1. Click "Generate Content"
-2. Enter a prompt describing what you need:
-   - "Write an email requesting a meeting"
-   - "Create a summary of quarterly results"
-   - "Draft a thank you note"
-3. AI generates content based on your prompt
-4. Edit and refine as needed
-
-### Keyboard Shortcuts
-
-- `Ctrl/Cmd + S`: Save document
-- `Ctrl/Cmd + N`: New document
-- `Ctrl/Cmd + O`: Open document
-- `Ctrl/Cmd + G`: Check grammar
-
 ## Translator
 
 Dedicated translation interface with privacy-first design.
@@ -165,33 +138,6 @@ Listen to source and translated text:
 2. Click speaker icon next to translated text
 3. Adjust volume and speed in browser settings
 4. Use for pronunciation practice
-
-### Language Swap
-
-Quickly reverse translation direction:
-
-1. Click the swap icon between language selectors
-2. Source and target languages switch
-3. Text is automatically re-translated
-4. Useful for back-translation verification
-
-### Quick Translate (Context Menu)
-
-Translate text on any webpage:
-
-1. Select text on any website
-2. Right-click and choose "Translate with IntelliPen"
-3. Translation overlay appears instantly
-4. Click outside to dismiss
-
-**Privacy Note**: Unlike cloud-based translators, your text never leaves your device.
-
-### Translation Tips
-
-- Keep sentences under 5000 characters for best results
-- Use proper punctuation for accurate translation
-- Review translations for context-specific accuracy
-- Back-translate to verify meaning preservation
 
 ## Meeting Dashboard
 
@@ -259,55 +205,6 @@ After recording stops, AI generates:
 - Ready to send or customize
 - Generated using Writer API
 
-### Exporting
-
-Save meeting data for later reference:
-
-1. **Export Transcript**:
-   - Click "Export Transcript"
-   - Saves as .txt file with timestamps
-   - Includes speaker labels (if detected)
-
-2. **Export Analysis**:
-   - Click "Export Analysis"
-   - Saves summary, action items, decisions
-   - Formatted for easy reading
-
-### Advanced Features
-
-#### Speaker Identification
-
-AI attempts to identify different speakers:
-
-- Labels speakers as "Speaker 1", "Speaker 2", etc.
-- Based on voice characteristics
-- Accuracy improves with distinct voices
-
-#### Language Detection
-
-Automatically detects meeting language:
-
-- Uses Language Detector API
-- Helps verify correct recognition language
-- Useful for multilingual meetings
-
-#### Transcript Translation
-
-Translate entire transcript to another language:
-
-1. Click "Translate Transcript"
-2. Select target language
-3. AI translates while preserving structure
-4. Export translated version
-
-### Meeting Tips
-
-- Use a quality microphone for best transcription
-- Speak clearly and avoid overlapping speech
-- Test audio before important meetings
-- Review transcript for accuracy
-- Edit action items before sharing
-
 ## Context Menu Integration
 
 Access IntelliPen features from any webpage.
@@ -365,69 +262,3 @@ Access IntelliPen features from any webpage.
 - **Clear Speech**: Speak clearly and avoid overlapping
 - **Review Transcript**: Check for accuracy after recording
 - **Edit Analysis**: Refine AI-generated action items
-
-### Privacy Tips
-
-- **Local Processing**: All AI runs on your device
-- **No Cloud Sync**: Data stays on your computer
-- **Encrypted Storage**: Local data is encrypted
-- **Clear Data**: Delete old documents and transcripts
-- **Permissions**: Only grant necessary permissions
-
-### Performance Tips
-
-- **Close Unused Tabs**: Free up system resources
-- **Sufficient Storage**: Keep 22+ GB free for AI model
-- **GPU Acceleration**: Ensure GPU is available
-- **Update Chrome**: Use latest version for best performance
-- **Restart Periodically**: Restart Chrome if performance degrades
-
-## Keyboard Shortcuts
-
-### Editor
-- `Ctrl/Cmd + S`: Save document
-- `Ctrl/Cmd + N`: New document
-- `Ctrl/Cmd + O`: Open document
-- `Ctrl/Cmd + G`: Check grammar
-
-### Global
-- `Alt + I`: Open IntelliPen sidepanel (configurable)
-- `Esc`: Close overlays and popups
-
-Configure custom shortcuts in `chrome://extensions/shortcuts`.
-
-## Troubleshooting
-
-### Common Issues
-
-**Grammar check not working**:
-- Ensure Proofreader API is available (check popup)
-- Verify text is in a supported language
-- Try with shorter text segments
-
-**Translation fails**:
-- Check character limit (5000 max)
-- Verify languages are different
-- Ensure Translator API is available
-
-**Meeting recording silent**:
-- Check microphone permissions
-- Verify correct microphone selected
-- Test microphone with test button
-- Check system audio settings
-
-**Slow performance**:
-- Close unnecessary Chrome tabs
-- Ensure sufficient free storage
-- Verify GPU is available
-- Restart Chrome
-
-### Getting Help
-
-- Check [GitHub Issues](https://github.com/vietanhdev/IntelliPen/issues)
-- Join [GitHub Discussions](https://github.com/vietanhdev/IntelliPen/discussions)
-- Review [Architecture](architecture.md) for technical details
-
----
-
-Need technical details? Check out the [Architecture Guide](architecture.md).

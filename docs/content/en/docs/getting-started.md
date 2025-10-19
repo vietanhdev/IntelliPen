@@ -1,10 +1,10 @@
 ---
-layout: default
-title: Getting Started
-nav_order: 2
+title: "Getting Started"
+linkTitle: "Getting Started"
+weight: 1
+description: >
+  Install and set up IntelliPen for the first time
 ---
-
-# Getting Started with IntelliPen
 
 This guide will help you install and set up IntelliPen for the first time.
 
@@ -33,9 +33,9 @@ Before installing IntelliPen, ensure your system meets these requirements:
 
 ## Installation
 
-### Option 1: Development Installation (Current)
+### Development Installation
 
-Since IntelliPen is currently in development, you'll need to install it as an unpacked extension:
+Since IntelliPen is currently in development, install it as an unpacked extension:
 
 1. **Clone the repository**:
    ```bash
@@ -63,10 +63,6 @@ Since IntelliPen is currently in development, you'll need to install it as an un
    - You should see the IntelliPen icon in your Chrome toolbar
    - Click the icon to open the popup menu
    - Check that API status indicators show availability
-
-### Option 2: Chrome Web Store (Coming Soon)
-
-IntelliPen will be available on the Chrome Web Store once development is complete.
 
 ## Initial Setup
 
@@ -131,37 +127,6 @@ IntelliPen has three main screens:
 
 Switch between screens using the navigation buttons at the top.
 
-## Quick Start Tutorials
-
-### Writing with IntelliPen Editor
-
-1. Click the IntelliPen icon to open the sidepanel
-2. Ensure "Editor" screen is selected
-3. Type or paste some text
-4. Click "Check Grammar" to see corrections
-5. Try "Improve Writing" for AI suggestions
-6. Use "Change Tone" to adjust formality
-
-### Translating Text
-
-1. Open the sidepanel and switch to "Translator" screen
-2. Select source language (or use "Auto-detect")
-3. Select target language
-4. Type or paste text to translate
-5. Translation appears automatically
-6. Click speaker icons to hear text-to-speech
-
-### Recording a Meeting
-
-1. Open the sidepanel and switch to "Meeting" screen
-2. Grant microphone permission when prompted
-3. Select your microphone from the dropdown
-4. Choose recognition language
-5. Click "Start Recording"
-6. Speak naturally - transcript appears in real-time
-7. Click "Stop Recording" to end and trigger AI analysis
-8. Review summary, action items, and key decisions
-
 ## Troubleshooting
 
 ### APIs Not Available
@@ -183,44 +148,11 @@ If the extension doesn't load:
 3. Check Chrome DevTools console for errors
 4. Try removing and re-adding the extension
 
-### Microphone Not Working
-
-If meeting recording doesn't work:
-
-1. Grant microphone permission when prompted
-2. Check Chrome site settings: `chrome://settings/content/microphone`
-3. Verify microphone works in other applications
-4. Try selecting a different microphone from the dropdown
-5. Use the "Test Microphone" button to verify
-
-### Translation Not Working
-
-If translation fails:
-
-1. Check that Translator API is available (green badge in popup)
-2. Verify text length is under 5000 characters
-3. Ensure source and target languages are different
-4. Try using "Auto-detect" for source language
-5. Check internet connection for initial model download
-
 ## Next Steps
 
 Now that you have IntelliPen installed and set up:
 
-- Read the [User Guide](user-guide.md) for detailed feature documentation
-- Explore the [Architecture](architecture.md) to understand how it works
-- Check out [API Reference](api-reference.md) for technical details
-- Join our community and [contribute](contributing.md) to development
-
-## Getting Help
-
-If you encounter issues:
-
-- Check the [User Guide](user-guide.md) for detailed instructions
-- Search [GitHub Issues](https://github.com/vietanhdev/IntelliPen/issues)
-- Join [GitHub Discussions](https://github.com/vietanhdev/IntelliPen/discussions)
-- Report bugs with detailed reproduction steps
-
----
-
-Ready to dive deeper? Continue to the [User Guide](user-guide.md).
+- Read the [User Guide](/docs/user-guide/) for detailed feature documentation
+- Explore the [Architecture](/docs/architecture/) to understand how it works
+- Check out [API Reference](/docs/api-reference/) for technical details
+- Join our community and [contribute](/docs/contributing/) to development

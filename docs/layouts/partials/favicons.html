@@ -1,0 +1,5 @@
+{{- $icon16 := .Site.Params.favicons.icon16 | default "/images/icon16.png" -}}
+{{- $icon32 := .Site.Params.favicons.icon32 | default "/images/icon32.png" -}}
+<link rel="icon" type="image/png" sizes="16x16" href="{{ $icon16 | relURL }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ $icon32 | relURL }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ "/images/icon128.png" | relURL }}">

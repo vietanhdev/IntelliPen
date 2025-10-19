@@ -1,10 +1,10 @@
 ---
-layout: default
-title: Privacy Policy
-nav_order: 7
+title: "Privacy Policy"
+linkTitle: "Privacy"
+weight: 7
+description: >
+  IntelliPen's privacy policy and data handling practices
 ---
-
-# Privacy Policy
 
 Last Updated: October 19, 2025
 
@@ -60,16 +60,7 @@ IntelliPen stores the following data on your device only:
 
 ### Chrome Storage API
 
-IntelliPen uses Chrome's Storage API to store data locally:
-
-```javascript
-// Example: Storing preferences
-chrome.storage.local.set({
-  sourceLanguage: 'en',
-  targetLanguage: 'es',
-  editorContent: encryptedContent
-});
-```
+IntelliPen uses Chrome's Storage API to store data locally.
 
 ### Encryption
 
@@ -78,13 +69,6 @@ All sensitive data stored locally is encrypted:
 - **Algorithm**: AES-GCM (256-bit)
 - **Key Management**: Keys stored securely in Chrome's storage
 - **Scope**: All user content is encrypted at rest
-
-### Data Retention
-
-- **Editor content**: Stored until you clear it or uninstall the extension
-- **Saved documents**: Stored until you delete them
-- **Meeting transcripts**: Stored until you delete them
-- **Preferences**: Stored until you reset or uninstall
 
 ### Data Deletion
 
@@ -111,30 +95,11 @@ IntelliPen requests only necessary permissions:
 - **Scope**: Only when you explicitly use context menu
 - **Data**: Selected text only when you choose to translate/edit
 
-#### Scripting
-- **Purpose**: Inject quick translate overlay
-- **Scope**: Only on pages where you use quick translate
-- **Data**: Selected text for translation
-
-#### Side Panel
-- **Purpose**: Display main application interface
-- **Scope**: Extension UI only
-- **Data**: None
-
-#### Context Menus
-- **Purpose**: Right-click menu options
-- **Scope**: Selected text only
-- **Data**: Text you choose to translate/edit
-
-### Optional Permissions
-
 #### Microphone (Optional)
 - **Purpose**: Meeting recording and transcription
 - **Scope**: Only when you start recording
 - **Data**: Audio processed locally, not transmitted
 - **Control**: You can revoke at any time in Chrome settings
-
-**Note**: Microphone permission is only requested when you use the meeting recording feature.
 
 ## Third-Party Services
 
@@ -171,42 +136,6 @@ IntelliPen does NOT use:
 5. **Content Security Policy**: Strict CSP to prevent XSS attacks
 6. **Input Sanitization**: All user input is sanitized
 
-### Security Best Practices
-
-We follow security best practices:
-
-- Minimal permissions requested
-- Regular security audits
-- Secure coding practices
-- Dependency vulnerability scanning
-- Open source for transparency
-
-## Privacy by Design
-
-### Architecture
-
-IntelliPen's architecture ensures privacy:
-
-```
-User Input → Local Processing → Local Storage
-     ↓              ↓                ↓
-  No Upload    No Cloud      No Transmission
-```
-
-### Privacy Indicators
-
-IntelliPen shows clear privacy indicators:
-
-- 🔒 Lock icon: Local processing active
-- 🟢 Green badge: API available locally
-- 📍 Local indicator: Data stays on device
-
-### Transparency
-
-- **Open Source**: Code is publicly available on GitHub
-- **Auditable**: Anyone can review our privacy practices
-- **No Hidden Features**: All functionality is documented
-
 ## Your Rights
 
 ### Data Control
@@ -217,34 +146,6 @@ You have complete control over your data:
 - **Modify**: Edit or update your preferences
 - **Delete**: Remove data at any time
 - **Export**: Save documents and transcripts locally
-
-### Privacy Settings
-
-Control privacy features:
-
-1. **Auto-save**: Enable/disable in editor settings
-2. **Microphone**: Grant/revoke in Chrome settings
-3. **Context Menu**: Enable/disable in extension options
-4. **Storage**: Clear data in extension settings
-
-## Children's Privacy
-
-IntelliPen does not knowingly collect data from children under 13. Since we don't collect any personal data, IntelliPen can be used by anyone, but parental supervision is recommended for children.
-
-## Changes to Privacy Policy
-
-We may update this privacy policy to reflect:
-
-- Changes in functionality
-- Legal requirements
-- Best practice updates
-
-**Notification**: We will notify users of significant changes through:
-- Extension update notes
-- GitHub repository announcements
-- Documentation updates
-
-**Effective Date**: Changes take effect immediately upon posting
 
 ## Compliance
 
@@ -274,42 +175,6 @@ For privacy-related questions:
 
 - **GitHub Issues**: [Report privacy concerns](https://github.com/vietanhdev/IntelliPen/issues)
 - **GitHub Discussions**: [Ask privacy questions](https://github.com/vietanhdev/IntelliPen/discussions)
-- **Email**: [Contact information in repository]
-
-### Security Issues
-
-To report security vulnerabilities:
-
-1. **Do NOT** open a public issue
-2. Email security concerns privately (see repository for contact)
-3. We will respond within 48 hours
-4. We will work with you to address the issue
-
-## Verification
-
-### How to Verify Our Claims
-
-You can verify our privacy practices:
-
-1. **Review Source Code**: 
-   - Visit [GitHub repository](https://github.com/vietanhdev/IntelliPen)
-   - Check for network requests (there are none)
-   - Review data storage code
-
-2. **Monitor Network Activity**:
-   - Open Chrome DevTools → Network tab
-   - Use IntelliPen features
-   - Verify no external requests are made
-
-3. **Inspect Storage**:
-   - Open Chrome DevTools → Application → Storage
-   - View chrome.storage.local
-   - See only local preferences and encrypted content
-
-4. **Check Permissions**:
-   - Go to `chrome://extensions/`
-   - Click "Details" on IntelliPen
-   - Review requested permissions
 
 ## Summary
 
@@ -325,9 +190,3 @@ You can verify our privacy practices:
 ✅ Privacy by design  
 
 **Your data is yours. It stays on your device. Always.**
-
----
-
-For technical details about our privacy architecture, see the [Architecture Guide](architecture.md).
-
-For questions about privacy, open a [GitHub Discussion](https://github.com/vietanhdev/IntelliPen/discussions).

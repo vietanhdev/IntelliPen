@@ -1,12 +1,26 @@
-# Jekyll
+# Hugo
+public/
+resources/
+.hugo_build.lock
+
+# Jekyll (old)
 _site/
 .sass-cache/
 .jekyll-cache/
 .jekyll-metadata
-
-# Ruby
-Gemfile.lock
 vendor/
 
-# macOS
+# OS
 .DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+npm-debug.log

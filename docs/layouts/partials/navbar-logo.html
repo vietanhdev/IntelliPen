@@ -1,0 +1,8 @@
+{{- $logo := .Site.Params.logos.navbar -}}
+<a class="navbar-brand" href="{{ .Site.Home.RelPermalink }}">
+  {{- if $logo -}}
+    <img src="{{ $logo | relURL }}" alt="{{ .Site.Title }}" class="navbar-logo">
+  {{- else -}}
+    <span class="navbar-brand-text">{{ .Site.Title }}</span>
+  {{- end -}}
+</a>

@@ -1,0 +1,172 @@
+baseURL = "https://intellipen.nrl.ai/"
+title = "IntelliPen Documentation"
+
+# Language settings
+contentDir = "content/en"
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = false
+enableMissingTranslationPlaceholders = true
+
+# Docsy theme
+theme = ["github.com/google/docsy", "github.com/google/docsy/dependencies"]
+
+# Useful when translating
+enableGitInfo = true
+
+# Language configuration
+[languages]
+[languages.en]
+languageName = "English"
+title = "IntelliPen Documentation"
+description = "Intelligent writing companion powered by Chrome's built-in AI"
+weight = 1
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.parser.attribute]
+      block = true
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    style = "tango"
+
+# Image processing configuration
+[imaging]
+resampleFilter = "CatmullRom"
+quality = 75
+anchor = "smart"
+
+# Services configuration
+[services]
+[services.googleAnalytics]
+# id = "UA-00000000-0"
+
+# Privacy configuration
+[privacy]
+  [privacy.googleAnalytics]
+    anonymizeIP = true
+    respectDoNotTrack = true
+  [privacy.x]
+    enableDNT = true
+  [privacy.youtube]
+    privacyEnhanced = true
+
+# Module configuration
+[module]
+  [module.hugoVersion]
+    extended = true
+    min = "0.110.0"
+  [[module.imports]]
+    path = "github.com/google/docsy"
+    disable = false
+  [[module.imports]]
+    path = "github.com/google/docsy/dependencies"
+    disable = false
+
+# Site parameters
+[params]
+copyright = "IntelliPen Team"
+privacy_policy = "/privacy"
+
+# Project description
+description = "Your intelligent writing companion powered by Chrome's built-in AI. Write better, translate faster, and capture meeting insights with AI that respects your privacy."
+
+# Repository configuration
+github_repo = "https://github.com/vietanhdev/IntelliPen"
+github_project_repo = "https://github.com/vietanhdev/IntelliPen"
+github_branch = "main"
+
+# Logo and branding
+[params.logos]
+navbar = "/images/logo.svg"
+footer = "/images/logo.svg"
+
+# Favicon configuration
+[params.favicons]
+icon16 = "/images/icon16.png"
+icon32 = "/images/icon32.png"
+
+# Version and release info
+version = "1.0.0"
+version_menu = "Releases"
+url_latest_version = "https://github.com/vietanhdev/IntelliPen/releases"
+
+# Chrome AI Challenge badge
+[params.chrome_ai_challenge]
+enabled = true
+badge_text = "Chrome AI Challenge 2025"
+badge_url = "https://developer.chrome.com/ai-challenge"
+
+# User interface configuration
+[params.ui]
+breadcrumb_disable = false
+footer_about_disable = false
+navbar_logo = false
+navbar_translucent_over_cover_disable = false
+sidebar_menu_compact = false
+sidebar_search_disable = false
+
+# Brand colors (IntelliPen gradient theme)
+[params.ui.colors]
+primary = "#667eea"
+secondary = "#764ba2"
+accent = "#60a5fa"
+success = "#10b981"
+warning = "#f59e0b"
+danger = "#ef4444"
+
+# Adds a H2 section titled "Feedback" to the bottom of each doc
+[params.ui.feedback]
+enable = true
+yes = 'Glad to hear it! Please <a href="https://github.com/vietanhdev/IntelliPen/issues/new">tell us how we can improve</a>.'
+no = 'Sorry to hear that. Please <a href="https://github.com/vietanhdev/IntelliPen/issues/new">tell us how we can improve</a>.'
+
+# Footer about section
+[params.ui.footer_about_enable]
+enable = true
+
+# Adds a reading time to the top of each doc
+[params.ui.readingtime]
+enable = true
+
+# Links configuration
+[[params.links.user]]
+  name = "GitHub Discussions"
+  url = "https://github.com/vietanhdev/IntelliPen/discussions"
+  icon = "fab fa-github"
+  desc = "Discussion and help from your fellow users"
+[[params.links.user]]
+  name = "Twitter"
+  url = "https://twitter.com/intellipen"
+  icon = "fab fa-twitter"
+  desc = "Follow us on Twitter to get the latest news"
+[[params.links.developer]]
+  name = "GitHub"
+  url = "https://github.com/vietanhdev/IntelliPen"
+  icon = "fab fa-github"
+  desc = "Development takes place here"
+[[params.links.developer]]
+  name = "Chrome AI Challenge"
+  url = "https://developer.chrome.com/ai-challenge"
+  icon = "fas fa-trophy"
+  desc = "Part of Google Chrome Built-in AI Challenge 2025"
+
+# Taxonomy configuration
+[taxonomies]
+tag = "tags"
+category = "categories"
+
+# Menu configuration
+[menu]
+  [[menu.main]]
+    name = "Documentation"
+    weight = 10
+    url = "/docs/"
+  [[menu.main]]
+    name = "Blog"
+    weight = 20
+    url = "/blog/"
+  [[menu.main]]
+    name = "GitHub"
+    weight = 30
+    url = "https://github.com/vietanhdev/IntelliPen"

@@ -1,80 +1,166 @@
 # IntelliPen Documentation
 
-This directory contains the documentation for IntelliPen, published via GitHub Pages.
+This directory contains the Hugo-based documentation for IntelliPen using the Docsy theme.
 
 ## Viewing Documentation
 
-Visit the live documentation at: https://vietanhdev.github.io/IntelliPen/
+Visit the live documentation at: https://intellipen.nrl.ai/
 
-## Documentation Structure
+## Prerequisites
 
-- `index.md` - Home page and overview
-- `getting-started.md` - Installation and setup guide
-- `user-guide.md` - Complete feature documentation
-- `architecture.md` - Technical architecture and design
-- `api-reference.md` - Chrome AI APIs integration reference
-- `contributing.md` - Development and contribution guidelines
+- **Hugo Extended** version 0.110.0 or later
+- **Go** 1.21 or later
+- **Node.js** and **npm** (for PostCSS)
 
-## Local Development
+## Quick Start
 
-To run the documentation site locally:
+### Install Hugo Extended
 
-### Prerequisites
+**macOS:**
+```bash
+brew install hugo
+```
 
-- Ruby 2.7 or higher
-- Bundler gem
+**Linux:**
+```bash
+# Download from GitHub releases
+wget https://github.com/gohugoio/hugo/releases/download/v0.121.0/hugo_extended_0.121.0_linux-amd64.deb
+sudo dpkg -i hugo_extended_0.121.0_linux-amd64.deb
+```
+
+**Windows:**
+```bash
+choco install hugo-extended
+```
 
 ### Setup
 
 ```bash
-# Install dependencies
 cd docs
-bundle install
 
-# Serve locally
-bundle exec jekyll serve
+# Run setup script
+./setup-hugo.sh
 
-# Open in browser
-# http://localhost:4000/IntelliPen/
+# Or manually:
+hugo mod get
+hugo mod tidy
+npm install
 ```
 
-### Making Changes
+### Local Development
 
-1. Edit markdown files in the `docs/` directory
-2. Jekyll will automatically rebuild (in serve mode)
-3. Refresh browser to see changes
-4. Commit and push to update live site
+```bash
+cd docs
 
-## GitHub Pages Configuration
+# Start development server
+hugo server
 
-The site uses:
-- **Theme**: Just the Docs
-- **Markdown**: Kramdown with GFM
-- **Plugins**: SEO tag, GitHub metadata, include cache
+# Or use npm script
+npm run dev
+```
 
-Configuration is in `_config.yml`.
+Visit `http://localhost:1313/`
 
-## Publishing
+### Build for Production
 
-Documentation is automatically published when changes are pushed to the `main` branch:
+```bash
+cd docs
 
-1. Make changes to markdown files
-2. Commit and push to main branch
-3. GitHub Actions builds and deploys automatically
-4. Changes appear at https://vietanhdev.github.io/IntelliPen/ within minutes
+# Build site
+hugo --gc --minify
 
-## Contributing
+# Or use npm script
+npm run build
+```
 
-To contribute to documentation:
+Output will be in `docs/public/` directory.
 
-1. Follow the [Contributing Guide](contributing.md)
-2. Ensure markdown is properly formatted
-3. Test locally before submitting PR
-4. Keep documentation in sync with code changes
+## Documentation Structure
+
+```
+docs/
+├── hugo.toml              # Hugo configuration
+├── go.mod                 # Go module dependencies
+├── package.json           # Node.js dependencies
+├── content/               # Content files
+│   └── en/               # English content
+│       ├── _index.md     # Home page
+│       ├── docs/         # Documentation
+│       │   ├── getting-started.md
+│       │   ├── user-guide.md
+│       │   ├── architecture.md
+│       │   ├── api-reference.md
+│       │   ├── contributing.md
+│       │   ├── faq.md
+│       │   └── privacy.md
+│       ├── blog/         # Blog posts
+│       └── about/        # About pages
+├── static/               # Static assets
+└── public/               # Built site (generated)
+```
+
+## Adding Content
+
+### New Documentation Page
+
+```bash
+hugo new docs/your-page.md
+```
+
+Edit the front matter:
+```yaml
+---
+title: "Your Page Title"
+linkTitle: "Short Title"
+weight: 10
+description: >
+  Brief description
+---
+```
+
+### New Blog Post
+
+```bash
+hugo new blog/your-post.md
+```
+
+## Deployment
+
+### GitHub Pages
+
+The site is automatically deployed via GitHub Actions when changes are pushed to the `main` branch.
+
+See `.github/workflows/hugo-docs.yml` for the workflow configuration.
+
+### Manual Deployment
+
+```bash
+cd docs
+hugo --gc --minify
+# Deploy public/ directory to your hosting
+```
+
+## Theme
+
+IntelliPen uses the [Docsy](https://www.docsy.dev/) theme, which provides:
+
+- Responsive design
+- Search functionality
+- Multi-language support
+- Blog support
+- Documentation structure
+- GitHub integration
+
+## Resources
+
+- [Hugo Documentation](https://gohugo.io/documentation/)
+- [Docsy Theme](https://www.docsy.dev/)
+- [Migration Guide](MIGRATION.md)
+- [Setup Guide](README_HUGO.md)
 
 ## Support
 
 For documentation issues:
-- Open an issue on GitHub
+- Open an issue on [GitHub](https://github.com/vietanhdev/IntelliPen/issues)
 - Tag with `documentation` label
 - Provide specific page and section references
