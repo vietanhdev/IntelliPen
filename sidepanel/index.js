@@ -144,11 +144,13 @@ class IntelliPenSidepanel {
     document.getElementById('sourceLanguage')?.addEventListener('change', (e) => {
       this.sourceLanguage = e.target.value;
       this.saveTranslationLanguages();
+      this.autoTranslate();
     });
 
     document.getElementById('targetLanguage')?.addEventListener('change', (e) => {
       this.targetLanguage = e.target.value;
       this.saveTranslationLanguages();
+      this.autoTranslate();
     });
 
     document.getElementById('swapLanguages')?.addEventListener('click', () => {
@@ -859,7 +861,7 @@ class IntelliPenSidepanel {
   async initializeTranslator() {
     console.log('Initializing translator...');
     this.updateSourceCharCount();
-    
+
     // Load saved language preferences
     await this.loadTranslationLanguages();
   }
@@ -867,7 +869,7 @@ class IntelliPenSidepanel {
   async loadTranslationLanguages() {
     try {
       const settings = await chrome.storage.local.get(['translationFromLang', 'translationToLang']);
-      
+
       if (settings.translationFromLang) {
         this.sourceLanguage = settings.translationFromLang;
         const sourceSelect = document.getElementById('sourceLanguage');
@@ -875,7 +877,7 @@ class IntelliPenSidepanel {
           sourceSelect.value = this.sourceLanguage;
         }
       }
-      
+
       if (settings.translationToLang) {
         this.targetLanguage = settings.translationToLang;
         const targetSelect = document.getElementById('targetLanguage');
@@ -883,7 +885,7 @@ class IntelliPenSidepanel {
           targetSelect.value = this.targetLanguage;
         }
       }
-      
+
       console.log('Loaded translation languages:', this.sourceLanguage, '→', this.targetLanguage);
     } catch (error) {
       console.error('Failed to load translation languages:', error);
@@ -896,7 +898,7 @@ class IntelliPenSidepanel {
         translationFromLang: this.sourceLanguage,
         translationToLang: this.targetLanguage
       });
-      
+
       console.log('Saved translation languages:', this.sourceLanguage, '→', this.targetLanguage);
     } catch (error) {
       console.error('Failed to save translation languages:', error);

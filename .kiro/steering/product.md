@@ -1,6 +1,6 @@
 # Product Overview
 
-IntelliPen is an intelligent Chrome extension that provides AI-powered writing assistance and meeting intelligence. Built on Chrome's built-in AI APIs (Gemini Nano), it offers a dual-screen interface with an IntelliPen Editor for writing tasks, a Translator for multi-language support, and a Meeting Dashboard for audio recording and analysis.
+Your intelligent writing companion powered by Chrome's built-in AI. IntelliPen brings professional writing assistance, real-time translation, and meeting intelligence directly to your browser—all processed locally on your device with zero data sharing. Write better, translate faster, and capture meeting insights with AI that respects your privacy.
 
 ## Core Features
 

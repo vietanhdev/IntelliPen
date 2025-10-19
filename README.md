@@ -1,6 +1,6 @@
 # IntelliPen Chrome Extension
 
-IntelliPen is an intelligent Chrome extension that provides AI-powered writing assistance and meeting intelligence. Built on Chrome's built-in AI APIs (Gemini Nano), it offers a dual-screen interface with an IntelliPen Editor for writing tasks and a Meeting Dashboard for audio recording and analysis.
+Your intelligent writing companion powered by Chrome's built-in AI. IntelliPen brings professional writing assistance, real-time translation, and meeting intelligence directly to your browser—all processed locally on your device with zero data sharing. Write better, translate faster, and capture meeting insights with AI that respects your privacy.
 
 ## Features
 
@@ -15,11 +15,12 @@ A rich-text editor with comprehensive AI-powered writing assistance:
 - **Export Options**: Save as .txt files
 
 ### 🌐 Translator
-Dedicated translation interface with advanced features:
+Dedicated translation interface with advanced features and complete privacy:
 
-- **Multi-language Support**: Translate between 25+ languages
+- **Multi-language Support**: Translate between 25+ languages, all processed locally
 - **Auto-detection** (Language Detector API): Automatic source language identification
-- **Real-time Translation**: Instant translation as you type
+- **Real-time Translation**: Instant translation as you type—no data sent to external servers
+- **Private Translation**: Unlike cloud-based translators, your sensitive content never leaves your device
 - **Text-to-Speech**: Listen to source and translated text
 - **Character Counter**: Track text length with visual warnings
 - **Language Swap**: Quick swap between source and target languages
@@ -77,8 +78,8 @@ IntelliPen leverages Chrome's built-in AI APIs:
 ### Development Installation
 1. Clone this repository:
    ```bash
-   git clone https://github.com/vietanhdev/intellipen-extension.git
-   cd intellipen-extension
+   git clone https://github.com/vietanhdev/IntelliPen.git
+   cd IntelliPen
    ```
 
 2. Install dependencies:
@@ -281,8 +282,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/intellipen/intellipen-extension/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/intellipen/intellipen-extension/discussions)
+- **Issues**: [GitHub Issues](https://github.com/vietanhdev/IntelliPen/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/vietanhdev/IntelliPen/discussions)
 
 ## Current Status
 
