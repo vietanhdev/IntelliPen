@@ -57,3 +57,5 @@ IntelliPen leverages Chrome's built-in AI APIs:
 - **Language Detector API**: Automatic language detection
 
 All processing happens client-side with Chrome 138+ requirements (22GB storage, 4GB+ VRAM, desktop platforms).
+
+We are participating in Google Chrome Built-in AI Challenge 2025 - Please obey the [Hackathon rules](.kiro/chrome_ai_docs/hackathon_rules.md).

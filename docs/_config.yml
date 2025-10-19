@@ -1,0 +1,98 @@
+# Jekyll configuration for GitHub Pages
+
+# Site settings
+title: IntelliPen Documentation
+description: Intelligent writing companion powered by Chrome's built-in AI
+baseurl: ""
+url: "https://intellipen.nrl.ai"
+
+# Theme
+theme: just-the-docs
+color_scheme: light
+
+# Just the Docs theme settings
+search_enabled: true
+search:
+  heading_level: 2
+  previews: 3
+  preview_words_before: 5
+  preview_words_after: 10
+  tokenizer_separator: /[\s/]+/
+  rel_url: true
+  button: false
+
+# Navigation
+nav_sort: order
+nav_enabled: true
+
+# Footer
+footer_content: "Copyright &copy; 2025 IntelliPen Team. Distributed under the MIT License."
+
+# Back to top link
+back_to_top: true
+back_to_top_text: "Back to top"
+
+# Heading anchors
+heading_anchors: true
+
+# Aux links
+aux_links:
+  "IntelliPen on GitHub":
+    - "https://github.com/vietanhdev/IntelliPen"
+  "Report an Issue":
+    - "https://github.com/vietanhdev/IntelliPen/issues"
+
+# Aux links in new tab
+aux_links_new_tab: true
+
+# Collections
+collections:
+  docs:
+    permalink: "/:path/"
+    output: true
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
+
+# Plugins
+plugins:
+  - jekyll-seo-tag
+  - jekyll-github-metadata
+  - jekyll-include-cache
+
+# Exclude from processing
+exclude:
+  - node_modules/
+  - vendor/
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - icon-showcase.html
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
+
+# Compression
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: []
+  blanklines: false
+  profile: false

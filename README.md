@@ -279,9 +279,21 @@ For full details, see our [Privacy Policy](PRIVACY.md).
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## Documentation
+
+📚 **[View Full Documentation](https://vietanhdev.github.io/IntelliPen/)**
+
+- [Getting Started](https://vietanhdev.github.io/IntelliPen/getting-started.html) - Installation and setup
+- [User Guide](https://vietanhdev.github.io/IntelliPen/user-guide.html) - Complete feature documentation
+- [Architecture](https://vietanhdev.github.io/IntelliPen/architecture.html) - Technical architecture and design
+- [API Reference](https://vietanhdev.github.io/IntelliPen/api-reference.html) - Chrome AI APIs integration
+- [Contributing](https://vietanhdev.github.io/IntelliPen/contributing.html) - Development guidelines
+- [Privacy Policy](https://vietanhdev.github.io/IntelliPen/privacy.html) - Privacy and data handling
+- [FAQ](https://vietanhdev.github.io/IntelliPen/faq.html) - Frequently asked questions
+
 ## Support
 
-- **Documentation**: [docs/](docs/)
+- **Documentation**: [https://vietanhdev.github.io/IntelliPen/](https://vietanhdev.github.io/IntelliPen/)
 - **Issues**: [GitHub Issues](https://github.com/vietanhdev/IntelliPen/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/vietanhdev/IntelliPen/discussions)
 
