@@ -1376,9 +1376,13 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow-y: auto;
   background: var(--surface-2);
-  padding-bottom: var(--space-4);
+}
+
+.analysis-section .md-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: var(--space-6);
 }
 
 /* Permission Banner - Material Design */
@@ -1432,7 +1436,396 @@ body {
   padding: var(--space-2) var(--space-3);
 }
 
-/* Material Design Analysis Cards */
+/* ============================================
+   MATERIAL DESIGN COMPONENTS
+   ============================================ */
+
+/* Material Design Toolbar */
+.md-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--color-neutral-200);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.md-toolbar-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-neutral-900);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.md-toolbar-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Material Design Icon Button */
+.md-icon-button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-neutral-700);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.md-icon-button svg {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.md-icon-button:hover {
+  background: rgba(26, 115, 232, 0.08);
+  color: var(--color-primary-600);
+}
+
+.md-icon-button:active {
+  background: rgba(26, 115, 232, 0.16);
+  transform: scale(0.95);
+}
+
+/* Ripple effect */
+.md-icon-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(26, 115, 232, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.md-icon-button:active::before {
+  width: 100px;
+  height: 100px;
+}
+
+/* Material Design Card */
+.md-card {
+  margin: var(--space-4) var(--space-5);
+  background: var(--surface-1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) backwards;
+}
+
+.md-card:nth-child(2) { animation-delay: 0ms; }
+.md-card:nth-child(3) { animation-delay: 100ms; }
+.md-card:nth-child(4) { animation-delay: 200ms; }
+.md-card:nth-child(5) { animation-delay: 300ms; }
+
+/* Material Design Elevation */
+.md-elevation-1 {
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.md-elevation-2 {
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
+}
+
+.md-elevation-3 {
+  box-shadow: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 1px 3px rgba(60, 64, 67, 0.3);
+}
+
+.md-elevation-4 {
+  box-shadow: 0 6px 10px 4px rgba(60, 64, 67, 0.15), 0 2px 3px rgba(60, 64, 67, 0.3);
+}
+
+.md-card:hover {
+  box-shadow: 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 1px 3px rgba(60, 64, 67, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Material Design Card Header */
+.md-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: linear-gradient(135deg, rgba(26, 115, 232, 0.04) 0%, transparent 100%);
+  border-bottom: 1px solid var(--color-neutral-100);
+}
+
+.md-card-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-primary-600);
+  flex-shrink: 0;
+}
+
+.md-card-title {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--color-neutral-900);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Material Design Content Container */
+.md-content {
+  padding: var(--space-4) 0;
+  overflow-y: auto;
+}
+
+/* Material Design Empty State */
+.md-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-5);
+  text-align: center;
+  min-height: 400px;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.md-empty-icon {
+  width: 80px;
+  height: 80px;
+  color: var(--color-neutral-400);
+  margin-bottom: var(--space-4);
+  opacity: 0.5;
+}
+
+.md-empty-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-neutral-700);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.md-empty-description {
+  font-size: var(--text-base);
+  color: var(--color-neutral-600);
+  max-width: 400px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Material Design Card Content */
+.md-card-content {
+  padding: var(--space-5);
+  color: var(--color-neutral-800);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.md-card-content p {
+  margin: 0 0 var(--space-3) 0;
+}
+
+.md-card-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* List content with no padding for items */
+.md-card-content-list {
+  padding: 0;
+}
+
+.md-card-content-list > p {
+  padding: var(--space-5);
+  margin: 0;
+}
+
+/* Email content with monospace font */
+.md-card-content-email {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  background: var(--surface-2);
+}
+
+.md-card-content-email pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
+}
+
+/* Material Design Card Actions */
+.md-card-actions {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-neutral-100);
+  background: var(--surface-2);
+}
+
+/* Material Design Button */
+.md-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.01em;
+}
+
+.md-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.md-button-text {
+  background: transparent;
+  color: var(--color-primary-600);
+}
+
+.md-button-text:hover {
+  background: rgba(26, 115, 232, 0.08);
+}
+
+.md-button-text:active {
+  background: rgba(26, 115, 232, 0.16);
+}
+
+.md-button-contained {
+  background: var(--color-primary-600);
+  color: white;
+}
+
+.md-button-contained:hover {
+  background: var(--color-primary-700);
+  box-shadow: 0 2px 4px rgba(60, 64, 67, 0.3);
+}
+
+.md-button-contained:active {
+  background: var(--color-primary-800);
+}
+
+/* Material Design Loading State */
+.md-loading-text {
+  color: var(--color-neutral-500);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.md-loading-text::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-neutral-300);
+  border-top-color: var(--color-primary-600);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Material Design Action Item */
+.action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-neutral-100);
+  transition: background 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.action-item:last-child {
+  border-bottom: none;
+}
+
+.action-item:hover {
+  background: var(--surface-2);
+}
+
+.action-checkbox {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0 0;
+  cursor: pointer;
+  accent-color: var(--color-primary-600);
+  flex-shrink: 0;
+}
+
+.action-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.action-text > div:first-child {
+  color: var(--color-neutral-900);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: var(--space-1);
+}
+
+.action-owner {
+  color: var(--color-neutral-600);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.action-owner::before {
+  content: '👤';
+  font-size: 12px;
+}
+
+/* Material Design Decision Item */
+.decision-item {
+  padding: var(--space-4) var(--space-5);
+  border-left: 3px solid var(--color-primary-600);
+  background: linear-gradient(90deg, rgba(26, 115, 232, 0.04) 0%, transparent 100%);
+  border-bottom: 1px solid var(--color-neutral-100);
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.decision-item:last-child {
+  border-bottom: none;
+}
+
+.decision-item:hover {
+  background: linear-gradient(90deg, rgba(26, 115, 232, 0.08) 0%, transparent 100%);
+  border-left-width: 4px;
+}
+
+.decision-text {
+  color: var(--color-neutral-900);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.decision-text::before {
+  content: '💡';
+  margin-right: var(--space-2);
+}
+
+/* Legacy support - keep old classes for backward compatibility */
 .analysis-card {
   margin: var(--space-4) var(--space-4) 0 var(--space-4);
   padding: 0;
@@ -1486,6 +1879,7 @@ body {
   box-shadow: 0 0 6px rgba(26, 115, 232, 0.3);
 }
 
+/* Legacy content styles - kept for backward compatibility */
 .summary-content,
 .action-items,
 .key-decisions,
@@ -1502,6 +1896,7 @@ body {
 .action-items p,
 .key-decisions p {
   margin: 0;
+  padding: var(--space-4);
 }
 
 .email-draft pre {
@@ -1518,6 +1913,7 @@ body {
   align-items: center;
   gap: var(--space-2);
   margin: 0;
+  padding: var(--space-4);
 }
 
 .loading-text::before {
@@ -1531,88 +1927,9 @@ body {
   flex-shrink: 0;
 }
 
-/* Material Design Action Item */
-.action-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-  margin-bottom: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background: var(--surface-2);
-  border-radius: var(--radius-md);
-  border-left: 3px solid var(--color-primary-600);
-  transition: all var(--transition-base);
-}
+/* Legacy action-text styles removed - using Material Design version above */
 
-.action-item:last-child {
-  margin-bottom: 0;
-}
-
-.action-item:hover {
-  background: var(--color-primary-50);
-  box-shadow: var(--elevation-1);
-  transform: translateX(4px);
-}
-
-.action-checkbox {
-  margin-top: 2px;
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: var(--color-primary-600);
-  flex-shrink: 0;
-}
-
-.action-text {
-  flex: 1;
-  font-size: var(--text-sm);
-  color: var(--color-neutral-800);
-  line-height: var(--leading-relaxed);
-}
-
-.action-text > div:first-child {
-  margin-bottom: var(--space-1);
-}
-
-.action-owner {
-  font-size: 10px;
-  color: var(--color-primary-700);
-  font-weight: var(--font-semibold);
-  background: var(--color-primary-50);
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-primary-200);
-  white-space: nowrap;
-  display: inline-block;
-}
-
-/* Material Design Decision Item */
-.decision-item {
-  margin-bottom: var(--space-2);
-  padding: var(--space-3);
-  background: var(--color-warning-bg);
-  border-left: 3px solid var(--color-warning);
-  border-radius: var(--radius-md);
-  box-shadow: var(--elevation-1);
-  transition: all var(--transition-base);
-}
-
-.decision-item:last-child {
-  margin-bottom: 0;
-}
-
-.decision-item:hover {
-  box-shadow: var(--elevation-2);
-  transform: translateX(4px);
-}
-
-.decision-text {
-  font-weight: var(--font-medium);
-  color: var(--color-neutral-900);
-  font-size: var(--text-sm);
-  line-height: var(--leading-relaxed);
-  margin: 0;
-}
+/* Legacy decision item styles removed - using Material Design version above */
 
 .email-actions {
   padding: var(--space-3) var(--space-4);

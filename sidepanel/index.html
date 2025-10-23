@@ -517,16 +517,17 @@
 
       <!-- Meeting Analysis Tab -->
       <section class="analysis-section meeting-tab-content" id="analysisTab" style="display: none;">
-        <div class="section-header">
-          <h2>Analysis Results</h2>
-          <div class="analysis-controls">
-            <button class="btn-icon" id="regenerateAnalysis" title="Regenerate Analysis">
+        <div class="md-toolbar">
+          <h2 class="md-toolbar-title">Analysis Results</h2>
+          <div class="md-toolbar-actions">
+            <button class="md-icon-button" id="regenerateAnalysis" title="Regenerate Analysis">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21.5 2v6h-6M2.5 22v-6h6M19.13 5.09A10 10 0 004.64 15.9M4.87 18.91A10 10 0 0019.36 8.1"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+                <circle cx="12" cy="12" r="2" fill="currentColor"/>
               </svg>
             </button>
-            <button class="btn-icon" id="exportAnalysis" title="Export Analysis">
+            <button class="md-icon-button" id="exportAnalysis" title="Export Analysis">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 11l3-3 3 3M12 14V8M20 16v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2" stroke="currentColor"
                   stroke-width="2" stroke-linecap="round" />
@@ -535,54 +536,88 @@
           </div>
         </div>
 
-        <!-- Executive Summary -->
-        <div class="analysis-card">
-          <h3>Executive Summary</h3>
-          <div class="summary-content" id="executiveSummary">
-            <p class="loading-text">Generating summary...</p>
+        <div class="md-content">
+          <!-- Empty State -->
+          <div class="md-empty-state" id="analysisEmptyState">
+            <svg class="md-empty-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <h3 class="md-empty-title">No Analysis Yet</h3>
+            <p class="md-empty-description">Record a meeting to generate AI-powered analysis with summaries, action items, and more.</p>
           </div>
-        </div>
 
-        <!-- Action Items -->
-        <div class="analysis-card">
-          <h3>Action Items</h3>
-          <div class="action-items" id="actionItems">
-            <p class="loading-text">Extracting action items...</p>
-          </div>
-        </div>
+          <!-- Analysis Cards (hidden initially) -->
+          <div class="md-analysis-cards" id="analysisCards" style="display: none;">
+            <!-- Executive Summary -->
+            <div class="md-card md-elevation-2">
+              <div class="md-card-header">
+                <svg class="md-card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <h3 class="md-card-title">Executive Summary</h3>
+              </div>
+              <div class="md-card-content" id="executiveSummary">
+                <p class="md-loading-text">Generating summary...</p>
+              </div>
+            </div>
 
-        <!-- Key Decisions -->
-        <div class="analysis-card">
-          <h3>Key Decisions</h3>
-          <div class="key-decisions" id="keyDecisions">
-            <p class="loading-text">Identifying key decisions...</p>
-          </div>
-        </div>
+            <!-- Action Items -->
+            <div class="md-card md-elevation-2">
+              <div class="md-card-header">
+                <svg class="md-card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <h3 class="md-card-title">Action Items</h3>
+              </div>
+              <div class="md-card-content md-card-content-list" id="actionItems">
+                <p class="md-loading-text">Extracting action items...</p>
+              </div>
+            </div>
 
-        <!-- Follow-up Email -->
-        <div class="analysis-card">
-          <h3>Follow-up Email Draft</h3>
-          <div class="email-draft" id="emailDraft">
-            <p class="loading-text">Generating follow-up email...</p>
-          </div>
-          <div class="email-actions">
-            <button class="btn btn-secondary" id="copyEmail">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2" />
-                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" />
-              </svg>
-              <span>Copy Email</span>
-            </button>
-            <button class="btn btn-secondary" id="editEmail">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor" opacity="0.9" />
-                <path
-                  d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                  fill="currentColor" />
-              </svg>
-              <span>Edit Email</span>
-            </button>
+            <!-- Key Decisions -->
+            <div class="md-card md-elevation-2">
+              <div class="md-card-header">
+                <svg class="md-card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <h3 class="md-card-title">Key Decisions</h3>
+              </div>
+              <div class="md-card-content md-card-content-list" id="keyDecisions">
+                <p class="md-loading-text">Identifying key decisions...</p>
+              </div>
+            </div>
+
+            <!-- Follow-up Email -->
+            <div class="md-card md-elevation-2">
+              <div class="md-card-header">
+                <svg class="md-card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <h3 class="md-card-title">Follow-up Email Draft</h3>
+              </div>
+              <div class="md-card-content md-card-content-email" id="emailDraft">
+                <p class="md-loading-text">Generating follow-up email...</p>
+              </div>
+              <div class="md-card-actions">
+                <button class="md-button md-button-text" id="copyEmail">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2" />
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                  </svg>
+                  <span>Copy</span>
+                </button>
+                <button class="md-button md-button-text" id="editEmail">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor" opacity="0.9" />
+                    <path
+                      d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                      fill="currentColor" />
+                  </svg>
+                  <span>Edit</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

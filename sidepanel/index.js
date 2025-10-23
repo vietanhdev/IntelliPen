@@ -1776,12 +1776,7 @@ class IntelliPenSidepanel {
       }
 
       // Show loading state
-      this.displayAnalysis({
-        executiveSummary: 'Generating executive summary...',
-        actionItems: [],
-        keyDecisions: [],
-        followUpEmail: 'Generating follow-up email...'
-      });
+      this.showAnalysisLoading();
 
       // Generate analysis
       const analysis = await this.meetingAI.analyzeMeeting(this.transcript);
@@ -1809,10 +1804,33 @@ class IntelliPenSidepanel {
     }
   }
 
+  showAnalysisLoading() {
+    // Hide empty state
+    const emptyState = document.getElementById('analysisEmptyState');
+    if (emptyState) emptyState.style.display = 'none';
+
+    // Show analysis cards
+    const analysisCards = document.getElementById('analysisCards');
+    if (analysisCards) analysisCards.style.display = 'block';
+
+    // Show loading states
+    document.getElementById('executiveSummary').innerHTML = '<p class="md-loading-text">Generating summary...</p>';
+    document.getElementById('actionItems').innerHTML = '<p class="md-loading-text">Extracting action items...</p>';
+    document.getElementById('keyDecisions').innerHTML = '<p class="md-loading-text">Identifying key decisions...</p>';
+    document.getElementById('emailDraft').innerHTML = '<p class="md-loading-text">Generating follow-up email...</p>';
+  }
+
   displayAnalysis(analysis) {
+    // Hide empty state and show cards
+    const emptyState = document.getElementById('analysisEmptyState');
+    if (emptyState) emptyState.style.display = 'none';
+
+    const analysisCards = document.getElementById('analysisCards');
+    if (analysisCards) analysisCards.style.display = 'block';
+
     // Display executive summary
     const summaryElement = document.getElementById('executiveSummary');
-    summaryElement.innerHTML = `<p>${analysis.executiveSummary || 'Analysis not yet implemented'}</p>`;
+    summaryElement.innerHTML = `<p>${analysis.executiveSummary || 'No summary available'}</p>`;
 
     // Display action items
     const actionItemsElement = document.getElementById('actionItems');
@@ -1844,7 +1862,7 @@ class IntelliPenSidepanel {
 
     // Display follow-up email
     const emailElement = document.getElementById('emailDraft');
-    emailElement.innerHTML = `<pre>${analysis.followUpEmail || 'Email draft not yet implemented'}</pre>`;
+    emailElement.innerHTML = `<pre>${analysis.followUpEmail || 'No email draft available'}</pre>`;
   }
 
   clearTranscript() {
@@ -1857,11 +1875,24 @@ class IntelliPenSidepanel {
       this.transcript = [];
       this.updateTranscript();
 
+      // Reset analysis view to empty state
+      this.resetAnalysisView();
+
       // Switch back to transcript tab
       this.switchMeetingTab('transcript');
 
       console.log('Transcript cleared');
     }
+  }
+
+  resetAnalysisView() {
+    // Show empty state
+    const emptyState = document.getElementById('analysisEmptyState');
+    if (emptyState) emptyState.style.display = 'flex';
+
+    // Hide analysis cards
+    const analysisCards = document.getElementById('analysisCards');
+    if (analysisCards) analysisCards.style.display = 'none';
   }
 
   exportTranscript() {

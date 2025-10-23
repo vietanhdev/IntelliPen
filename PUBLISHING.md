@@ -5,7 +5,7 @@
 - **Package Size**: 82KB (313KB uncompressed)
 - **Files**: 39 files
 - **Build Output**: `dist/` directory
-- **Distribution Package**: `intellipen-v1.0.0.zip`
+- **Distribution Package**: `intellipen-v1.0.1.zip`
 
 ## Quick Build Commands
 
@@ -23,7 +23,7 @@ NODE_ENV=production npm run build  # Build for production
 ### 1. Pre-Submission Requirements
 - [x] Extension built and tested locally
 - [x] Production build created (`dist/` folder)
-- [x] ZIP package created (`intellipen-v1.0.0.zip`)
+- [x] ZIP package created (`intellipen-v1.0.1.zip`)
 - [ ] Extension tested in Chrome 138+ (load unpacked from `dist/`)
 - [ ] All features working (Editor, Translator, Meeting Dashboard)
 - [ ] Chrome AI APIs tested (requires Chrome 138+ with Gemini Nano)
@@ -120,7 +120,7 @@ Prepare explanations for each permission:
 
 1. Go to [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
 2. Click "New Item"
-3. Upload `intellipen-v1.0.0.zip`
+3. Upload `intellipen-v1.0.1.zip`
 4. Fill in store listing information
 5. Upload screenshots and promotional images
 6. Set pricing (Free)

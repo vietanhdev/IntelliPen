@@ -10,14 +10,29 @@ class MeetingAIFeatures {
     this.activeSummarizer = null;
   }
 
+  // Helper to clean JSON responses from markdown code blocks
+  cleanJSONResponse(response) {
+    if (typeof response !== 'string') {
+      return response;
+    }
+
+    // Remove markdown code blocks (```json ... ``` or ``` ... ```)
+    let cleaned = response.trim();
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '');
+    cleaned = cleaned.replace(/\n?```\s*$/, '');
+    cleaned = cleaned.trim();
+
+    return cleaned;
+  }
+
   // ===== Meeting Analysis =====
 
   async analyzeMeeting(transcript) {
     try {
       console.log('Analyzing meeting with', transcript.length, 'entries');
-      
+
       // Combine transcript into full text
-      const fullTranscript = transcript.map(entry => 
+      const fullTranscript = transcript.map(entry =>
         `${entry.speaker}: ${entry.text}`
       ).join('\n');
 
@@ -63,7 +78,7 @@ class MeetingAIFeatures {
       return summary;
     } catch (error) {
       console.error('Executive summary generation failed:', error);
-      
+
       // Fallback to basic summary
       const sentences = transcript.split(/[.!?]+/).filter(s => s.trim().length > 20);
       return sentences.slice(0, 3).join('. ') + '.';
@@ -102,11 +117,12 @@ Return the action items in this JSON format:
         }
       });
 
-      const actionItems = JSON.parse(response);
+      const cleanedResponse = this.cleanJSONResponse(response);
+      const actionItems = JSON.parse(cleanedResponse);
       return actionItems;
     } catch (error) {
       console.error('Action item extraction failed:', error);
-      
+
       // Fallback: Look for action-oriented keywords
       return this.extractActionItemsFallback(transcript);
     }
@@ -115,7 +131,7 @@ Return the action items in this JSON format:
   extractActionItemsFallback(transcript) {
     const actionItems = [];
     const actionKeywords = ['will', 'should', 'need to', 'must', 'have to', 'going to', 'action item'];
-    
+
     const sentences = transcript.split(/[.!?]+/);
     sentences.forEach(sentence => {
       const lowerSentence = sentence.toLowerCase();
@@ -152,11 +168,12 @@ Return the key decisions as a JSON array of strings:
         }
       });
 
-      const decisions = JSON.parse(response);
+      const cleanedResponse = this.cleanJSONResponse(response);
+      const decisions = JSON.parse(cleanedResponse);
       return decisions;
     } catch (error) {
       console.error('Key decision identification failed:', error);
-      
+
       // Fallback: Look for decision-oriented keywords
       return this.identifyKeyDecisionsFallback(transcript);
     }
@@ -165,7 +182,7 @@ Return the key decisions as a JSON array of strings:
   identifyKeyDecisionsFallback(transcript) {
     const decisions = [];
     const decisionKeywords = ['decided', 'agreed', 'approved', 'resolved', 'concluded', 'determined'];
-    
+
     const sentences = transcript.split(/[.!?]+/);
     sentences.forEach(sentence => {
       const lowerSentence = sentence.toLowerCase();
@@ -205,7 +222,7 @@ The email should include:
       return email;
     } catch (error) {
       console.error('Follow-up email generation failed:', error);
-      
+
       // Fallback: Basic email template
       return this.generateFollowUpEmailFallback(transcript);
     }
@@ -213,7 +230,7 @@ The email should include:
 
   generateFollowUpEmailFallback(transcript) {
     const firstSentences = transcript.split(/[.!?]+/).slice(0, 3).join('. ');
-    
+
     return `Subject: Meeting Follow-up
 
 Dear Team,
@@ -228,7 +245,7 @@ Best regards`;
   }
 
   getFallbackAnalysis(transcript) {
-    const fullTranscript = transcript.map(entry => 
+    const fullTranscript = transcript.map(entry =>
       `${entry.speaker}: ${entry.text}`
     ).join('\n');
 
@@ -249,7 +266,7 @@ Best regards`;
         throw new Error('LanguageModel API not available');
       }
 
-      const fullTranscript = transcript.map((entry, index) => 
+      const fullTranscript = transcript.map((entry, index) =>
         `[${index}] ${entry.text}`
       ).join('\n');
 
@@ -262,7 +279,8 @@ Return a JSON array mapping segment indices to speaker labels:
 [{"index": 0, "speaker": "Speaker A"}, ...]`;
 
       const response = await this.aiManager.prompt(prompt);
-      const speakerMap = JSON.parse(response);
+      const cleanedResponse = this.cleanJSONResponse(response);
+      const speakerMap = JSON.parse(cleanedResponse);
 
       // Update transcript with identified speakers
       speakerMap.forEach(({ index, speaker }) => {
@@ -298,7 +316,7 @@ Return a JSON array mapping segment indices to speaker labels:
       }
 
       const detection = await this.aiManager.detectLanguage(sampleText);
-      
+
       return {
         success: true,
         language: detection.language,
@@ -318,7 +336,7 @@ Return a JSON array mapping segment indices to speaker labels:
 
   async generateMeetingSummary(transcript, summaryType = 'tldr') {
     try {
-      const fullTranscript = transcript.map(entry => 
+      const fullTranscript = transcript.map(entry =>
         `${entry.speaker}: ${entry.text}`
       ).join('\n');
 
@@ -368,7 +386,7 @@ Return a JSON array mapping segment indices to speaker labels:
           sourceLanguage,
           targetLanguage
         );
-        
+
         translatedTranscript.push({
           ...entry,
           originalText: entry.text,
@@ -396,7 +414,7 @@ Return a JSON array mapping segment indices to speaker labels:
 
   async analyzeMeetingStreaming(transcript, onUpdate) {
     try {
-      const fullTranscript = transcript.map(entry => 
+      const fullTranscript = transcript.map(entry =>
         `${entry.speaker}: ${entry.text}`
       ).join('\n');
 
