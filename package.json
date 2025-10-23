@@ -1,6 +1,6 @@
 {
   "name": "intellipen",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Intelligent writing and meeting companion with real-time grammar correction, style improvements, and meeting transcription using Chrome's built-in AI APIs.",
   "main": "background.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "test-server": "node start-test-server.js",
     "generate-icons": "node scripts/generate-icons.js",
     "generate-store-images": "node scripts/generate-store-images.js",
-    "package": "npm run clean && NODE_ENV=production npm run build && cd dist && zip -r ../intellipen-v1.0.1.zip . && cd .. && echo 'Package created: intellipen-v1.0.1.zip'"
+    "package": "npm run clean && NODE_ENV=production npm run build && cd dist && zip -r ../intellipen-v1.0.2.zip . && cd .. && echo 'Package created: intellipen-v1.0.2.zip'"
   },
   "keywords": [
     "chrome-extension",

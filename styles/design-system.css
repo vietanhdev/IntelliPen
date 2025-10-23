@@ -9,6 +9,9 @@
    ============================================ */
 
 :root {
+  /* Theme */
+  color-scheme: light;
+  
   /* Primary Colors - Chrome Blue Palette */
   --color-primary-50: #e8f0fe;
   --color-primary-100: #d2e3fc;
@@ -131,6 +134,121 @@
   --z-popover: 1500;
   --z-tooltip: 1600;
   --z-toast: 1700;
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  
+  /* Primary Colors - Adjusted for dark mode */
+  --color-primary-50: #1a2942;
+  --color-primary-100: #1e3a5f;
+  --color-primary-200: #2a4a7c;
+  --color-primary-300: #4a7bc8;
+  --color-primary-400: #669df6;
+  --color-primary-500: #8ab4f8;
+  --color-primary-600: #aecbfa;
+  --color-primary-700: #c2dbff;
+  --color-primary-800: #d2e3fc;
+  --color-primary-900: #e8f0fe;
+
+  /* Neutral Colors - Dark Mode */
+  --color-neutral-0: #000000;
+  --color-neutral-50: #0a0a0a;
+  --color-neutral-100: #1a1a1a;
+  --color-neutral-200: #2a2a2a;
+  --color-neutral-300: #3a3a3a;
+  --color-neutral-400: #5a5a5a;
+  --color-neutral-500: #7a7a7a;
+  --color-neutral-600: #9a9a9a;
+  --color-neutral-700: #bdbdbd;
+  --color-neutral-800: #e0e0e0;
+  --color-neutral-900: #f5f5f5;
+
+  /* Semantic Colors - Dark Mode */
+  --color-success: #81c995;
+  --color-success-bg: #1e3a28;
+  --color-warning: #fdd663;
+  --color-warning-bg: #3a2f1a;
+  --color-error: #f28b82;
+  --color-error-bg: #3a1f1e;
+  --color-info: #8ab4f8;
+  --color-info-bg: #1a2942;
+
+  /* Surface Colors - Dark Mode */
+  --surface-1: #1a1a1a;
+  --surface-2: #2a2a2a;
+  --surface-3: #3a3a3a;
+  --surface-4: #4a4a4a;
+  --surface-5: #5a5a5a;
+
+  /* Elevation Shadows - Dark Mode (lighter for visibility) */
+  --elevation-0: none;
+  --elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.6), 0 1px 3px 1px rgba(0, 0, 0, 0.4);
+  --elevation-2: 0 1px 2px 0 rgba(0, 0, 0, 0.6), 0 2px 6px 2px rgba(0, 0, 0, 0.4);
+  --elevation-3: 0 4px 8px 3px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.6);
+  --elevation-4: 0 6px 10px 4px rgba(0, 0, 0, 0.4), 0 2px 3px rgba(0, 0, 0, 0.6);
+  --elevation-5: 0 8px 12px 6px rgba(0, 0, 0, 0.4), 0 4px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Auto dark mode based on system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    
+    /* Primary Colors - Adjusted for dark mode */
+    --color-primary-50: #1a2942;
+    --color-primary-100: #1e3a5f;
+    --color-primary-200: #2a4a7c;
+    --color-primary-300: #4a7bc8;
+    --color-primary-400: #669df6;
+    --color-primary-500: #8ab4f8;
+    --color-primary-600: #aecbfa;
+    --color-primary-700: #c2dbff;
+    --color-primary-800: #d2e3fc;
+    --color-primary-900: #e8f0fe;
+
+    /* Neutral Colors - Dark Mode */
+    --color-neutral-0: #000000;
+    --color-neutral-50: #0a0a0a;
+    --color-neutral-100: #1a1a1a;
+    --color-neutral-200: #2a2a2a;
+    --color-neutral-300: #3a3a3a;
+    --color-neutral-400: #5a5a5a;
+    --color-neutral-500: #7a7a7a;
+    --color-neutral-600: #9a9a9a;
+    --color-neutral-700: #bdbdbd;
+    --color-neutral-800: #e0e0e0;
+    --color-neutral-900: #f5f5f5;
+
+    /* Semantic Colors - Dark Mode */
+    --color-success: #81c995;
+    --color-success-bg: #1e3a28;
+    --color-warning: #fdd663;
+    --color-warning-bg: #3a2f1a;
+    --color-error: #f28b82;
+    --color-error-bg: #3a1f1e;
+    --color-info: #8ab4f8;
+    --color-info-bg: #1a2942;
+
+    /* Surface Colors - Dark Mode */
+    --surface-1: #1a1a1a;
+    --surface-2: #2a2a2a;
+    --surface-3: #3a3a3a;
+    --surface-4: #4a4a4a;
+    --surface-5: #5a5a5a;
+
+    /* Elevation Shadows - Dark Mode */
+    --elevation-0: none;
+    --elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.6), 0 1px 3px 1px rgba(0, 0, 0, 0.4);
+    --elevation-2: 0 1px 2px 0 rgba(0, 0, 0, 0.6), 0 2px 6px 2px rgba(0, 0, 0, 0.4);
+    --elevation-3: 0 4px 8px 3px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.6);
+    --elevation-4: 0 6px 10px 4px rgba(0, 0, 0, 0.4), 0 2px 3px rgba(0, 0, 0, 0.6);
+    --elevation-5: 0 8px 12px 6px rgba(0, 0, 0, 0.4), 0 4px 4px rgba(0, 0, 0, 0.6);
+  }
 }
 
 /* ============================================

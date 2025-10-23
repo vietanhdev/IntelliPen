@@ -36,6 +36,49 @@ body {
   background: var(--surface-1);
   border-bottom: 1px solid var(--color-neutral-200);
   min-height: 56px;
+  gap: var(--space-3);
+}
+
+/* Theme toggle icons */
+.theme-icon-light,
+.theme-icon-dark {
+  position: absolute;
+  transition: all var(--transition-base);
+}
+
+/* Light mode: show sun icon */
+:root:not([data-theme="dark"]) .theme-icon-light {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+:root:not([data-theme="dark"]) .theme-icon-dark {
+  opacity: 0;
+  transform: rotate(90deg) scale(0);
+}
+
+/* Dark mode: show moon icon */
+[data-theme="dark"] .theme-icon-light {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0);
+}
+
+[data-theme="dark"] .theme-icon-dark {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* Auto dark mode */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-light {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0);
+  }
+
+  :root:not([data-theme="light"]) .theme-icon-dark {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
 }
 
 .header-title {
@@ -54,6 +97,20 @@ body {
   border-radius: var(--radius-md);
   color: var(--color-neutral-0);
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Dark mode title icon */
+[data-theme="dark"] .title-icon {
+  background: linear-gradient(135deg, #4a7bc8 0%, #2a4a7c 100%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .title-icon {
+    background: linear-gradient(135deg, #4a7bc8 0%, #2a4a7c 100%);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  }
 }
 
 .title-icon svg {
@@ -66,6 +123,17 @@ body {
   font-weight: var(--font-semibold);
   color: var(--color-neutral-900);
   margin: 0;
+}
+
+/* Dark mode header title */
+[data-theme="dark"] .header-title h1 {
+  color: var(--color-neutral-900);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .header-title h1 {
+    color: var(--color-neutral-900);
+  }
 }
 
 /* ============================================
@@ -329,6 +397,7 @@ body {
     transform: translateY(100%);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -357,10 +426,10 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--color-primary-600) 50%, 
-    transparent 100%);
+  background: linear-gradient(90deg,
+      transparent 0%,
+      var(--color-primary-600) 50%,
+      transparent 100%);
   opacity: 0.3;
 }
 
@@ -417,17 +486,32 @@ body {
   animation: fadeInUp 0.3s cubic-bezier(0.4, 0.0, 0.2, 1) backwards;
 }
 
-.suggestion-item:nth-child(1) { animation-delay: 0ms; }
-.suggestion-item:nth-child(2) { animation-delay: 50ms; }
-.suggestion-item:nth-child(3) { animation-delay: 100ms; }
-.suggestion-item:nth-child(4) { animation-delay: 150ms; }
-.suggestion-item:nth-child(5) { animation-delay: 200ms; }
+.suggestion-item:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.suggestion-item:nth-child(2) {
+  animation-delay: 50ms;
+}
+
+.suggestion-item:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.suggestion-item:nth-child(4) {
+  animation-delay: 150ms;
+}
+
+.suggestion-item:nth-child(5) {
+  animation-delay: 200ms;
+}
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -627,7 +711,9 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .suggestions-loading-text {
@@ -692,9 +778,11 @@ body {
     transform: scale(0);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -1111,10 +1199,13 @@ body {
 
 /* Material Design recording pulse animation */
 @keyframes recordingPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.2);
     opacity: 0.8;
@@ -1166,9 +1257,12 @@ body {
 
 /* Material Design pulse animation for status dot */
 @keyframes statusPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7);
   }
+
   50% {
     box-shadow: 0 0 0 6px rgba(211, 47, 47, 0);
   }
@@ -1272,10 +1366,10 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    var(--color-primary-600) 50%, 
-    transparent 100%);
+  background: linear-gradient(90deg,
+      transparent 0%,
+      var(--color-primary-600) 50%,
+      transparent 100%);
   opacity: 0.3;
 }
 
@@ -1319,11 +1413,25 @@ body {
   animation: fadeInUp 0.3s cubic-bezier(0.4, 0.0, 0.2, 1) backwards;
 }
 
-.transcript-entry:nth-child(1) { animation-delay: 0ms; }
-.transcript-entry:nth-child(2) { animation-delay: 50ms; }
-.transcript-entry:nth-child(3) { animation-delay: 100ms; }
-.transcript-entry:nth-child(4) { animation-delay: 150ms; }
-.transcript-entry:nth-child(5) { animation-delay: 200ms; }
+.transcript-entry:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.transcript-entry:nth-child(2) {
+  animation-delay: 50ms;
+}
+
+.transcript-entry:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.transcript-entry:nth-child(4) {
+  animation-delay: 150ms;
+}
+
+.transcript-entry:nth-child(5) {
+  animation-delay: 200ms;
+}
 
 .transcript-entry:hover {
   box-shadow: var(--elevation-2);
@@ -1532,10 +1640,21 @@ body {
   animation: fadeInUp 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) backwards;
 }
 
-.md-card:nth-child(2) { animation-delay: 0ms; }
-.md-card:nth-child(3) { animation-delay: 100ms; }
-.md-card:nth-child(4) { animation-delay: 200ms; }
-.md-card:nth-child(5) { animation-delay: 300ms; }
+.md-card:nth-child(2) {
+  animation-delay: 0ms;
+}
+
+.md-card:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.md-card:nth-child(4) {
+  animation-delay: 200ms;
+}
+
+.md-card:nth-child(5) {
+  animation-delay: 300ms;
+}
 
 /* Material Design Elevation */
 .md-elevation-1 {
@@ -1646,7 +1765,7 @@ body {
   padding: 0;
 }
 
-.md-card-content-list > p {
+.md-card-content-list>p {
   padding: var(--space-5);
   margin: 0;
 }
@@ -1776,7 +1895,7 @@ body {
   min-width: 0;
 }
 
-.action-text > div:first-child {
+.action-text>div:first-child {
   color: var(--color-neutral-900);
   font-size: 14px;
   line-height: 1.5;
@@ -1845,10 +1964,21 @@ body {
   margin-bottom: var(--space-4);
 }
 
-.analysis-card:nth-child(1) { animation-delay: 0ms; }
-.analysis-card:nth-child(2) { animation-delay: 100ms; }
-.analysis-card:nth-child(3) { animation-delay: 200ms; }
-.analysis-card:nth-child(4) { animation-delay: 300ms; }
+.analysis-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.analysis-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.analysis-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.analysis-card:nth-child(4) {
+  animation-delay: 300ms;
+}
 
 .analysis-card:hover {
   box-shadow: var(--elevation-4);
@@ -2238,6 +2368,7 @@ body {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -2250,10 +2381,13 @@ body {
 
 /* Pulse animation for recording indicator */
 @keyframes pulseGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7);
   }
+
   50% {
     opacity: 0.8;
     box-shadow: 0 0 0 8px rgba(211, 47, 47, 0);
@@ -2269,19 +2403,21 @@ body {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
 }
 
 .loading-text.gradient {
-  background: linear-gradient(90deg, 
-    var(--color-primary-600), 
-    var(--color-secondary-600), 
-    var(--color-primary-600));
+  background: linear-gradient(90deg,
+      var(--color-primary-600),
+      var(--color-secondary-600),
+      var(--color-primary-600));
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2345,9 +2481,12 @@ body {
 
 /* Badge pulse animation */
 @keyframes badgePulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }
@@ -2359,9 +2498,12 @@ body {
 
 /* Floating animation for placeholders */
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -2376,18 +2518,17 @@ body {
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
 }
 
 .analysis-card.loading {
-  background: linear-gradient(
-    90deg,
-    var(--surface-1) 0%,
-    var(--surface-2) 50%,
-    var(--surface-1) 100%
-  );
+  background: linear-gradient(90deg,
+      var(--surface-1) 0%,
+      var(--surface-2) 50%,
+      var(--surface-1) 100%);
   background-size: 1000px 100%;
   animation: shimmerCard 2s infinite;
 }

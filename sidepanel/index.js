@@ -56,6 +56,9 @@ class IntelliPenSidepanel {
     console.log('IntelliPen Sidepanel: Initializing...');
 
     try {
+      // Load theme first
+      await this.loadTheme();
+
       // Initialize AI Manager
       await this.initializeAI();
 
@@ -77,6 +80,57 @@ class IntelliPenSidepanel {
     } catch (error) {
       console.error('IntelliPen Sidepanel: Failed to initialize:', error);
       this.showError('Failed to initialize IntelliPen');
+    }
+  }
+
+  async loadTheme() {
+    try {
+      const result = await chrome.storage.local.get(['theme']);
+      const theme = result.theme || 'auto';
+      this.applyTheme(theme);
+    } catch (error) {
+      console.error('Failed to load theme:', error);
+    }
+  }
+
+  applyTheme(theme) {
+    const root = document.documentElement;
+    
+    if (theme === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+    } else if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+    } else {
+      // Auto mode - remove attribute to use system preference
+      root.removeAttribute('data-theme');
+    }
+  }
+
+  async toggleTheme() {
+    try {
+      const result = await chrome.storage.local.get(['theme']);
+      const currentTheme = result.theme || 'auto';
+      
+      // Cycle through: auto -> light -> dark -> auto
+      let newTheme;
+      if (currentTheme === 'auto') {
+        newTheme = 'light';
+      } else if (currentTheme === 'light') {
+        newTheme = 'dark';
+      } else {
+        newTheme = 'auto';
+      }
+      
+      await chrome.storage.local.set({ theme: newTheme });
+      this.applyTheme(newTheme);
+      
+      // Show toast notification
+      const themeNames = { auto: 'Auto', light: 'Light', dark: 'Dark' };
+      this.showInfo(`Theme: ${themeNames[newTheme]}`);
+      
+      console.log('Theme changed to:', newTheme);
+    } catch (error) {
+      console.error('Failed to toggle theme:', error);
     }
   }
 
@@ -120,6 +174,12 @@ class IntelliPenSidepanel {
   }
 
   setupEventListeners() {
+    // Theme toggle
+    const themeToggleBtn = document.getElementById('themeToggle');
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => this.toggleTheme());
+    }
+
     // Navigation tabs
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', (e) => {
@@ -2268,6 +2328,14 @@ class IntelliPenSidepanel {
 
   handleMessage(message, sender, sendResponse) {
     switch (message.type) {
+      case 'themeChanged':
+        // Sync theme change from other extension pages
+        if (message.theme) {
+          this.applyTheme(message.theme);
+        }
+        sendResponse({ success: true });
+        break;
+
       case 'PING_SIDEPANEL':
         // Respond that sidepanel is open
         sendResponse({ sidePanelOpen: true });
