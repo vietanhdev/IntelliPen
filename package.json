@@ -11,7 +11,8 @@
     "lint": "eslint . --ext .js",
     "test": "jest",
     "test-server": "node start-test-server.js",
-    "generate-icons": "node scripts/generate-icons.js"
+    "generate-icons": "node scripts/generate-icons.js",
+    "package": "npm run clean && NODE_ENV=production npm run build && cd dist && zip -r ../intellipen-v1.0.0.zip . && cd .. && echo 'Package created: intellipen-v1.0.0.zip'"
   },
   "keywords": [
     "chrome-extension",

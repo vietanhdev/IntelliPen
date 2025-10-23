@@ -107,19 +107,34 @@ export function createContextMenu(items = [], position = { x: 0, y: 0 }) {
 }
 
 /**
- * Create a toast notification
+ * Create a Material Design 3 toast notification (snackbar)
  */
 export function createToast(options = {}) {
   const {
     message = '',
+    title = '',
     type = 'info', // info, success, warning, error
-    duration = 3000,
+    duration = 4000,
     icon = null,
+    action = null, // { text: 'Action', onClick: () => {} }
+    dismissible = true,
   } = options;
 
-  const toast = document.createElement('div');
-  toast.className = `intellipen-toast intellipen-toast-${type}`;
+  // Get or create toast container
+  let container = document.querySelector('.toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
 
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+
+  // Add icon
   const iconName = icon || {
     info: 'info',
     success: 'check',
@@ -127,27 +142,135 @@ export function createToast(options = {}) {
     error: 'close',
   }[type];
 
-  const iconEl = createIcon(iconName, { size: 20 });
+  const iconEl = document.createElement('div');
+  iconEl.className = 'toast-icon';
+  iconEl.appendChild(createIcon(iconName, { size: 20 }));
   toast.appendChild(iconEl);
 
-  const messageSpan = document.createElement('span');
-  messageSpan.textContent = message;
-  toast.appendChild(messageSpan);
+  // Add content
+  const content = document.createElement('div');
+  content.className = 'toast-content';
 
-  const closeBtn = createIcon('close', { size: 16, className: 'intellipen-icon-button' });
-  closeBtn.addEventListener('click', () => toast.remove());
-  toast.appendChild(closeBtn);
+  if (title) {
+    const titleEl = document.createElement('div');
+    titleEl.className = 'toast-title';
+    titleEl.textContent = title;
+    content.appendChild(titleEl);
+  }
 
-  document.body.appendChild(toast);
+  if (message) {
+    const messageEl = document.createElement('div');
+    messageEl.className = 'toast-message';
+    messageEl.textContent = message;
+    content.appendChild(messageEl);
+  }
 
+  toast.appendChild(content);
+
+  // Add action button if provided
+  if (action) {
+    const actionBtn = document.createElement('button');
+    actionBtn.className = 'toast-action';
+    actionBtn.textContent = action.text || 'Action';
+    actionBtn.addEventListener('click', () => {
+      if (action.onClick) action.onClick();
+      dismissToast(toast);
+    });
+    toast.appendChild(actionBtn);
+  }
+
+  // Add close button if dismissible
+  if (dismissible) {
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'toast-close';
+    closeBtn.setAttribute('aria-label', 'Close notification');
+    closeBtn.appendChild(createIcon('close', { size: 18 }));
+    closeBtn.addEventListener('click', () => dismissToast(toast));
+    toast.appendChild(closeBtn);
+  }
+
+  // Add progress bar for auto-dismiss
+  if (duration > 0) {
+    const progress = document.createElement('div');
+    progress.className = 'toast-progress';
+    progress.style.animationDuration = `${duration}ms`;
+    toast.appendChild(progress);
+  }
+
+  // Add to container
+  container.appendChild(toast);
+
+  // Auto-dismiss after duration
   if (duration > 0) {
     setTimeout(() => {
-      toast.classList.add('fade-out');
-      setTimeout(() => toast.remove(), 300);
+      dismissToast(toast);
     }, duration);
   }
 
   return toast;
+}
+
+/**
+ * Dismiss a toast with animation
+ */
+function dismissToast(toast) {
+  if (!toast || toast.classList.contains('dismissing')) return;
+  
+  toast.classList.add('dismissing');
+  toast.addEventListener('animationend', () => {
+    toast.remove();
+    
+    // Remove container if empty
+    const container = document.querySelector('.toast-container');
+    if (container && container.children.length === 0) {
+      container.remove();
+    }
+  }, { once: true });
+}
+
+/**
+ * Show a success toast
+ */
+export function showSuccessToast(message, options = {}) {
+  return createToast({
+    message,
+    type: 'success',
+    ...options,
+  });
+}
+
+/**
+ * Show an error toast
+ */
+export function showErrorToast(message, options = {}) {
+  return createToast({
+    message,
+    type: 'error',
+    duration: 5000, // Errors stay longer
+    ...options,
+  });
+}
+
+/**
+ * Show a warning toast
+ */
+export function showWarningToast(message, options = {}) {
+  return createToast({
+    message,
+    type: 'warning',
+    ...options,
+  });
+}
+
+/**
+ * Show an info toast
+ */
+export function showInfoToast(message, options = {}) {
+  return createToast({
+    message,
+    type: 'info',
+    ...options,
+  });
 }
 
 /**

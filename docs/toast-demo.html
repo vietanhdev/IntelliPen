@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Material Design Toasts - IntelliPen</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <style>
+    body {
+      padding: var(--space-8);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .demo-section {
+      margin-bottom: var(--space-8);
+    }
+
+    .demo-section h2 {
+      margin-bottom: var(--space-4);
+      color: var(--color-neutral-900);
+    }
+
+    .demo-section p {
+      margin-bottom: var(--space-4);
+      color: var(--color-neutral-700);
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+
+    .demo-card {
+      background: var(--surface-1);
+      border: 1px solid var(--color-neutral-200);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-4);
+    }
+
+    .demo-card h3 {
+      margin-bottom: var(--space-3);
+      color: var(--color-neutral-900);
+    }
+
+    .code-block {
+      background: var(--color-neutral-900);
+      color: var(--color-neutral-100);
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+      font-family: var(--font-family-mono);
+      font-size: var(--text-sm);
+      overflow-x: auto;
+      margin-top: var(--space-3);
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list li {
+      padding: var(--space-2) 0;
+      padding-left: var(--space-6);
+      position: relative;
+    }
+
+    .feature-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--color-success);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Material Design 3 Toasts (Snackbars)</h1>
+  <p>IntelliPen's toast notification system follows Material Design 3 guidelines for snackbars.</p>
+
+  <div class="demo-section">
+    <h2>Basic Toast Types</h2>
+    <p>Four semantic types with appropriate colors and icons:</p>
+    <div class="button-grid">
+      <button class="btn btn-primary" onclick="showInfoDemo()">
+        Info Toast
+      </button>
+      <button class="btn btn-primary" onclick="showSuccessDemo()">
+        Success Toast
+      </button>
+      <button class="btn btn-primary" onclick="showWarningDemo()">
+        Warning Toast
+      </button>
+      <button class="btn btn-primary" onclick="showErrorDemo()">
+        Error Toast
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Toast with Title</h2>
+    <p>Toasts can include both a title and message for more context:</p>
+    <div class="button-grid">
+      <button class="btn btn-secondary" onclick="showTitleDemo()">
+        Toast with Title
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Toast with Action</h2>
+    <p>Add action buttons for user interaction:</p>
+    <div class="button-grid">
+      <button class="btn btn-secondary" onclick="showActionDemo()">
+        Toast with Action
+      </button>
+      <button class="btn btn-secondary" onclick="showUndoDemo()">
+        Undo Action
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Persistent Toast</h2>
+    <p>Toasts that don't auto-dismiss (duration = 0):</p>
+    <div class="button-grid">
+      <button class="btn btn-secondary" onclick="showPersistentDemo()">
+        Persistent Toast
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Long Duration Toast</h2>
+    <p>Toasts with extended display time:</p>
+    <div class="button-grid">
+      <button class="btn btn-secondary" onclick="showLongDemo()">
+        10 Second Toast
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Multiple Toasts</h2>
+    <p>Stack multiple toasts at once:</p>
+    <div class="button-grid">
+      <button class="btn btn-secondary" onclick="showMultipleDemo()">
+        Show 3 Toasts
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-card">
+    <h3>Material Design 3 Features</h3>
+    <ul class="feature-list">
+      <li>Bottom-center positioning (Material Design standard)</li>
+      <li>Smooth slide-up animation with cubic-bezier easing</li>
+      <li>Dark background with high contrast text</li>
+      <li>Semantic color coding (success, warning, error, info)</li>
+      <li>Optional action buttons with uppercase text</li>
+      <li>Progress bar for auto-dismiss timing</li>
+      <li>Accessible with ARIA attributes</li>
+      <li>Responsive design for mobile devices</li>
+      <li>Stacking support for multiple toasts</li>
+      <li>Smooth dismiss animation</li>
+    </ul>
+  </div>
+
+  <div class="demo-card">
+    <h3>Usage Examples</h3>
+    
+    <h4>Basic Toast</h4>
+    <div class="code-block">
+createToast({
+  message: 'File saved successfully',
+  type: 'success'
+});
+    </div>
+
+    <h4>Toast with Title and Action</h4>
+    <div class="code-block">
+createToast({
+  title: 'Connection Lost',
+  message: 'Unable to reach the server',
+  type: 'error',
+  action: {
+    text: 'Retry',
+    onClick: () => reconnect()
+  },
+  duration: 0 // Persistent
+});
+    </div>
+
+    <h4>Helper Functions</h4>
+    <div class="code-block">
+// Quick helpers
+showSuccessToast('Operation completed');
+showErrorToast('Something went wrong');
+showWarningToast('Please review your input');
+showInfoToast('New update available');
+    </div>
+  </div>
+
+  <script type="module">
+    import { createToast, showSuccessToast, showErrorToast, showWarningToast, showInfoToast } from '../src/components/ui-components.js';
+
+    // Make functions available globally for demo buttons
+    window.showInfoDemo = () => {
+      createToast({
+        message: 'This is an informational message',
+        type: 'info'
+      });
+    };
+
+    window.showSuccessDemo = () => {
+      showSuccessToast('Operation completed successfully!');
+    };
+
+    window.showWarningDemo = () => {
+      showWarningToast('Please review your input before continuing');
+    };
+
+    window.showErrorDemo = () => {
+      showErrorToast('An error occurred while processing your request');
+    };
+
+    window.showTitleDemo = () => {
+      createToast({
+        title: 'Update Available',
+        message: 'A new version of IntelliPen is ready to install',
+        type: 'info',
+        duration: 5000
+      });
+    };
+
+    window.showActionDemo = () => {
+      createToast({
+        message: 'Would you like to enable notifications?',
+        type: 'info',
+        action: {
+          text: 'Enable',
+          onClick: () => {
+            showSuccessToast('Notifications enabled');
+          }
+        },
+        duration: 6000
+      });
+    };
+
+    window.showUndoDemo = () => {
+      createToast({
+        message: 'Message deleted',
+        type: 'info',
+        action: {
+          text: 'Undo',
+          onClick: () => {
+            showSuccessToast('Message restored');
+          }
+        },
+        duration: 5000
+      });
+    };
+
+    window.showPersistentDemo = () => {
+      createToast({
+        title: 'Important Notice',
+        message: 'This toast will not auto-dismiss. Click the X to close.',
+        type: 'warning',
+        duration: 0
+      });
+    };
+
+    window.showLongDemo = () => {
+      createToast({
+        message: 'This toast will stay visible for 10 seconds',
+        type: 'info',
+        duration: 10000
+      });
+    };
+
+    window.showMultipleDemo = () => {
+      setTimeout(() => showInfoToast('First toast'), 0);
+      setTimeout(() => showSuccessToast('Second toast'), 300);
+      setTimeout(() => showWarningToast('Third toast'), 600);
+    };
+  </script>
+</body>
+</html>

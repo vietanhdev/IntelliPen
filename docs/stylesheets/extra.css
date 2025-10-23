@@ -1,0 +1,403 @@
+/* IntelliPen Material Blue Theme */
+
+:root {
+  --md-primary-fg-color: #1e88e5;
+  --md-primary-fg-color--light: #42a5f5;
+  --md-primary-fg-color--dark: #1565c0;
+  --md-accent-fg-color: #03a9f4;
+}
+
+/* Hero Section */
+.hero {
+  background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #1e88e5 100%);
+  color: white !important;
+  padding: 4rem 2rem;
+  margin: -1rem -1rem 2rem -1rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero h1,
+.hero h2,
+.hero h3,
+.hero p,
+.hero strong {
+  color: white !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.95;
+}
+
+.hero .md-button {
+  margin: 0.5rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: none;
+  letter-spacing: 0.5px;
+}
+
+.hero .md-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Primary Button (Get Started) */
+.hero .md-button--primary {
+  background: white !important;
+  color: var(--md-primary-fg-color) !important;
+  border: 2px solid white;
+}
+
+.hero .md-button--primary:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.4);
+}
+
+/* Secondary Button (View on GitHub) */
+.hero .md-button:not(.md-button--primary) {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.hero .md-button:not(.md-button--primary):hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.2);
+}
+
+.hero .badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: white !important;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Feature Cards */
+.md-typeset .grid.cards>ol>li,
+.md-typeset .grid.cards>ul>li {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: var(--md-default-bg-color);
+}
+
+.md-typeset .grid.cards>ol>li:hover,
+.md-typeset .grid.cards>ul>li:hover {
+  border-color: var(--md-primary-fg-color);
+  box-shadow: 0 8px 24px rgba(30, 136, 229, 0.15);
+  transform: translateY(-4px);
+  background: linear-gradient(135deg, rgba(30, 136, 229, 0.02) 0%, rgba(30, 136, 229, 0.05) 100%);
+}
+
+/* Card Title Styling */
+.md-typeset .grid.cards > ul > li > p > strong {
+  font-size: 1.1rem;
+  color: var(--md-primary-fg-color--dark);
+  display: block;
+  margin-top: 0.5rem;
+}
+
+/* Card List Items */
+.md-typeset .grid.cards ul li ul li {
+  padding: 0.25rem 0;
+  line-height: 1.6;
+}
+
+/* Icons */
+.check {
+  color: #4caf50;
+  font-size: 1.1rem;
+  margin-right: 0.25rem;
+}
+
+.lg {
+  font-size: 2.5rem;
+  display: inline-block;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.middle {
+  vertical-align: middle;
+}
+
+/* Icon Animations and Effects */
+.md-typeset .grid.cards > ol > li:hover .lg,
+.md-typeset .grid.cards > ul > li:hover .lg {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Feature Section Icons - Gradient Colors */
+.md-typeset .grid.cards > ol > li svg,
+.md-typeset .grid.cards > ul > li svg {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Icon Color Scheme */
+.md-typeset .admonition svg,
+.md-typeset .grid.cards svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Specific Icon Colors for Features */
+.md-typeset h2 + p + .grid.cards > ul > li:nth-child(1) svg {
+  color: #1e88e5; /* Editor - Blue */
+}
+
+.md-typeset h2 + p + .grid.cards > ul > li:nth-child(2) svg {
+  color: #00acc1; /* Translator - Cyan */
+}
+
+.md-typeset h2 + p + .grid.cards > ul > li:nth-child(3) svg {
+  color: #5e35b1; /* Meeting - Purple */
+}
+
+/* Privacy Section Icons */
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="laptop"]) svg,
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="shield-account"]) svg,
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="lock"]) svg,
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="eye"]) svg {
+  color: #43a047; /* Privacy - Green */
+}
+
+/* AI APIs Section Icons - Varied Colors */
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="chat"]) svg {
+  color: #1e88e5; /* Prompt API - Blue */
+}
+
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="spellcheck"]) svg {
+  color: #e53935; /* Proofreader - Red */
+}
+
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="pen"]) svg {
+  color: #fb8c00; /* Writer - Orange */
+}
+
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="sync"]) svg {
+  color: #00acc1; /* Rewriter - Cyan */
+}
+
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="text-box-outline"]) svg {
+  color: #8e24aa; /* Summarizer - Purple */
+}
+
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="web"]) svg {
+  color: #43a047; /* Translator - Green */
+}
+
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="magnify"]) svg {
+  color: #fdd835; /* Language Detector - Yellow */
+}
+
+/* Why Choose Section Icons */
+.md-typeset .grid.cards > ul > li:has(svg[data-icon*="chrome"]) svg {
+  color: #1e88e5; /* Chrome - Blue */
+}
+
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="shield-check"]) svg {
+  color: #43a047; /* Privacy - Green */
+}
+
+.md-typeset .grid.cards > ul > li:has(svg[data-icon="source-branch"]) svg {
+  color: #fb8c00; /* Open Source - Orange */
+}
+
+/* Icon Container Styling */
+.md-typeset .grid.cards > ul > li > p:first-child {
+  margin-bottom: 1rem;
+}
+
+/* Icon Background Circle Effect */
+.md-typeset .grid.cards > ul > li:hover svg {
+  filter: drop-shadow(0 4px 12px rgba(30, 136, 229, 0.3));
+}
+
+/* Pulse Animation for Important Icons */
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.md-typeset .grid.cards > ul > li:first-child svg {
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+/* Icon Glow on Hover */
+.md-typeset .grid.cards > ul > li:hover svg {
+  transform: scale(1.1);
+}
+
+/* Center Content */
+.center-content {
+  text-align: center;
+  margin: 3rem 0;
+  padding: 2rem;
+}
+
+.md-button--large {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(30, 136, 229, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.md-button--large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(30, 136, 229, 0.4);
+}
+
+/* Button Icons */
+.md-button svg {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+/* Section Spacing */
+.md-typeset h2 {
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: var(--md-primary-fg-color--dark);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 76.1875em) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .hero {
+    padding: 3rem 1.5rem;
+  }
+}
+
+@media screen and (max-width: 44.9375em) {
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .md-button--large {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+
+/* Enhanced Check Icons in Lists */
+.md-typeset .grid.cards ul li ul li::marker {
+  content: none;
+}
+
+.md-typeset .grid.cards ul li ul li {
+  list-style: none;
+  position: relative;
+  padding-left: 0;
+}
+
+/* Smooth Transitions for All Elements */
+.md-typeset .grid.cards * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Icon Badge Effect */
+.md-typeset .grid.cards > ul > li > p:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+}
+
+/* Gradient Background for Icon Container on Hover */
+.md-typeset .grid.cards > ul > li:hover > p:first-child {
+  background: radial-gradient(circle, rgba(30, 136, 229, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  padding: 1rem;
+}
+
+/* Trophy Badge in Hero */
+.hero .badge svg {
+  vertical-align: middle;
+  margin-right: 0.5rem;
+  color: #ffd700 !important;
+  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.5));
+}
+
+/* Material Icons Enhancement */
+.md-typeset svg.twemoji {
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
+}
+
+/* Large Icons in Cards */
+.md-typeset .grid.cards .lg svg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+/* Icon Rotation on Hover for Specific Types */
+.md-typeset .grid.cards > ul > li:hover svg[data-icon="sync"] {
+  transform: scale(1.1) rotate(180deg);
+}
+
+.md-typeset .grid.cards > ul > li:hover svg[data-icon="magnify"] {
+  transform: scale(1.2);
+}
+
+/* Smooth Icon Transitions */
+.md-typeset svg {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}

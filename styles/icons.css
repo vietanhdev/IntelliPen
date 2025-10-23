@@ -1,23 +1,11 @@
 /**
  * IntelliPen Icon Styles
- * Consistent styling for all icons across the extension
- * 
- * Design System:
- * - All icons use currentColor for dynamic theming
- * - Standard sizes: xs(14px), sm(16px), md(20px), lg(24px), xl(32px)
- * - Consistent stroke-width: 2px (primary), 1.5px (secondary)
- * - Smooth edges: stroke-linecap and stroke-linejoin set to round
+ * Material Design Icon System
  */
 
-:root {
-  --icon-check-color: #ffffff;
-  --icon-primary: #667eea;
-  --icon-secondary: #764ba2;
-  --icon-success: #10b981;
-  --icon-warning: #f59e0b;
-  --icon-error: #ef4444;
-  --icon-muted: #6b7280;
-}
+/* ============================================
+   ICON BASE STYLES
+   ============================================ */
 
 .intellipen-icon {
   display: inline-flex;
@@ -25,7 +13,7 @@
   justify-content: center;
   flex-shrink: 0;
   user-select: none;
-  line-height: 1;
+  vertical-align: middle;
 }
 
 .intellipen-icon svg {
@@ -34,93 +22,105 @@
   display: block;
 }
 
-/* Icon sizes */
-.intellipen-icon-xs {
-  width: 14px;
-  height: 14px;
-}
+/* ============================================
+   ICON SIZES
+   ============================================ */
 
-.intellipen-icon-sm {
+.icon-xs {
   width: 16px;
   height: 16px;
 }
 
-.intellipen-icon-md {
+.icon-sm {
+  width: 18px;
+  height: 18px;
+}
+
+.icon-md {
   width: 20px;
   height: 20px;
 }
 
-.intellipen-icon-lg {
+.icon-lg {
   width: 24px;
   height: 24px;
 }
 
-.intellipen-icon-xl {
+.icon-xl {
   width: 32px;
   height: 32px;
 }
 
-/* Icon colors - using CSS variables for consistency */
-.intellipen-icon-primary {
-  color: var(--icon-primary);
+.icon-2xl {
+  width: 40px;
+  height: 40px;
 }
 
-.intellipen-icon-secondary {
-  color: var(--icon-secondary);
+/* ============================================
+   ICON COLORS - Material Design Palette
+   ============================================ */
+
+.icon-primary {
+  color: var(--color-primary-600, #1a73e8);
 }
 
-.intellipen-icon-success {
-  color: var(--icon-success);
+.icon-secondary {
+  color: var(--color-neutral-700, #5f6368);
 }
 
-.intellipen-icon-warning {
-  color: var(--icon-warning);
+.icon-success {
+  color: var(--color-success, #1e8e3e);
 }
 
-.intellipen-icon-error {
-  color: var(--icon-error);
+.icon-warning {
+  color: var(--color-warning, #f9ab00);
 }
 
-.intellipen-icon-muted {
-  color: var(--icon-muted);
+.icon-error {
+  color: var(--color-error, #d93025);
 }
 
-/* Interactive icons */
-.intellipen-icon-button {
+.icon-info {
+  color: var(--color-info, #1967d2);
+}
+
+.icon-muted {
+  color: var(--color-neutral-500, #9aa0a6);
+}
+
+.icon-white {
+  color: #ffffff;
+}
+
+/* ============================================
+   ICON STATES
+   ============================================ */
+
+.icon-interactive {
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 6px;
-  padding: 4px;
+  transition: all 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-.intellipen-icon-button:hover {
-  background: color-mix(in srgb, var(--icon-primary) 10%, transparent);
-  color: var(--icon-primary);
+.icon-interactive:hover {
+  opacity: 0.8;
   transform: scale(1.05);
 }
 
-.intellipen-icon-button:active {
+.icon-interactive:active {
   transform: scale(0.95);
-  transition-duration: 0.1s;
 }
 
-.intellipen-icon-button:disabled {
-  opacity: 0.4;
+.icon-disabled {
+  opacity: 0.38;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
-.intellipen-icon-button:disabled:hover {
-  background: transparent;
-  color: inherit;
-  transform: none;
-}
+/* ============================================
+   ICON ANIMATIONS
+   ============================================ */
 
-/* Animated icons */
-.intellipen-icon-spin {
-  animation: intellipen-icon-spin 1s linear infinite;
-}
-
-@keyframes intellipen-icon-spin {
+@keyframes icon-spin {
   from {
     transform: rotate(0deg);
   }
@@ -129,11 +129,7 @@
   }
 }
 
-.intellipen-icon-pulse {
-  animation: intellipen-icon-pulse 2s ease-in-out infinite;
-}
-
-@keyframes intellipen-icon-pulse {
+@keyframes icon-pulse {
   0%, 100% {
     opacity: 1;
   }
@@ -142,46 +138,324 @@
   }
 }
 
-/* Icon with badge */
-.intellipen-icon-badge {
-  position: relative;
+@keyframes icon-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
-.intellipen-icon-badge::after {
+.icon-spin {
+  animation: icon-spin 1s linear infinite;
+}
+
+.icon-pulse {
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
+.icon-bounce {
+  animation: icon-bounce 1s ease-in-out infinite;
+}
+
+/* ============================================
+   ICON CONTAINERS
+   ============================================ */
+
+.icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.icon-container-sm {
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+}
+
+.icon-container-md {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+}
+
+.icon-container-lg {
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+}
+
+/* Container variants */
+.icon-container-primary {
+  background: var(--color-primary-50, #e8f0fe);
+  color: var(--color-primary-600, #1a73e8);
+}
+
+.icon-container-primary:hover {
+  background: var(--color-primary-100, #d2e3fc);
+}
+
+.icon-container-success {
+  background: var(--color-success-bg, #e6f4ea);
+  color: var(--color-success, #1e8e3e);
+}
+
+.icon-container-success:hover {
+  background: #c6e8cc;
+}
+
+.icon-container-warning {
+  background: var(--color-warning-bg, #fef7e0);
+  color: var(--color-warning, #f9ab00);
+}
+
+.icon-container-warning:hover {
+  background: #fef0c7;
+}
+
+.icon-container-error {
+  background: var(--color-error-bg, #fce8e6);
+  color: var(--color-error, #d93025);
+}
+
+.icon-container-error:hover {
+  background: #fad2cf;
+}
+
+.icon-container-neutral {
+  background: var(--surface-3, #f1f3f4);
+  color: var(--color-neutral-700, #5f6368);
+}
+
+.icon-container-neutral:hover {
+  background: var(--surface-4, #e8eaed);
+}
+
+/* ============================================
+   ICON BADGES
+   ============================================ */
+
+.icon-badge {
+  position: relative;
+  display: inline-flex;
+}
+
+.icon-badge::after {
   content: '';
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -2px;
+  right: -2px;
   width: 8px;
   height: 8px;
-  background: #ef4444;
-  border: 2px solid white;
   border-radius: 50%;
+  border: 2px solid white;
 }
 
-/* Menu icons */
-.intellipen-menu-icon {
-  margin-right: 8px;
-  color: var(--icon-muted);
-  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+.icon-badge-primary::after {
+  background: var(--color-primary-600, #1a73e8);
 }
 
-.intellipen-menu-item:hover .intellipen-menu-icon {
-  color: var(--icon-primary);
+.icon-badge-success::after {
+  background: var(--color-success, #1e8e3e);
 }
 
-/* Gradient icons */
-.intellipen-icon-gradient {
-  background: linear-gradient(135deg, var(--icon-primary) 0%, var(--icon-secondary) 100%);
+.icon-badge-warning::after {
+  background: var(--color-warning, #f9ab00);
+}
+
+.icon-badge-error::after {
+  background: var(--color-error, #d93025);
+}
+
+/* ============================================
+   ICON GRADIENTS
+   ============================================ */
+
+.icon-gradient-primary {
+  background: linear-gradient(135deg, #4285f4 0%, #1a73e8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: transparent;
 }
 
-/* Ensure gradient works in all browsers */
-@supports not (background-clip: text) {
-  .intellipen-icon-gradient {
-    color: var(--icon-primary);
+.icon-gradient-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.icon-gradient-success {
+  background: linear-gradient(135deg, #34d399 0%, #1e8e3e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.icon-gradient-rainbow {
+  background: linear-gradient(135deg, #4285f4 0%, #a855f7 50%, #f9ab00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   ICON BUTTON INTEGRATION
+   ============================================ */
+
+.btn .intellipen-icon {
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  padding: 8px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  color: var(--color-neutral-700, #5f6368);
+}
+
+.btn-icon:hover {
+  background: var(--surface-3, #f1f3f4);
+}
+
+.btn-icon:active {
+  background: var(--surface-4, #e8eaed);
+  transform: scale(0.95);
+}
+
+.btn-icon:focus-visible {
+  outline: 2px solid var(--color-primary-600, #1a73e8);
+  outline-offset: 2px;
+}
+
+.btn-icon:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ============================================
+   CONTEXT MENU ICONS
+   ============================================ */
+
+.context-menu-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  color: var(--color-neutral-700, #5f6368);
+  flex-shrink: 0;
+}
+
+.context-menu-item:hover .context-menu-icon {
+  color: var(--color-primary-600, #1a73e8);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.icon-flip-horizontal {
+  transform: scaleX(-1);
+}
+
+.icon-flip-vertical {
+  transform: scaleY(-1);
+}
+
+.icon-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.icon-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.icon-rotate-270 {
+  transform: rotate(270deg);
+}
+
+/* ============================================
+   RESPONSIVE ICONS
+   ============================================ */
+
+@media (max-width: 640px) {
+  .icon-responsive {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (min-width: 641px) {
+  .icon-responsive {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .icon-responsive {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.icon-accessible {
+  position: relative;
+}
+
+.icon-accessible::before {
+  content: attr(aria-label);
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%) translateY(-8px);
+  padding: 4px 8px;
+  background: var(--color-neutral-800, #3c4043);
+  color: white;
+  font-size: 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  z-index: 1000;
+}
+
+.icon-accessible:hover::before,
+.icon-accessible:focus::before {
+  opacity: 1;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .intellipen-icon {
+    filter: contrast(1.2);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .icon-spin,
+  .icon-pulse,
+  .icon-bounce,
+  .icon-interactive {
+    animation: none;
+    transition: none;
   }
 }

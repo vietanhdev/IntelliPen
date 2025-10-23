@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IntelliPen Icon Preview</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 40px;
+    }
+    
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    
+    .icon-card {
+      text-align: center;
+      padding: 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    
+    .icon-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .icon-wrapper {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+    }
+    
+    .icon-card h3 {
+      color: #667eea;
+      margin: 0 0 5px 0;
+      font-size: 18px;
+    }
+    
+    .icon-card p {
+      color: #666;
+      margin: 0;
+      font-size: 14px;
+    }
+    
+    .svg-section {
+      margin-top: 40px;
+      padding-top: 40px;
+      border-top: 2px solid #e5e7eb;
+    }
+    
+    .svg-preview {
+      background: #f9fafb;
+      padding: 40px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .svg-preview img {
+      max-width: 256px;
+      height: auto;
+    }
+    
+    .info-box {
+      background: #eff6ff;
+      border-left: 4px solid #667eea;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+    }
+    
+    .info-box h3 {
+      color: #667eea;
+      margin-top: 0;
+    }
+    
+    .info-box ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    
+    .info-box li {
+      margin: 8px 0;
+      color: #555;
+    }
+    
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🖋️ IntelliPen Icon Preview</h1>
+    <p class="subtitle">Chrome Extension Icons - All Sizes</p>
+    
+    <div class="icon-grid">
+      <div class="icon-card">
+        <div class="icon-wrapper">
+          <img src="icon16.png" alt="16x16 icon" width="16" height="16" style="image-rendering: pixelated;">
+        </div>
+        <h3>16×16</h3>
+        <p>Toolbar icon</p>
+      </div>
+      
+      <div class="icon-card">
+        <div class="icon-wrapper">
+          <img src="icon32.png" alt="32x32 icon" width="32" height="32">
+        </div>
+        <h3>32×32</h3>
+        <p>Windows standard</p>
+      </div>
+      
+      <div class="icon-card">
+        <div class="icon-wrapper">
+          <img src="icon48.png" alt="48x48 icon" width="48" height="48">
+        </div>
+        <h3>48×48</h3>
+        <p>Extension management</p>
+      </div>
+      
+      <div class="icon-card">
+        <div class="icon-wrapper">
+          <img src="icon128.png" alt="128x128 icon" width="128" height="128">
+        </div>
+        <h3>128×128</h3>
+        <p>Chrome Web Store</p>
+      </div>
+    </div>
+    
+    <div class="svg-section">
+      <h2>SVG Source</h2>
+      <div class="svg-preview">
+        <img src="icon.svg" alt="SVG icon" width="256" height="256">
+      </div>
+    </div>
+    
+    <div class="info-box">
+      <h3>Icon Design Features</h3>
+      <ul>
+        <li><strong>Purple gradient pen</strong> - Brand colors (#667eea to #764ba2)</li>
+        <li><strong>Golden AI sparkles</strong> - Indicates intelligent features</li>
+        <li><strong>Writing lines</strong> - Suggests text editing capabilities</li>
+        <li><strong>Flat design</strong> - Modern aesthetic that scales well</li>
+        <li><strong>High contrast</strong> - Readable at all sizes, including 16×16</li>
+      </ul>
+    </div>
+    
+    <div class="info-box">
+      <h3>Regenerating Icons</h3>
+      <p>To regenerate PNG icons from the SVG source, run:</p>
+      <p><code>npm run generate-icons</code></p>
+    </div>
+  </div>
+</body>
+</html>

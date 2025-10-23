@@ -132,16 +132,17 @@ class IntelliPenExtension {
   async createContextMenus() {
     // Remove existing menus first
     chrome.contextMenus.removeAll(async () => {
-      // Primary actions - Edit and Translate
+      // Send to Editor
       chrome.contextMenus.create({
         id: 'intellipen-edit',
-        title: '✏️ Edit with IntelliPen',
+        title: 'Send to Editor',
         contexts: ['selection']
       });
 
+      // Translate text
       chrome.contextMenus.create({
         id: 'intellipen-translate',
-        title: '🌐 Translate with IntelliPen',
+        title: 'Translate text',
         contexts: ['selection']
       });
 
@@ -264,6 +265,47 @@ class IntelliPenExtension {
     } catch (error) {
       console.error('IntelliPen: Failed to open translator:', error);
       this.showErrorNotification('Failed to open translator');
+    }
+  }
+
+  async handleQuickAction(info, tab, action) {
+    const selectedText = info.selectionText || '';
+
+    if (!selectedText.trim()) {
+      this.showErrorNotification('Please select some text');
+      return;
+    }
+
+    try {
+      // Send message to content script to show inline result
+      await chrome.tabs.sendMessage(tab.id, {
+        type: 'SHOW_QUICK_ACTION_RESULT',
+        data: {
+          text: selectedText,
+          action: action
+        }
+      });
+
+      console.log(`IntelliPen: Quick action ${action} triggered`);
+    } catch (error) {
+      console.error('IntelliPen: Failed to execute quick action:', error);
+
+      // Fallback: open in sidebar
+      try {
+        await chrome.sidePanel.open({ tabId: tab.id });
+        await new Promise(resolve => setTimeout(resolve, 500));
+        await chrome.runtime.sendMessage({
+          type: 'LOAD_TEXT_IN_EDITOR',
+          data: {
+            text: selectedText,
+            action: action,
+            tabId: tab.id
+          }
+        });
+      } catch (fallbackError) {
+        console.error('IntelliPen: Fallback also failed:', fallbackError);
+        this.showErrorNotification('Failed to process request');
+      }
     }
   }
 

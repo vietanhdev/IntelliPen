@@ -128,7 +128,15 @@ class AIAPIManager {
   async createWriter(options = {}) {
     try {
       if (!('Writer' in self)) {
-        throw new Error('Writer API not available');
+        throw new Error('Writer API not available in window context');
+      }
+
+      console.log('Writer API found in window, checking availability...');
+      
+      // Check availability before creating
+      if (Writer.availability) {
+        const availability = await Writer.availability();
+        console.log('Writer availability check result:', availability);
       }
 
       const defaultOptions = {
@@ -138,22 +146,43 @@ class AIAPIManager {
         ...options
       };
 
+      console.log('Creating Writer with options:', defaultOptions);
       const writer = await Writer.create(defaultOptions);
-      console.log('Writer created successfully');
+      console.log('Writer created successfully:', writer);
       return writer;
     } catch (error) {
       console.error('Failed to create writer:', error);
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
       throw error;
     }
   }
 
   async write(prompt, options = {}) {
     try {
+      console.log('Creating writer with options:', options);
       const writer = await this.createWriter(options);
+      console.log('Writer created, calling write() with prompt length:', prompt.length);
+      
       const result = await writer.write(prompt, { context: options.context });
+      
+      console.log('Write result received:', {
+        type: typeof result,
+        length: result?.length,
+        preview: typeof result === 'string' ? result.substring(0, 100) : result
+      });
+      
       return result;
     } catch (error) {
       console.error('Writing failed:', error);
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
       throw error;
     }
   }
@@ -434,7 +463,13 @@ class AIAPIManager {
   }
 
   isAPIAvailable(apiName) {
-    return this.availability[apiName] === 'available';
+    const availability = this.availability[apiName];
+    // API is available if it's in any of these states:
+    // - 'readily': Ready to use immediately
+    // - 'after-download': Model needs download but API is enabled
+    // - 'available': Generic available state (some Chrome versions)
+    const availableStates = ['readily', 'after-download', 'available'];
+    return availableStates.includes(availability);
   }
 
   async waitForDownload(apiName, onProgress) {

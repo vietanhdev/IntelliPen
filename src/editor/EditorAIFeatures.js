@@ -16,14 +16,14 @@ class EditorAIFeatures {
   async checkGrammar(text) {
     try {
       console.log('Checking grammar for text:', text.substring(0, 50) + '...');
-      
+
       // Check if Proofreader API is available
       if (!this.aiManager.isAPIAvailable('proofreader')) {
         throw new Error('Proofreader API is not available. Please ensure Chrome 141+ and enable the API.');
       }
 
       const result = await this.aiManager.proofread(text);
-      
+
       return {
         success: true,
         corrected: result.corrected,
@@ -43,7 +43,7 @@ class EditorAIFeatures {
   getFallbackGrammarSuggestions(text) {
     // Basic fallback suggestions when API is not available
     const suggestions = [];
-    
+
     // Check for common issues
     if (text.match(/\bi\b/)) {
       suggestions.push({
@@ -51,21 +51,21 @@ class EditorAIFeatures {
         text: 'Consider capitalizing "I" when used as a pronoun'
       });
     }
-    
+
     if (text.match(/\s{2,}/)) {
       suggestions.push({
         type: 'Spacing',
         text: 'Multiple spaces detected - consider using single spaces'
       });
     }
-    
+
     if (!text.match(/[.!?]$/)) {
       suggestions.push({
         type: 'Punctuation',
         text: 'Consider ending sentences with proper punctuation'
       });
     }
-    
+
     return suggestions;
   }
 
@@ -74,26 +74,37 @@ class EditorAIFeatures {
   async improveWriting(text, options = {}) {
     try {
       console.log('Improving writing for text:', text.substring(0, 50) + '...');
-      
+
       // Check if Writer API is available
+      const writerAvailability = this.aiManager.getAvailability('writer');
+      console.log('Writer API availability status:', writerAvailability);
+
       if (!this.aiManager.isAPIAvailable('writer')) {
-        throw new Error('Writer API is not available. Please ensure you have the required Chrome version.');
+        throw new Error(`Writer API is not available. Current status: ${writerAvailability}. Please ensure you have the required Chrome version and the API is enabled in chrome://flags/`);
       }
 
       const prompt = `Improve the following text while maintaining its core message:\n\n${text}`;
-      
+
       const improved = await this.aiManager.write(prompt, {
         tone: options.tone || 'neutral',
         format: 'plain-text',
-        length: 'as-is',
+        length: 'medium', // Valid values: 'short', 'medium', 'long'
         context: 'This is for general writing improvement, focusing on clarity, conciseness, and readability.'
       });
-      
+
+      console.log('Improved text received:', improved);
+      console.log('Improved text type:', typeof improved);
+
+      // Check if we got a valid result
+      if (!improved || typeof improved !== 'string' || improved.trim() === '') {
+        throw new Error('Writer API returned empty or invalid result');
+      }
+
       return {
         success: true,
         original: text,
-        improved: improved,
-        suggestions: this.generateImprovementSuggestions(text, improved)
+        improved: improved.trim(),
+        suggestions: this.generateImprovementSuggestions(text, improved.trim())
       };
     } catch (error) {
       console.error('Writing improvement failed:', error);
@@ -107,23 +118,71 @@ class EditorAIFeatures {
 
   generateImprovementSuggestions(original, improved) {
     const suggestions = [];
-    
+
     const originalWords = original.split(/\s+/).length;
     const improvedWords = improved.split(/\s+/).length;
-    
+
+    // Word count comparison
     if (improvedWords < originalWords) {
       suggestions.push({
         type: 'Conciseness',
-        text: `Reduced from ${originalWords} to ${improvedWords} words`
+        text: `Reduced from ${originalWords} to ${improvedWords} words (${Math.round((1 - improvedWords / originalWords) * 100)}% shorter)`
+      });
+    } else if (improvedWords > originalWords) {
+      suggestions.push({
+        type: 'Expansion',
+        text: `Expanded from ${originalWords} to ${improvedWords} words for better clarity`
+      });
+    } else {
+      suggestions.push({
+        type: 'Refinement',
+        text: `Improved clarity and readability while maintaining length`
       });
     }
-    
+
+    // Check for structural improvements
+    const originalSentences = original.split(/[.!?]+/).filter(s => s.trim()).length;
+    const improvedSentences = improved.split(/[.!?]+/).filter(s => s.trim()).length;
+
+    if (improvedSentences !== originalSentences) {
+      suggestions.push({
+        type: 'Structure',
+        text: `Restructured into ${improvedSentences} sentence${improvedSentences !== 1 ? 's' : ''} for better flow`
+      });
+    }
+
     return suggestions;
   }
 
   getFallbackWritingSuggestions(text) {
     const suggestions = [];
-    
+
+    // Check actual availability status
+    const writerAvailability = this.aiManager.getAvailability('writer');
+
+    // Add API availability message based on status
+    if (writerAvailability === 'after-download') {
+      suggestions.push({
+        type: 'Info',
+        text: '💡 Writer API requires model download. The Gemini Nano model (~22GB) needs to be downloaded. This happens automatically in the background. Check chrome://components/ for "Optimization Guide On Device Model" status.'
+      });
+    } else if (writerAvailability === 'no' || writerAvailability === 'unavailable') {
+      suggestions.push({
+        type: 'Info',
+        text: '💡 Writer API is not available. Enable it in chrome://flags/ by searching for "Writer API" and restarting Chrome. Also ensure you have Chrome 128+ on a supported platform.'
+      });
+    } else if (writerAvailability === 'readily' || writerAvailability === 'available') {
+      suggestions.push({
+        type: 'Info',
+        text: `💡 Writer API is available (status: ${writerAvailability}) but failed to generate improved text. This may be a temporary issue. Try again or check the console for error details.`
+      });
+    } else {
+      suggestions.push({
+        type: 'Info',
+        text: `💡 Writer API status: ${writerAvailability}. There may be an issue with the API initialization.`
+      });
+    }
+
     // Check for passive voice
     if (text.match(/\b(is|are|was|were|been|being)\s+\w+ed\b/)) {
       suggestions.push({
@@ -131,7 +190,7 @@ class EditorAIFeatures {
         text: 'Consider using active voice for more direct writing'
       });
     }
-    
+
     // Check for word repetition
     const words = text.toLowerCase().split(/\s+/);
     const wordCounts = {};
@@ -140,7 +199,7 @@ class EditorAIFeatures {
         wordCounts[word] = (wordCounts[word] || 0) + 1;
       }
     });
-    
+
     const repeated = Object.entries(wordCounts).filter(([_, count]) => count > 2);
     if (repeated.length > 0) {
       suggestions.push({
@@ -148,7 +207,17 @@ class EditorAIFeatures {
         text: `Consider varying word choice - "${repeated[0][0]}" appears ${repeated[0][1]} times`
       });
     }
-    
+
+    // Check for long sentences
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim());
+    const longSentences = sentences.filter(s => s.split(/\s+/).length > 25);
+    if (longSentences.length > 0) {
+      suggestions.push({
+        type: 'Readability',
+        text: `${longSentences.length} sentence${longSentences.length > 1 ? 's' : ''} may be too long. Consider breaking them up for better readability.`
+      });
+    }
+
     return suggestions;
   }
 
@@ -157,7 +226,7 @@ class EditorAIFeatures {
   async changeTone(text, targetTone) {
     try {
       console.log(`Changing tone to ${targetTone} for text:`, text.substring(0, 50) + '...');
-      
+
       // Check if Rewriter API is available
       if (!this.aiManager.isAPIAvailable('rewriter')) {
         throw new Error('Rewriter API is not available. Please ensure you have the required Chrome version.');
@@ -170,16 +239,16 @@ class EditorAIFeatures {
         'friendly': 'more-casual',
         'neutral': 'as-is'
       };
-      
+
       const rewriterTone = toneMap[targetTone] || 'as-is';
-      
+
       const rewritten = await this.aiManager.rewrite(text, {
         tone: rewriterTone,
         format: 'plain-text',
         length: 'as-is',
         context: `Adjust the tone to be ${targetTone} while preserving the core message.`
       });
-      
+
       return {
         success: true,
         original: text,
@@ -198,7 +267,7 @@ class EditorAIFeatures {
 
   getFallbackToneSuggestions(text, targetTone) {
     const suggestions = [];
-    
+
     if (targetTone === 'formal') {
       suggestions.push({
         type: 'Tone',
@@ -210,7 +279,7 @@ class EditorAIFeatures {
         text: 'For casual tone: Use contractions, shorter sentences, and conversational language'
       });
     }
-    
+
     return suggestions;
   }
 
@@ -219,7 +288,7 @@ class EditorAIFeatures {
   async summarizeText(text, options = {}) {
     try {
       console.log('Summarizing text:', text.substring(0, 50) + '...');
-      
+
       // Check if Summarizer API is available
       if (!this.aiManager.isAPIAvailable('summarizer')) {
         throw new Error('Summarizer API is not available.');
@@ -231,7 +300,7 @@ class EditorAIFeatures {
         length: options.length || 'short',
         context: options.context
       });
-      
+
       return {
         success: true,
         original: text,
@@ -251,20 +320,20 @@ class EditorAIFeatures {
   async translateText(text, targetLanguage, sourceLanguage = 'auto') {
     try {
       console.log(`Translating text to ${targetLanguage}:`, text.substring(0, 50) + '...');
-      
+
       // Detect source language if auto
       if (sourceLanguage === 'auto') {
         const detection = await this.aiManager.detectLanguage(text);
         sourceLanguage = detection?.language || 'en';
       }
-      
+
       // Check if Translator API is available
       if (!this.aiManager.isAPIAvailable('translator')) {
         throw new Error('Translator API is not available.');
       }
 
       const translated = await this.aiManager.translate(text, sourceLanguage, targetLanguage);
-      
+
       return {
         success: true,
         original: text,
@@ -286,7 +355,7 @@ class EditorAIFeatures {
   async generateContent(prompt, options = {}) {
     try {
       console.log('Generating content for prompt:', prompt.substring(0, 50) + '...');
-      
+
       // Check if Writer API is available
       if (!this.aiManager.isAPIAvailable('writer')) {
         throw new Error('Writer API is not available.');
@@ -298,7 +367,7 @@ class EditorAIFeatures {
         length: options.length || 'medium',
         context: options.context
       });
-      
+
       return {
         success: true,
         prompt: prompt,
@@ -318,14 +387,14 @@ class EditorAIFeatures {
   async improveWritingStreaming(text, options = {}, onChunk) {
     try {
       const prompt = `Improve the following text while maintaining its core message:\n\n${text}`;
-      
+
       const improved = await this.aiManager.writeStreaming(prompt, {
         tone: options.tone || 'neutral',
         format: 'plain-text',
-        length: 'as-is',
+        length: 'medium', // Valid values: 'short', 'medium', 'long'
         context: 'This is for general writing improvement.'
       }, onChunk);
-      
+
       return {
         success: true,
         original: text,
@@ -349,15 +418,15 @@ class EditorAIFeatures {
         'friendly': 'more-casual',
         'neutral': 'as-is'
       };
-      
+
       const rewriterTone = toneMap[targetTone] || 'as-is';
-      
+
       const rewritten = await this.aiManager.rewriteStreaming(text, {
         tone: rewriterTone,
         format: 'plain-text',
         length: 'as-is'
       }, onChunk);
-      
+
       return {
         success: true,
         original: text,

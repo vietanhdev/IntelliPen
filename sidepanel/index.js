@@ -91,6 +91,16 @@ class IntelliPenSidepanel {
       this.aiManager = aiAPIManager;
       await this.aiManager.initialize();
 
+      // Log API availability status for debugging
+      console.log('=== Chrome AI API Availability Status ===');
+      const apis = ['languageModel', 'proofreader', 'writer', 'rewriter', 'summarizer', 'translator', 'languageDetector'];
+      apis.forEach(api => {
+        const status = this.aiManager.getAvailability(api);
+        const available = this.aiManager.isAPIAvailable(api);
+        console.log(`${api}: ${status} (${available ? '✓ Available' : '✗ Not Available'})`);
+      });
+      console.log('=========================================');
+
       // Initialize AI feature modules
       if (typeof EditorAIFeatures !== 'undefined') {
         this.editorAI = new EditorAIFeatures(this.aiManager);
@@ -115,6 +125,14 @@ class IntelliPenSidepanel {
       tab.addEventListener('click', (e) => {
         const screen = e.currentTarget.dataset.screen;
         this.switchScreen(screen);
+      });
+    });
+
+    // Meeting tabs
+    document.querySelectorAll('.meeting-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const tabName = e.currentTarget.dataset.tab;
+        this.switchMeetingTab(tabName);
       });
     });
 
@@ -296,6 +314,36 @@ class IntelliPenSidepanel {
     // Initialize translator when switching to translator screen
     if (screenName === 'translator') {
       this.initializeTranslator();
+    }
+
+    // Reset to transcript tab when switching to meeting screen
+    if (screenName === 'meeting') {
+      this.switchMeetingTab('transcript');
+    }
+  }
+
+  switchMeetingTab(tabName) {
+    console.log(`Switching to ${tabName} tab`);
+
+    // Update meeting tabs
+    document.querySelectorAll('.meeting-tab').forEach(tab => {
+      if (tab.dataset.tab === tabName) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    // Show/hide tab content
+    const transcriptTab = document.getElementById('transcriptTab');
+    const analysisTab = document.getElementById('analysisTab');
+
+    if (tabName === 'transcript') {
+      transcriptTab.style.display = 'flex';
+      analysisTab.style.display = 'none';
+    } else if (tabName === 'analysis') {
+      transcriptTab.style.display = 'none';
+      analysisTab.style.display = 'flex';
     }
   }
 
@@ -545,11 +593,16 @@ class IntelliPenSidepanel {
         throw new Error('AI features not initialized');
       }
 
+      console.log('Calling checkGrammar with text:', text.substring(0, 100));
       const result = await this.editorAI.checkGrammar(text);
+      console.log('Grammar check result:', result);
 
       if (result.success) {
-        const suggestions = result.corrections.map(correction => ({
-          type: correction.type,
+        // Ensure corrections is an array
+        const corrections = Array.isArray(result.corrections) ? result.corrections : [];
+        
+        const suggestions = corrections.map(correction => ({
+          type: correction.type || 'Grammar',
           text: `"${correction.original}" → "${correction.suggestion}"${correction.explanation ? ': ' + correction.explanation : ''}`
         }));
 
@@ -563,10 +616,12 @@ class IntelliPenSidepanel {
         }
       } else {
         // Show fallback suggestions
-        this.displaySuggestions(result.fallback || [{
+        const fallbackSuggestions = result.fallback || [{
           type: 'Info',
           text: result.error || 'Grammar checking is currently unavailable'
-        }]);
+        }];
+        console.log('Showing fallback suggestions:', fallbackSuggestions);
+        this.displaySuggestions(fallbackSuggestions);
       }
     } catch (error) {
       console.error('Grammar check failed:', error);
@@ -595,27 +650,45 @@ class IntelliPenSidepanel {
         throw new Error('AI features not initialized');
       }
 
+      console.log('Calling improveWriting with text:', text.substring(0, 100));
       const result = await this.editorAI.improveWriting(text);
+      console.log('Writing improvement result:', result);
 
       if (result.success) {
+        // Check if we have improved text
+        if (!result.improved || result.improved.trim() === '') {
+          console.error('No improved text returned');
+          this.displaySuggestions([{
+            type: 'Error',
+            text: 'Writing improvement returned empty result. The AI may not be responding correctly.'
+          }]);
+          return;
+        }
+
+        // Ensure suggestions is an array
+        const additionalSuggestions = Array.isArray(result.suggestions) ? result.suggestions : [];
+        
         const suggestions = [
           {
             type: 'Improved Version',
             text: result.improved
           },
-          ...result.suggestions.map(s => ({
+          ...additionalSuggestions.map(s => ({
             type: s.type,
             text: s.text
           }))
         ];
 
+        console.log('Displaying suggestions:', suggestions);
         this.displaySuggestions(suggestions);
       } else {
         // Show fallback suggestions
-        this.displaySuggestions(result.fallback || [{
+        const fallbackSuggestions = result.fallback || [{
           type: 'Info',
           text: result.error || 'Writing improvement is currently unavailable'
-        }]);
+        }];
+        console.log('Showing fallback suggestions:', fallbackSuggestions);
+        this.displaySuggestions(fallbackSuggestions);
       }
     } catch (error) {
       console.error('Writing improvement failed:', error);
@@ -648,21 +721,27 @@ class IntelliPenSidepanel {
         throw new Error('AI features not initialized');
       }
 
+      console.log('Calling changeTone with tone:', tone);
       const result = await this.editorAI.changeTone(text, tone);
+      console.log('Tone change result:', result);
 
       if (result.success) {
-        this.displaySuggestions([
+        const suggestions = [
           {
             type: `${tone.charAt(0).toUpperCase() + tone.slice(1)} Tone`,
             text: result.rewritten
           }
-        ]);
+        ];
+        console.log('Displaying tone suggestions:', suggestions);
+        this.displaySuggestions(suggestions);
       } else {
         // Show fallback suggestions
-        this.displaySuggestions(result.fallback || [{
+        const fallbackSuggestions = result.fallback || [{
           type: 'Info',
           text: result.error || 'Tone adjustment is currently unavailable'
-        }]);
+        }];
+        console.log('Showing fallback suggestions:', fallbackSuggestions);
+        this.displaySuggestions(fallbackSuggestions);
       }
     } catch (error) {
       console.error('Tone change failed:', error);
@@ -735,9 +814,9 @@ class IntelliPenSidepanel {
     const content = document.getElementById('suggestionsContent');
     if (content) {
       content.innerHTML = `
-        <div class="suggestions-placeholder">
-          <span class="placeholder-icon">⏳</span>
-          <p>${message}</p>
+        <div class="suggestions-loading">
+          <div class="suggestions-loading-spinner"></div>
+          <p class="suggestions-loading-text">${message}</p>
         </div>
       `;
     }
@@ -745,34 +824,59 @@ class IntelliPenSidepanel {
 
   displaySuggestions(suggestions) {
     const content = document.getElementById('suggestionsContent');
-    if (!content) return;
+    if (!content) {
+      console.error('suggestionsContent element not found');
+      return;
+    }
 
-    if (suggestions.length === 0) {
+    console.log('displaySuggestions called with:', suggestions);
+
+    if (!suggestions || suggestions.length === 0) {
+      console.log('No suggestions to display');
       content.innerHTML = `
-        <div class="suggestions-placeholder">
-          <span class="placeholder-icon">✓</span>
+        <div class="placeholder">
+          <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
           <p>No suggestions found</p>
         </div>
       `;
       return;
     }
 
-    content.innerHTML = suggestions.map((suggestion, index) => `
-      <div class="suggestion-item" data-index="${index}">
-        <div class="suggestion-header">
-          <div class="suggestion-type">${suggestion.type}</div>
+    content.innerHTML = suggestions.map((suggestion, index) => {
+      // Determine if this is an actionable suggestion
+      const isActionable = suggestion.type === 'Improved Version' || 
+                          suggestion.type.includes('Tone') || 
+                          suggestion.type === 'Rewritten';
+      
+      return `
+        <div class="suggestion-item" data-index="${index}" data-type="${this.escapeHtml(suggestion.type)}">
+          <div class="suggestion-header">
+            <div class="suggestion-type">${this.escapeHtml(suggestion.type)}</div>
+          </div>
+          <div class="suggestion-text">${this.escapeHtml(suggestion.text)}</div>
+          <div class="suggestion-actions">
+            ${isActionable ? `
+              <button class="suggestion-btn apply" data-action="apply" data-index="${index}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Apply</span>
+              </button>
+            ` : ''}
+            <button class="suggestion-btn copy" data-action="copy" data-index="${index}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span>Copy</span>
+            </button>
+          </div>
         </div>
-        <div class="suggestion-text">${suggestion.text}</div>
-        <div class="suggestion-actions">
-          <button class="suggestion-btn apply" data-action="apply" data-index="${index}">
-            ✓ Apply
-          </button>
-          <button class="suggestion-btn copy" data-action="copy" data-index="${index}">
-            📋 Copy
-          </button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     // Add event listeners to buttons
     content.querySelectorAll('.suggestion-btn').forEach(btn => {
@@ -780,12 +884,21 @@ class IntelliPenSidepanel {
         e.stopPropagation();
         const action = btn.dataset.action;
         const index = parseInt(btn.dataset.index);
-        this.handleSuggestionAction(action, suggestions[index]);
+        this.handleSuggestionAction(action, suggestions[index], index);
       });
     });
   }
 
-  handleSuggestionAction(action, suggestion) {
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  handleSuggestionAction(action, suggestion, index) {
+    // Add index to suggestion for button feedback
+    suggestion.index = index;
+    
     if (action === 'apply') {
       this.applySuggestion(suggestion);
     } else if (action === 'copy') {
@@ -806,22 +919,64 @@ class IntelliPenSidepanel {
       this.updateEditorStats();
       this.autoSaveContent();
 
-      // Show success feedback
-      this.showSuccessFeedback('Applied successfully!');
+      // Show success state in suggestions panel
+      this.showSuccessState();
+
+      // Show toast notification
+      this.showSuccess('Changes applied successfully!');
 
       // Close suggestions panel after a moment
       setTimeout(() => {
         this.hideSuggestionsPanel();
-      }, 1000);
+      }, 1500);
     } else {
       // For other suggestions, just copy to clipboard
       this.copySuggestion(suggestion);
     }
   }
 
+  showSuccessState() {
+    const content = document.getElementById('suggestionsContent');
+    if (content) {
+      content.innerHTML = `
+        <div class="suggestions-success">
+          <svg class="suggestions-success-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.2"/>
+            <path d="M8 12l3 3 5-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="suggestions-success-text">Applied successfully!</p>
+        </div>
+      `;
+    }
+  }
+
   copySuggestion(suggestion) {
     navigator.clipboard.writeText(suggestion.text).then(() => {
-      this.showSuccessFeedback('Copied to clipboard!');
+      this.showSuccess('Copied to clipboard!');
+      
+      // Add visual feedback to the button that was clicked
+      const buttons = document.querySelectorAll('.suggestion-btn.copy');
+      buttons.forEach(btn => {
+        if (btn.dataset.index === suggestion.index) {
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Copied!</span>
+          `;
+          btn.style.background = 'var(--color-success-bg)';
+          btn.style.color = 'var(--color-success)';
+          btn.style.borderColor = 'var(--color-success)';
+          
+          setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
+          }, 2000);
+        }
+      });
     }).catch(error => {
       console.error('Failed to copy:', error);
       this.showError('Failed to copy suggestion');
@@ -829,31 +984,8 @@ class IntelliPenSidepanel {
   }
 
   showSuccessFeedback(message) {
-    const content = document.getElementById('suggestionsContent');
-    if (!content) return;
-
-    // Create temporary success message
-    const feedback = document.createElement('div');
-    feedback.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #10b981;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 500;
-      z-index: 1000;
-      animation: fadeInOut 2s ease-in-out;
-    `;
-    feedback.textContent = message;
-
-    content.appendChild(feedback);
-
-    setTimeout(() => {
-      feedback.remove();
-    }, 2000);
+    // Use the toast notification system
+    this.showSuccess(message);
   }
 
   // ===== Translator Methods =====
@@ -1290,23 +1422,28 @@ class IntelliPenSidepanel {
 
     if (this.isRecording) {
       recordBtn.className = 'record-btn recording';
-      recordIcon.textContent = '⏹️';
+      // Update to stop icon (square)
+      recordIcon.innerHTML = '<rect x="8" y="8" width="8" height="8" rx="1" fill="currentColor" />';
       recordText.textContent = 'Stop Recording';
     } else {
       recordBtn.className = 'record-btn';
-      recordIcon.textContent = '🎙️';
+      // Update to record icon (circle)
+      recordIcon.innerHTML = '<circle cx="12" cy="12" r="4" fill="currentColor" />';
       recordText.textContent = 'Start Recording';
     }
   }
 
   updateRecordingStatus() {
+    const recordingStatus = document.getElementById('recordingStatus');
     const statusDot = document.querySelector('.status-dot');
     const statusText = document.querySelector('.status-text');
 
     if (this.isRecording) {
+      recordingStatus?.classList.add('active');
       statusDot.className = 'status-dot recording';
       statusText.textContent = 'Recording in progress';
     } else {
+      recordingStatus?.classList.remove('active');
       statusDot.className = 'status-dot';
       statusText.textContent = this.transcript.length > 0 ? 'Recording stopped' : 'Ready to record';
     }
@@ -1631,9 +1768,8 @@ class IntelliPenSidepanel {
     try {
       console.log('Generating meeting analysis...');
 
-      // Show analysis section
-      const analysisSection = document.getElementById('analysisSection');
-      analysisSection.style.display = 'block';
+      // Switch to analysis tab
+      this.switchMeetingTab('analysis');
 
       if (!this.meetingAI) {
         throw new Error('Meeting AI features not initialized');
@@ -1721,8 +1857,8 @@ class IntelliPenSidepanel {
       this.transcript = [];
       this.updateTranscript();
 
-      // Hide analysis section
-      document.getElementById('analysisSection').style.display = 'none';
+      // Switch back to transcript tab
+      this.switchMeetingTab('transcript');
 
       console.log('Transcript cleared');
     }
@@ -1752,8 +1888,8 @@ class IntelliPenSidepanel {
   }
 
   exportAnalysis() {
-    const analysisSection = document.getElementById('analysisSection');
-    if (analysisSection.style.display === 'none') {
+    const analysisTab = document.getElementById('analysisTab');
+    if (analysisTab.style.display === 'none') {
       this.showError('No analysis available to export');
       return;
     }
@@ -2215,50 +2351,18 @@ class IntelliPenSidepanel {
   }
 
   showToast(title, message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
-
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-
-    const icons = {
-      error: '❌',
-      success: '✅',
-      warning: '⚠️',
-      info: 'ℹ️'
-    };
-
-    toast.innerHTML = `
-      <span class="toast-icon">${icons[type] || icons.info}</span>
-      <div class="toast-content">
-        <div class="toast-title">${title}</div>
-        <div class="toast-message">${message}</div>
-      </div>
-      <button class="toast-close">×</button>
-    `;
-
-    const closeBtn = toast.querySelector('.toast-close');
-    closeBtn.addEventListener('click', () => {
-      this.removeToast(toast);
-    });
-
-    container.appendChild(toast);
-
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-      this.removeToast(toast);
-    }, 5000);
-  }
-
-  removeToast(toast) {
-    if (!toast || !toast.parentElement) return;
-
-    toast.classList.add('removing');
-    setTimeout(() => {
-      if (toast.parentElement) {
-        toast.parentElement.removeChild(toast);
-      }
-    }, 300);
+    // Use the Material Design toast system from ui-components
+    if (typeof createToast !== 'undefined') {
+      createToast({
+        title: title,
+        message: message,
+        type: type,
+        duration: type === 'error' ? 5000 : 4000
+      });
+    } else {
+      // Fallback to console if createToast is not available
+      console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
+    }
   }
 }
 

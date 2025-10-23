@@ -1,2 +1,37 @@
-node_modules
-/dist
+# Node
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Build
+dist/
+build/
+site/
+
+# Python
+venv/
+venv_docs/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Hugo backup
+docs_hugo_backup/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+intellipen-v*.zip
