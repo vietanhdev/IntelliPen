@@ -300,25 +300,42 @@ Use headed mode (default) when:
 
 ## Continuous Integration
 
-### GitHub Actions Example
+### GitHub Actions
 
-```yaml
-name: Tests
+The project includes a complete GitHub Actions workflow at `.github/workflows/test.yml` that:
 
-on: [push, pull_request]
+- ✅ Runs tests on Node.js 18.x and 20.x
+- ✅ Executes tests in headless mode
+- ✅ Runs linting checks
+- ✅ Verifies build output
+- ✅ Uploads test results and build artifacts
+- ✅ Triggers on push, pull requests, and manual dispatch
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - run: npm install
-      - run: npm run test:install-chrome
-      - run: npm run build
-      - run: npm run test:headless  # Use headless mode in CI
+**Workflow Status:** [![Tests](https://github.com/vietanhdev/IntelliPen/actions/workflows/test.yml/badge.svg)](https://github.com/vietanhdev/IntelliPen/actions/workflows/test.yml)
+
+### Manual Workflow Trigger
+
+You can manually trigger the test workflow from the GitHub Actions tab:
+1. Go to the "Actions" tab in your repository
+2. Select "Tests" workflow
+3. Click "Run workflow"
+
+### Local CI Simulation
+
+To simulate the CI environment locally:
+
+```bash
+# Install dependencies (like CI does)
+npm ci
+
+# Install Chrome for Testing
+npm run test:install-chrome
+
+# Build extension
+npm run build
+
+# Run tests in headless mode
+npm run test:headless
 ```
 
 ## Performance Tips

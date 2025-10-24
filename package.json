@@ -16,6 +16,7 @@
     "test:e2e:watch": "jest --config jest.config.js --watch",
     "test:e2e:verbose": "npm run build && jest --config jest.config.js --verbose",
     "test:install-chrome": "node scripts/install-chrome-for-testing.js",
+    "test:ci": "bash scripts/test-ci-locally.sh",
     "test-server": "node start-test-server.js",
     "generate-icons": "node scripts/generate-icons.js",
     "generate-store-images": "node scripts/generate-store-images.js",

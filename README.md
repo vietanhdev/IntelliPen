@@ -1,5 +1,9 @@
 # IntelliPen Chrome Extension
 
+[![Tests](https://github.com/vietanhdev/IntelliPen/actions/workflows/test.yml/badge.svg)](https://github.com/vietanhdev/IntelliPen/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-blue.svg)](https://chrome.google.com/webstore)
+
 Your intelligent writing companion powered by Chrome's built-in AI. IntelliPen brings professional writing assistance, real-time translation, and meeting intelligence directly to your browser—all processed locally on your device with zero data sharing.
 
 <div align="center">
@@ -331,6 +335,55 @@ IntelliPen is built with privacy as a core principle:
 - Collaborative editing features
 - Cloud sync (optional, privacy-preserving)
 - Advanced analytics dashboard
+
+## Testing
+
+IntelliPen includes comprehensive end-to-end tests with support for both headed and headless modes.
+
+### Running Tests
+
+```bash
+# Run tests with visible browser
+npm test
+
+# Run tests in headless mode (no windows)
+npm run test:headless
+
+# Simulate CI environment locally
+npm run test:ci
+```
+
+### Continuous Integration
+
+All pull requests and commits are automatically tested via GitHub Actions:
+- ✅ Tests run on Node.js 18.x and 20.x
+- ✅ Headless mode for fast execution
+- ✅ Linting and build verification
+- ✅ Automatic artifact uploads
+
+See [TESTING.md](TESTING.md) for detailed testing documentation.
+
+## Contributing
+
+We welcome contributions! Here's how to get started:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes**
+4. **Run tests**: `npm run test:ci` (simulates CI environment)
+5. **Commit your changes**: `git commit -m 'Add amazing feature'`
+6. **Push to the branch**: `git push origin feature/amazing-feature`
+7. **Open a Pull Request**
+
+### Before Submitting
+
+- ✅ Run `npm run test:ci` to ensure all tests pass
+- ✅ Run `npm run lint` to check code style
+- ✅ Update documentation if needed
+- ✅ Add tests for new features
+- ✅ Ensure the extension builds successfully
+
+See [.github/CI_CD.md](.github/CI_CD.md) for CI/CD documentation.
 
 ## Support
 

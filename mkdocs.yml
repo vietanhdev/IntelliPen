@@ -175,6 +175,7 @@ nav:
     - API Reference: api-reference.md
     - Design System: design-system.md
     - Theme System: theme-system.md
+    - Testing: testing.md
   - Resources:
     - FAQ: faq.md
     - Privacy: privacy.md

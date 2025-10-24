@@ -113,7 +113,38 @@ IntelliPen leverages Chrome's cutting-edge built-in AI APIs (Gemini Nano) to del
 - **Node.js 16+**: Development environment
 - **npm**: Package manager and script runner
 
+### Testing Infrastructure
+- **Puppeteer Core**: Browser automation for end-to-end testing
+- **Jest 29.7.0**: Test framework with 60-second timeout support
+- **Chrome for Testing 138+**: Dedicated Chrome build for automated testing
+- **7 Test Suites**: Comprehensive coverage of all features
+  - **Basic Tests**: Browser launch, page creation, navigation
+  - **AI APIs Tests**: API availability detection and AIAPIManager initialization
+  - **Editor Tests**: Text editing, grammar checking, tone adjustment
+  - **Translator Tests**: Language selection, translation controls, text I/O
+  - **Meeting Tests**: Recording controls, device selection, transcript display
+  - **Popup Tests**: Extension branding, API status indicators, quick actions
+  - **Service Worker Tests**: Extension loading, Chrome APIs availability
+- **Headless Mode**: Fast execution for CI/CD pipelines
+- **Headed Mode**: Visual debugging for test development
+- **Serial Execution**: Prevents browser conflicts with `maxWorkers: 1`
+
 ## Challenges we ran into
+
+### Automated Testing with Chrome AI APIs
+Testing a Chrome extension that relies on cutting-edge AI APIs presented unique challenges:
+- **Chrome Version Requirements**: Tests require Chrome 138+ with specific hardware (4GB+ VRAM, 22GB storage)
+- **Extension Loading**: Puppeteer needed custom configuration to load unpacked extensions with trial tokens
+- **Async API Detection**: AI APIs load asynchronously, requiring careful timing in tests
+- **Headless Limitations**: Some AI features behave differently in headless mode
+- **Serial Execution**: Browser conflicts required running tests serially with `maxWorkers: 1`
+
+We built a comprehensive test infrastructure with:
+- Automatic Chrome for Testing installation (`npm run test:install-chrome`)
+- Global setup/teardown for browser lifecycle management
+- Helper functions for extension page navigation
+- Both headed (visual debugging) and headless (CI/CD) modes
+- 7 test suites covering all major features
 
 ### API Availability Detection
 Chrome's built-in AI APIs are still in early access (Chrome 138+), requiring specific Chrome versions, hardware (4GB+ VRAM), and 22GB+ storage for the Gemini Nano model. We built a comprehensive availability checking system in AIAPIManager that:
@@ -165,6 +196,14 @@ Chrome AI APIs require trial tokens in manifest.json for early access. We had to
 
 ## Accomplishments that we're proud of
 
+🧪 **Comprehensive Test Coverage**: Built a complete end-to-end testing infrastructure with:
+- 7 test suites covering all major features (AI APIs, Editor, Translator, Meeting, Popup, Service Worker)
+- Puppeteer-based browser automation with Chrome for Testing 138+
+- Both headed (visual debugging) and headless (CI/CD) modes
+- Automatic Chrome installation and extension loading
+- Serial execution to prevent browser conflicts
+- 60-second timeout support for AI operations
+
 ✨ **Complete Privacy**: Built a fully-featured AI writing assistant that never sends data to external servers—all processing happens locally using Chrome's built-in Gemini Nano model
 
 🎯 **7 AI APIs Integration**: Successfully integrated all 7 available Chrome built-in AI APIs into a cohesive user experience with proper availability checking and fallback mechanisms
@@ -211,6 +250,16 @@ Chrome AI APIs require trial tokens in manifest.json for early access. We had to
 - Real-time stats (word count, character count, reading time)
 
 ## What we learned
+
+### Testing Chrome Extensions Requires Special Tooling
+Building automated tests for a Chrome extension with AI APIs taught us valuable lessons:
+- **Puppeteer Configuration**: Loading unpacked extensions requires specific launch arguments and permissions
+- **Async Timing**: AI API availability checks need proper waiting strategies
+- **Test Isolation**: Each test needs clean browser state to avoid interference
+- **Headless vs Headed**: Some features behave differently in headless mode
+- **CI/CD Integration**: Headless mode enables fast automated testing in GitHub Actions
+
+We learned to build a robust test infrastructure that supports both development (headed mode for debugging) and production (headless mode for CI/CD).
 
 ### Chrome AI APIs are Powerful but Early
 The built-in AI APIs offer impressive capabilities, but they're still in early access with specific requirements:
@@ -389,11 +438,14 @@ IntelliPen is ready to transform your writing workflow while keeping your data p
 - **DOMPurify 3.0.8** - HTML sanitization
 - **Sharp 0.33.5** - Image processing
 
-### Development Tools
+### Development & Testing Tools
 - **Node.js 16+**
 - **npm** - Package manager
 - **ESLint 8.56.0** - Code linting
 - **Jest 29.7.0** - Testing framework
+- **Puppeteer Core** - Browser automation for E2E tests
+- **@puppeteer/browsers** - Chrome for Testing installer
+- **Chrome for Testing 138+** - Dedicated Chrome build for automated testing
 
 ## Links
 - **GitHub Repository**: [https://github.com/vietanhdev/IntelliPen](https://github.com/vietanhdev/IntelliPen)

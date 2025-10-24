@@ -162,6 +162,23 @@ If the extension doesn't load:
     3. Check Chrome DevTools console for errors
     4. Try removing and re-adding the extension
 
+## Running Tests (Optional)
+
+If you're interested in development or contributing, IntelliPen includes comprehensive automated tests:
+
+```bash
+# Install Chrome for Testing
+npm run test:install-chrome
+
+# Run all tests with visible browser
+npm test
+
+# Run tests in headless mode (faster)
+npm run test:headless
+```
+
+See the [Testing Guide](testing.md) for detailed information about the test suite.
+
 ## Next Steps
 
 Now that you have IntelliPen installed and set up:
@@ -169,4 +186,5 @@ Now that you have IntelliPen installed and set up:
 - Read the [User Guide](user-guide.md) for detailed feature documentation
 - Explore the [Architecture](architecture.md) to understand how it works
 - Check out [API Reference](api-reference.md) for technical details
+- Review the [Testing Guide](testing.md) to run automated tests
 - Join our community and [contribute](contributing.md) to development

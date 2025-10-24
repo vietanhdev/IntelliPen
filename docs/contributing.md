@@ -60,7 +60,13 @@ git remote add upstream https://github.com/vietanhdev/IntelliPen.git
 npm install
 ```
 
-### 3. Build the Extension
+### 3. Install Chrome for Testing (for automated tests)
+
+```bash
+npm run test:install-chrome
+```
+
+### 4. Build the Extension
 
 ```bash
 # Development build with source maps
@@ -70,7 +76,19 @@ npm run dev
 npm run build:watch
 ```
 
-### 4. Load in Chrome
+### 5. Run Tests
+
+```bash
+# Run all tests with visible browser
+npm test
+
+# Run tests in headless mode (faster)
+npm run test:headless
+```
+
+See the [Testing Guide](testing.md) for more details.
+
+### 6. Load in Chrome
 
 1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable "Developer mode"
@@ -104,6 +122,15 @@ git checkout -b feature/your-feature-name
 # Rebuild the extension
 npm run build
 
+# Run automated tests
+npm test
+
+# Or run in headless mode (faster)
+npm run test:headless
+
+# Run specific test suite
+npm test -- tests/e2e/editor.test.js
+
 # Reload extension in Chrome
 # Go to chrome://extensions/ and click reload
 
@@ -113,6 +140,9 @@ npm run build
 # - Test edge cases
 # - Check console for errors
 ```
+
+!!! tip "Automated Testing"
+    IntelliPen includes comprehensive end-to-end tests. See the [Testing Guide](testing.md) for detailed information about running and writing tests.
 
 ### 4. Commit Changes
 
@@ -199,22 +229,36 @@ async function checkGrammar(text) {
 
 ### Pull Request Process
 
-1. **Update Documentation**:
+1. **Run Tests**:
+   ```bash
+   # Ensure all tests pass
+   npm run test:headless
+   
+   # Or test locally like CI does
+   bash scripts/test-ci-locally.sh
+   ```
+
+2. **Update Documentation**:
    - Update README.md if needed
    - Add/update JSDoc comments
    - Update relevant docs/ files
+   - Add tests for new features
 
-2. **Create Pull Request**:
+3. **Create Pull Request**:
    - Use descriptive title
    - Fill out PR template completely
    - Reference related issues
    - Add screenshots/videos if UI changes
+   - Ensure CI tests pass
 
-3. **Code Review**:
+4. **Code Review**:
    - Respond to feedback promptly
    - Make requested changes
    - Push updates to same branch
    - Be open to suggestions
+
+!!! note "Continuous Integration"
+    All pull requests automatically run tests via GitHub Actions. Ensure tests pass before requesting review.
 
 ## Reporting Issues
 
