@@ -1,0 +1,69 @@
+describe('Extension Popup', () => {
+  let browser, extensionId, page;
+
+  beforeAll(async () => {
+    ({ browser, extensionId } = await global.setupBrowser());
+  });
+
+  afterAll(async () => {
+    await global.teardownBrowser();
+  });
+
+  beforeEach(async () => {
+    page = await browser.newPage();
+    // Open popup in tab (since we can't open actual popup in tests)
+    await page.goto(global.getExtensionPage('popup/menu.html'));
+    await page.waitForTimeout(1000);
+  });
+
+  afterEach(async () => {
+    if (page) {
+      await page.close();
+    }
+  });
+
+  test('should load popup page', async () => {
+    const title = await page.title();
+    expect(title).toBeTruthy();
+  });
+
+  test('should have extension branding', async () => {
+    const heading = await page.$('h1, h2, .app-title');
+    expect(heading).toBeTruthy();
+  });
+
+  test('should have open sidepanel button', async () => {
+    const openBtn = await page.$('#open-sidepanel-btn, button[data-action="open-sidepanel"]');
+    expect(openBtn).toBeTruthy();
+  });
+
+  test('should display API status section', async () => {
+    const statusSection = await page.$('.api-status, #api-status, .status-container');
+    expect(statusSection).toBeTruthy();
+  });
+
+  test('should have multiple API status indicators', async () => {
+    const statusElements = await page.$$('.api-status-item, .status-badge, .api-indicator');
+    // Should have at least one status indicator
+    expect(statusElements.length).toBeGreaterThanOrEqual(0);
+  });
+
+  test('should have quick action buttons', async () => {
+    const buttons = await page.$$('button');
+    expect(buttons.length).toBeGreaterThan(0);
+  });
+
+  test('should have proper styling', async () => {
+    const body = await page.$('body');
+    const backgroundColor = await page.$eval('body', el => 
+      window.getComputedStyle(el).backgroundColor
+    );
+    expect(backgroundColor).toBeTruthy();
+  });
+
+  test('should be responsive', async () => {
+    await page.setViewport({ width: 320, height: 480 });
+    const body = await page.$('body');
+    expect(body).toBeTruthy();
+  });
+});

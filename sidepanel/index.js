@@ -23,6 +23,12 @@ class IntelliPenSidepanel {
     this.isSpeaking = false;
     this.speechSynthesis = window.speechSynthesis;
 
+    // Translator settings
+    this.translatorSettings = {
+      doubleClickTranslate: false,
+      shiftClickTranslate: false
+    };
+
     // Meeting state
     this.isRecording = false;
     this.currentSession = null;
@@ -46,6 +52,17 @@ class IntelliPenSidepanel {
     this.aiManager = null;
     this.editorAI = null;
     this.meetingAI = null;
+
+    // Real-time grammar checking
+    this.realtimeGrammarEnabled = false;
+    this.grammarCheckTimeout = null;
+    this.currentCorrections = [];
+    this.correctedText = '';
+    this.errorHighlights = null;
+    this.proofreadClickHandler = null;
+
+    // Rich text proofreader
+    this.richTextProofreader = null;
 
     this.isInitialized = false;
   }
@@ -95,7 +112,7 @@ class IntelliPenSidepanel {
 
   applyTheme(theme) {
     const root = document.documentElement;
-    
+
     if (theme === 'dark') {
       root.setAttribute('data-theme', 'dark');
     } else if (theme === 'light') {
@@ -110,7 +127,7 @@ class IntelliPenSidepanel {
     try {
       const result = await chrome.storage.local.get(['theme']);
       const currentTheme = result.theme || 'auto';
-      
+
       // Cycle through: auto -> light -> dark -> auto
       let newTheme;
       if (currentTheme === 'auto') {
@@ -120,14 +137,14 @@ class IntelliPenSidepanel {
       } else {
         newTheme = 'auto';
       }
-      
+
       await chrome.storage.local.set({ theme: newTheme });
       this.applyTheme(newTheme);
-      
+
       // Show toast notification
       const themeNames = { auto: 'Auto', light: 'Light', dark: 'Dark' };
       this.showInfo(`Theme: ${themeNames[newTheme]}`);
-      
+
       console.log('Theme changed to:', newTheme);
     } catch (error) {
       console.error('Failed to toggle theme:', error);
@@ -159,6 +176,12 @@ class IntelliPenSidepanel {
       if (typeof EditorAIFeatures !== 'undefined') {
         this.editorAI = new EditorAIFeatures(this.aiManager);
         console.log('Editor AI features initialized');
+      }
+
+      // Initialize Rich Text Proofreader
+      if (typeof RichTextProofreader !== 'undefined') {
+        this.richTextProofreader = new RichTextProofreader();
+        console.log('Rich Text Proofreader initialized');
       }
 
       if (typeof MeetingAIFeatures !== 'undefined') {
@@ -202,7 +225,7 @@ class IntelliPenSidepanel {
     document.getElementById('saveDocBtn')?.addEventListener('click', () => this.saveDocument());
     document.getElementById('undoBtn')?.addEventListener('click', () => this.undo());
     document.getElementById('redoBtn')?.addEventListener('click', () => this.redo());
-    document.getElementById('checkGrammarBtn')?.addEventListener('click', () => this.checkGrammar());
+    document.getElementById('grammarCheckbox')?.addEventListener('change', (e) => this.toggleGrammarCheck(e.target.checked));
     document.getElementById('improveWritingBtn')?.addEventListener('click', () => this.improveWriting());
     document.getElementById('changeToneBtn')?.addEventListener('click', () => this.changeTone());
 
@@ -263,6 +286,28 @@ class IntelliPenSidepanel {
     document.getElementById('saveTranslation')?.addEventListener('click', () => {
       this.saveTranslation();
     });
+
+    // Translator settings
+    document.getElementById('translatorSettingsBtn')?.addEventListener('click', () => {
+      this.openTranslatorSettings();
+    });
+
+    document.getElementById('closeTranslatorSettings')?.addEventListener('click', () => {
+      this.closeTranslatorSettings();
+    });
+
+    document.getElementById('doubleClickTranslate')?.addEventListener('change', (e) => {
+      this.translatorSettings.doubleClickTranslate = e.target.checked;
+      this.saveTranslatorSettings();
+      this.updateTranslatorEventListeners();
+    });
+
+    document.getElementById('shiftClickTranslate')?.addEventListener('change', (e) => {
+      this.translatorSettings.shiftClickTranslate = e.target.checked;
+      this.saveTranslatorSettings();
+      this.updateTranslatorEventListeners();
+    });
+
     // Meeting controls
     document.getElementById('recordBtn')?.addEventListener('click', () => {
       this.toggleRecording();
@@ -527,6 +572,143 @@ class IntelliPenSidepanel {
 
     // Auto-save
     this.autoSaveContent();
+
+    // Real-time grammar checking (debounced)
+    if (this.realtimeGrammarEnabled) {
+      this.scheduleRealtimeGrammarCheck();
+    }
+  }
+
+  scheduleRealtimeGrammarCheck() {
+    // Clear existing timeout
+    if (this.grammarCheckTimeout) {
+      clearTimeout(this.grammarCheckTimeout);
+    }
+
+    // Schedule new check after 2 seconds of inactivity
+    this.grammarCheckTimeout = setTimeout(() => {
+      this.performRealtimeGrammarCheck();
+    }, 2000);
+  }
+
+  async performRealtimeGrammarCheck() {
+    const editorArea = document.getElementById('editorArea');
+    if (!editorArea || !this.richTextProofreader) return;
+
+    // Extract plain text using the rich text proofreader
+    // This preserves the mapping between plain text and DOM nodes
+    const text = this.richTextProofreader.getPlainText(editorArea);
+
+    if (!text.trim() || text.length < 10) {
+      // Don't check very short text
+      this.clearErrorHighlights();
+      this.hideGrammarStatus();
+      return;
+    }
+
+    try {
+      if (!this.editorAI) return;
+
+      // Show loading indicator
+      this.showGrammarStatus('checking', 'Checking grammar...');
+
+      console.log('Performing real-time grammar check on rich text...');
+      const result = await this.editorAI.checkGrammar(text);
+
+      if (result.success && result.corrections && result.corrections.length > 0) {
+        // Check if this is an info message about API limitations
+        if (result.corrections[0].type === 'info') {
+          // Show message about Chrome version requirement
+          this.clearErrorHighlights();
+          console.log('Grammar checking available but requires Chrome 141+ for highlighting');
+        } else if (result.corrections.length === 1 &&
+          result.corrections[0].explanation?.includes('full replacement')) {
+          // API returned a full replacement correction (partial result)
+          // Don't try to highlight, just show the corrected text option
+          console.log('⚠️ API returned full replacement - showing corrected text without highlights');
+          this.currentCorrections = result.corrections;
+          this.correctedText = result.corrected;
+          this.clearErrorHighlights();
+
+          // Show suggestion panel with the corrected text
+          this.displayProofreadingResults(result.corrected, 1);
+        } else {
+          // Store corrections
+          this.currentCorrections = result.corrections;
+          this.correctedText = result.corrected;
+
+          // Apply highlights using rich text proofreader
+          // This will map corrections to the actual DOM nodes
+          this.applyErrorHighlightsRichText(editorArea, result.corrections);
+
+          console.log(`Found ${result.corrections.length} grammar issues in rich text`);
+          
+          // Show success status
+          this.showGrammarStatus('success', `Found ${result.corrections.length} issue${result.corrections.length !== 1 ? 's' : ''}`);
+          setTimeout(() => this.hideGrammarStatus(), 2000);
+        }
+      } else {
+        // No errors found, clear highlights
+        this.clearErrorHighlights();
+        this.showGrammarStatus('success', 'No issues found');
+        setTimeout(() => this.hideGrammarStatus(), 2000);
+      }
+    } catch (error) {
+      console.error('Real-time grammar check failed:', error);
+      this.showGrammarStatus('error', 'Check failed');
+      setTimeout(() => this.hideGrammarStatus(), 3000);
+    }
+  }
+
+  showGrammarStatus(type, message) {
+    const statusEl = document.getElementById('grammarStatus');
+    const textEl = document.getElementById('grammarStatusText');
+    
+    if (!statusEl || !textEl) return;
+
+    statusEl.style.display = 'flex';
+    statusEl.className = 'stat-item grammar-status';
+    
+    if (type === 'success') {
+      statusEl.classList.add('success');
+    } else if (type === 'error') {
+      statusEl.classList.add('error');
+    }
+    
+    textEl.textContent = message;
+  }
+
+  hideGrammarStatus() {
+    const statusEl = document.getElementById('grammarStatus');
+    if (statusEl) {
+      statusEl.style.display = 'none';
+    }
+  }
+
+  toggleGrammarCheck(enabled) {
+    this.realtimeGrammarEnabled = enabled;
+
+    if (!enabled) {
+      // Clear any pending checks
+      if (this.grammarCheckTimeout) {
+        clearTimeout(this.grammarCheckTimeout);
+      }
+      // Clear highlights
+      this.clearErrorHighlights();
+      const editorArea = document.getElementById('editorArea');
+      if (editorArea) {
+        editorArea.dataset.proofreading = 'false';
+      }
+
+      // Hide popover if open
+      const popover = document.getElementById('proofreadPopover');
+      if (popover) {
+        popover.hidePopover();
+      }
+    } else {
+      // Trigger immediate check
+      this.scheduleRealtimeGrammarCheck();
+    }
   }
 
   handlePaste(e) {
@@ -635,62 +817,7 @@ class IntelliPenSidepanel {
     document.execCommand('redo');
   }
 
-  async checkGrammar() {
-    const editorArea = document.getElementById('editorArea');
-    if (!editorArea) return;
-
-    const text = editorArea.textContent || '';
-    if (!text.trim()) {
-      this.showError('Please enter some text to check');
-      return;
-    }
-
-    this.showSuggestionsPanel();
-    this.showLoadingSuggestions('Checking grammar...');
-
-    try {
-      if (!this.editorAI) {
-        throw new Error('AI features not initialized');
-      }
-
-      console.log('Calling checkGrammar with text:', text.substring(0, 100));
-      const result = await this.editorAI.checkGrammar(text);
-      console.log('Grammar check result:', result);
-
-      if (result.success) {
-        // Ensure corrections is an array
-        const corrections = Array.isArray(result.corrections) ? result.corrections : [];
-        
-        const suggestions = corrections.map(correction => ({
-          type: correction.type || 'Grammar',
-          text: `"${correction.original}" → "${correction.suggestion}"${correction.explanation ? ': ' + correction.explanation : ''}`
-        }));
-
-        if (suggestions.length === 0) {
-          this.displaySuggestions([{
-            type: 'Success',
-            text: '✓ No grammar issues found!'
-          }]);
-        } else {
-          this.displaySuggestions(suggestions);
-        }
-      } else {
-        // Show fallback suggestions
-        const fallbackSuggestions = result.fallback || [{
-          type: 'Info',
-          text: result.error || 'Grammar checking is currently unavailable'
-        }];
-        console.log('Showing fallback suggestions:', fallbackSuggestions);
-        this.displaySuggestions(fallbackSuggestions);
-      }
-    } catch (error) {
-      console.error('Grammar check failed:', error);
-      this.displaySuggestions([{
-        type: 'Error',
-        text: 'Grammar checking failed: ' + error.message
-      }]);
-    }
-  }
+  // Grammar checking is now automatic via checkbox - no manual button needed
 
   async improveWriting() {
     const editorArea = document.getElementById('editorArea');
@@ -727,7 +854,7 @@ class IntelliPenSidepanel {
 
         // Ensure suggestions is an array
         const additionalSuggestions = Array.isArray(result.suggestions) ? result.suggestions : [];
-        
+
         const suggestions = [
           {
             type: 'Improved Version',
@@ -907,10 +1034,10 @@ class IntelliPenSidepanel {
 
     content.innerHTML = suggestions.map((suggestion, index) => {
       // Determine if this is an actionable suggestion
-      const isActionable = suggestion.type === 'Improved Version' || 
-                          suggestion.type.includes('Tone') || 
-                          suggestion.type === 'Rewritten';
-      
+      const isActionable = suggestion.type === 'Improved Version' ||
+        suggestion.type.includes('Tone') ||
+        suggestion.type === 'Rewritten';
+
       return `
         <div class="suggestion-item" data-index="${index}" data-type="${this.escapeHtml(suggestion.type)}">
           <div class="suggestion-header">
@@ -955,10 +1082,600 @@ class IntelliPenSidepanel {
     return div.innerHTML;
   }
 
+  initializeProofreaderHighlights() {
+    // Initialize CSS Highlights API for error highlighting
+    if (!CSS.highlights) {
+      console.warn('CSS Highlights API not supported');
+      return false;
+    }
+
+    this.errorHighlights = {
+      spelling: new Highlight(),
+      punctuation: new Highlight(),
+      capitalization: new Highlight(),
+      grammar: new Highlight(),
+      preposition: new Highlight(),           // New type from official demo
+      'missing-words': new Highlight(),       // New type from official demo
+      deletion: new Highlight(),
+      addition: new Highlight(),
+      info: new Highlight(),
+      other: new Highlight()
+    };
+
+    for (const type in this.errorHighlights) {
+      CSS.highlights.set(type, this.errorHighlights[type]);
+    }
+
+    return true;
+  }
+
+  getCursorPosition(element) {
+    const selection = window.getSelection();
+    if (selection.rangeCount === 0) return 0;
+
+    const range = selection.getRangeAt(0);
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(element);
+    preCaretRange.setEnd(range.endContainer, range.endOffset);
+    return preCaretRange.toString().length;
+  }
+
+  setCursorPosition(element, offset) {
+    const textNode = element.firstChild;
+    if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return;
+
+    const range = document.createRange();
+    const selection = window.getSelection();
+
+    try {
+      const safeOffset = Math.min(offset, textNode.length);
+      range.setStart(textNode, safeOffset);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    } catch (error) {
+      console.error('Error setting cursor position:', error);
+    }
+  }
+
+  clearErrorHighlights() {
+    if (!this.errorHighlights) return;
+
+    for (const type in this.errorHighlights) {
+      this.errorHighlights[type].clear();
+    }
+  }
+
+  applyErrorHighlights(corrections, text) {
+    const editorArea = document.getElementById('editorArea');
+    if (!editorArea) {
+      console.error('Editor area not found');
+      return;
+    }
+
+    console.log('=== Applying Error Highlights ===');
+    console.log('Corrections:', corrections);
+    console.log('Text length:', text.length);
+    console.log('Editor content:', editorArea.textContent);
+
+    // Initialize highlights if needed
+    if (!this.errorHighlights) {
+      console.log('Initializing highlights...');
+      if (!this.initializeProofreaderHighlights()) {
+        console.error('Cannot apply highlights - CSS Highlights API not available');
+        return;
+      }
+      console.log('Highlights initialized:', Object.keys(this.errorHighlights));
+    }
+
+    // Clear previous highlights
+    this.clearErrorHighlights();
+    console.log('Previous highlights cleared');
+
+    // For CSS Highlights API, we need to work with the existing text nodes
+    // Don't recreate if we can avoid it to preserve formatting
+    console.log('Getting text nodes for highlights');
+    const currentText = editorArea.innerText || editorArea.textContent;
+
+    // Check if we have a simple text node structure
+    let textNode = null;
+    if (editorArea.childNodes.length === 1 && editorArea.firstChild.nodeType === Node.TEXT_NODE) {
+      // Simple case: single text node
+      textNode = editorArea.firstChild;
+      console.log('Using existing text node');
+    } else {
+      // Complex structure or no text node - need to normalize
+      console.log('Normalizing editor content, childNodes:', editorArea.childNodes.length);
+      // Save cursor position
+      const selection = window.getSelection();
+      const cursorOffset = selection.rangeCount > 0 ? this.getCursorPosition(editorArea) : 0;
+
+      // Recreate preserving line breaks
+      editorArea.innerHTML = '';
+      textNode = document.createTextNode(currentText);
+      editorArea.appendChild(textNode);
+
+      // Restore cursor position
+      if (cursorOffset > 0) {
+        this.setCursorPosition(editorArea, cursorOffset);
+      }
+    }
+
+    console.log('Text node created:', {
+      nodeType: textNode.nodeType,
+      length: textNode.length,
+      content: textNode.textContent.substring(0, 100)
+    });
+
+    // Apply highlights for each correction
+    let highlightsApplied = 0;
+    for (const correction of corrections) {
+      try {
+        const range = new Range();
+        range.setStart(textNode, correction.startIndex);
+        range.setEnd(textNode, correction.endIndex);
+
+        const type = correction.type || 'other';
+        const highlightedText = currentText.substring(correction.startIndex, correction.endIndex);
+
+        console.log(`Applying ${type} highlight:`, {
+          start: correction.startIndex,
+          end: correction.endIndex,
+          text: highlightedText,
+          suggestion: correction.suggestion
+        });
+
+        if (this.errorHighlights[type]) {
+          this.errorHighlights[type].add(range);
+          highlightsApplied++;
+          console.log(`✓ Highlight added to ${type}`);
+        } else {
+          console.error('No highlight registry for type:', type);
+        }
+      } catch (error) {
+        console.error('Error applying highlight:', error, correction);
+      }
+    }
+
+    console.log(`=== Applied ${highlightsApplied}/${corrections.length} highlights ===`);
+
+    // Verify highlights were added
+    for (const type in this.errorHighlights) {
+      const size = this.errorHighlights[type].size;
+      if (size > 0) {
+        console.log(`${type}: ${size} ranges`);
+      }
+    }
+
+    // Mark editor as proofreading mode
+    editorArea.dataset.proofreading = 'true';
+
+    // Add click handler for showing popover
+    this.setupProofreadingPopover(editorArea, corrections);
+  }
+
+  /**
+   * Apply error highlights to rich text (contenteditable with HTML formatting)
+   * This preserves the HTML structure while highlighting errors
+   */
+  applyErrorHighlightsRichText(editorArea, corrections) {
+    if (!editorArea || !this.richTextProofreader) {
+      console.error('Cannot apply rich text highlights - missing dependencies');
+      return;
+    }
+
+    console.log('=== Applying Rich Text Error Highlights ===');
+    console.log('Corrections:', corrections);
+
+    // Initialize highlights if needed
+    if (!this.errorHighlights) {
+      console.log('Initializing highlights...');
+      if (!this.initializeProofreaderHighlights()) {
+        console.error('Cannot apply highlights - CSS Highlights API not available');
+        return;
+      }
+    }
+
+    // Clear previous highlights
+    this.clearErrorHighlights();
+
+    // Create highlight ranges using the rich text proofreader
+    // This maps plain text positions to DOM nodes
+    const highlightRanges = this.richTextProofreader.createHighlightRanges(editorArea, corrections);
+
+    console.log(`Created ${highlightRanges.length} highlight ranges`);
+
+    // Apply highlights for each range
+    let highlightsApplied = 0;
+    for (const { range, correction } of highlightRanges) {
+      try {
+        const type = correction.type || 'other';
+
+        console.log(`Applying ${type} highlight:`, {
+          start: correction.startIndex,
+          end: correction.endIndex,
+          original: correction.original,
+          suggestion: correction.suggestion
+        });
+
+        if (this.errorHighlights[type]) {
+          this.errorHighlights[type].add(range);
+          highlightsApplied++;
+        } else {
+          console.warn(`Unknown highlight type: ${type}`);
+        }
+      } catch (error) {
+        console.error('Failed to apply highlight:', error, correction);
+      }
+    }
+
+    console.log(`Applied ${highlightsApplied}/${corrections.length} highlights to rich text`);
+
+    // Mark editor as proofreading mode
+    editorArea.dataset.proofreading = 'true';
+
+    // Add click handler for showing popover
+    this.setupProofreadingPopover(editorArea, corrections);
+  }
+
+  setupProofreadingPopover(editorArea, corrections) {
+    const popover = document.getElementById('proofreadPopover');
+    const popoverErrorType = document.getElementById('popoverErrorType');
+    const popoverExplanation = document.getElementById('popoverExplanation');
+    const popoverCorrectionBtn = document.getElementById('popoverCorrectionBtn');
+
+    if (!popover || !popoverErrorType || !popoverCorrectionBtn) {
+      console.warn('Popover elements not found');
+      return;
+    }
+
+    // Remove old listeners
+    if (this.proofreadClickHandler) {
+      editorArea.removeEventListener('click', this.proofreadClickHandler);
+    }
+
+    // Add new click handler
+    this.proofreadClickHandler = (e) => {
+      const selection = window.getSelection();
+      if (selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
+      const preCaretRange = range.cloneRange();
+      preCaretRange.selectNodeContents(editorArea);
+      preCaretRange.setEnd(range.endContainer, range.endOffset);
+      const caretPosition = preCaretRange.toString().length;
+
+      // Find correction at caret position
+      const correction = corrections.find(
+        c => c.startIndex <= caretPosition && caretPosition <= c.endIndex
+      );
+
+      if (!correction) {
+        popover.hidePopover();
+        return;
+      }
+
+      // Update popover content
+      const typeLabel = correction.type.charAt(0).toUpperCase() + correction.type.slice(1);
+      popoverErrorType.textContent = typeLabel;
+
+      // Show explanation if available
+      if (popoverExplanation) {
+        popoverExplanation.textContent = correction.explanation || '';
+        popoverExplanation.style.display = correction.explanation ? 'block' : 'none';
+      }
+
+      popoverCorrectionBtn.textContent = correction.suggestion || '[Remove]';
+
+      // Position popover near the error
+      const rect = range.getBoundingClientRect();
+      const editorRect = editorArea.getBoundingClientRect();
+      popover.style.top = `${rect.bottom - editorRect.top + 5}px`;
+      popover.style.left = `${rect.left - editorRect.left}px`;
+
+      // Show popover
+      popover.showPopover();
+
+      // Set up correction button click handler
+      popoverCorrectionBtn.onclick = () => {
+        this.applyPopoverCorrection(correction);
+        popover.hidePopover();
+      };
+    };
+
+    editorArea.addEventListener('click', this.proofreadClickHandler);
+    editorArea.addEventListener('keyup', this.proofreadClickHandler);
+  }
+
+  applyPopoverCorrection(correction) {
+    const editorArea = document.getElementById('editorArea');
+    if (!editorArea) return;
+
+    const currentText = editorArea.textContent;
+    const before = currentText.substring(0, correction.startIndex);
+    const after = currentText.substring(correction.endIndex);
+    const newText = before + correction.suggestion + after;
+
+    editorArea.textContent = newText;
+    this.editorContent = editorArea.innerHTML;
+    this.updateEditorStats();
+    this.autoSaveContent();
+
+    // Remove this correction and reapply highlights
+    this.currentCorrections = this.currentCorrections.filter(c => c !== correction);
+
+    if (this.currentCorrections.length === 0) {
+      this.clearErrorHighlights();
+      editorArea.dataset.proofreading = 'false';
+      this.displaySuggestions([{
+        type: 'Success',
+        text: '✓ All corrections applied!'
+      }]);
+      setTimeout(() => this.hideSuggestionsPanel(), 1500);
+    } else {
+      this.applyErrorHighlights(this.currentCorrections, newText);
+      this.displayProofreadingResults(this.correctedText, this.currentCorrections.length);
+    }
+
+    this.showSuccess('Correction applied!');
+  }
+
+  displayProofreadingResults(correctedText, errorCount) {
+    const content = document.getElementById('suggestionsContent');
+    if (!content) return;
+
+    // Check if this is a full replacement correction
+    const isFullReplacement = this.currentCorrections.length === 1 &&
+      this.currentCorrections[0].explanation?.includes('full replacement');
+
+    const instructionsHtml = isFullReplacement ? `
+      <div class="proofreader-instructions">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 16v-4M12 8v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        AI has suggested a corrected version of your text
+      </div>
+      <div class="corrected-text-preview">
+        <div class="preview-label">Suggested correction:</div>
+        <div class="preview-text">${this.escapeHtml(correctedText)}</div>
+      </div>
+    ` : `
+      <div class="proofreader-instructions">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 16v-4M12 8v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Click on underlined text to see and apply corrections
+      </div>
+
+      <div class="error-legend">
+        <div class="legend-item">
+          <div class="legend-color spelling"></div>
+          <span>Spelling</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color grammar"></div>
+          <span>Grammar</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color punctuation"></div>
+          <span>Punctuation</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color capitalization"></div>
+          <span>Capitalization</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color other"></div>
+          <span>Other</span>
+        </div>
+      </div>`;
+
+    const html = instructionsHtml + `
+      <div class="corrected-text-display">
+        <h4>${isFullReplacement ? 'Suggested Text' : `Corrected Text (${errorCount} issue${errorCount !== 1 ? 's' : ''} found)`}</h4>
+        ${isFullReplacement ? '' : `<div class="corrected-text">${this.escapeHtml(correctedText)}</div>`}
+      </div>
+
+      <div class="apply-all-container">
+        <button class="suggestion-btn apply-all" id="applyAllCorrectionsBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Apply All Corrections</span>
+        </button>
+      </div>
+    `;
+
+    content.innerHTML = html;
+
+    // Add event listener for apply all button
+    const applyAllBtn = document.getElementById('applyAllCorrectionsBtn');
+    if (applyAllBtn) {
+      applyAllBtn.addEventListener('click', () => this.applyAllCorrectionsFromProofreader());
+    }
+  }
+
+  applyAllCorrectionsFromProofreader() {
+    const editorArea = document.getElementById('editorArea');
+    if (!editorArea || !this.currentCorrections || this.currentCorrections.length === 0) return;
+
+    console.log('Applying all corrections to rich text...');
+
+    // Use rich text proofreader to apply corrections while preserving formatting
+    if (this.richTextProofreader) {
+      const appliedCount = this.richTextProofreader.applyAllCorrections(editorArea, this.currentCorrections);
+      console.log(`Applied ${appliedCount} corrections to rich text`);
+    } else {
+      // Fallback: replace with plain corrected text (loses formatting)
+      console.warn('Rich text proofreader not available, using fallback');
+      editorArea.textContent = this.correctedText;
+    }
+
+    // Update state
+    this.editorContent = editorArea.innerHTML;
+    this.updateEditorStats();
+    this.autoSaveContent();
+
+    // Clear highlights and corrections
+    this.clearErrorHighlights();
+    this.currentCorrections = [];
+    editorArea.dataset.proofreading = 'false';
+
+    this.displaySuggestions([{
+      type: 'Success',
+      text: '✓ All corrections applied!'
+    }]);
+
+    this.showSuccess('All corrections applied!');
+    setTimeout(() => this.hideSuggestionsPanel(), 1500);
+  }
+
+  displayCorrectionsWithActions(corrections, originalText) {
+    const content = document.getElementById('suggestionsContent');
+    if (!content) return;
+
+    const correctionItems = corrections.map((correction, index) => {
+      const typeLabel = correction.type === 'correction' ? 'Grammar' :
+        correction.type === 'addition' ? 'Addition' :
+          correction.type === 'deletion' ? 'Deletion' :
+            correction.type.charAt(0).toUpperCase() + correction.type.slice(1);
+
+      return `
+        <div class="suggestion-item correction-item" data-index="${index}">
+          <div class="suggestion-header">
+            <div class="suggestion-type">${typeLabel}</div>
+          </div>
+          <div class="correction-content">
+            ${correction.original ? `<div class="correction-original">"${this.escapeHtml(correction.original)}"</div>` : ''}
+            ${correction.suggestion ? `<div class="correction-arrow">→</div>` : ''}
+            ${correction.suggestion ? `<div class="correction-suggestion">"${this.escapeHtml(correction.suggestion)}"</div>` : ''}
+            ${correction.explanation ? `<div class="correction-explanation">${this.escapeHtml(correction.explanation)}</div>` : ''}
+          </div>
+          <div class="suggestion-actions">
+            <button class="suggestion-btn apply" data-action="apply-correction" data-index="${index}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Apply</span>
+            </button>
+            <button class="suggestion-btn ignore" data-action="ignore" data-index="${index}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span>Ignore</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const applyAllButton = corrections.length > 1 ? `
+      <div class="apply-all-container">
+        <button class="suggestion-btn apply-all" data-action="apply-all">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Apply All Corrections</span>
+        </button>
+      </div>
+    ` : '';
+
+    content.innerHTML = applyAllButton + correctionItems;
+
+    // Add event listeners
+    content.querySelectorAll('.suggestion-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = btn.dataset.action;
+        const index = btn.dataset.index ? parseInt(btn.dataset.index) : null;
+
+        if (action === 'apply-all') {
+          this.applyAllCorrections();
+        } else if (action === 'apply-correction' && index !== null) {
+          this.applySingleCorrection(index);
+        } else if (action === 'ignore' && index !== null) {
+          this.ignoreCorrection(index);
+        }
+      });
+    });
+  }
+
+  applySingleCorrection(index) {
+    const editorArea = document.getElementById('editorArea');
+    if (!editorArea || !this.currentCorrections) return;
+
+    const correction = this.currentCorrections[index];
+    const currentText = editorArea.textContent;
+
+    // Apply the single correction
+    const before = currentText.substring(0, correction.startIndex);
+    const after = currentText.substring(correction.endIndex);
+    const newText = before + correction.suggestion + after;
+
+    editorArea.textContent = newText;
+    this.editorContent = editorArea.innerHTML;
+    this.updateEditorStats();
+    this.autoSaveContent();
+
+    // Remove this correction from the list
+    this.currentCorrections.splice(index, 1);
+
+    // Update display
+    if (this.currentCorrections.length === 0) {
+      this.displaySuggestions([{
+        type: 'Success',
+        text: '✓ All corrections applied!'
+      }]);
+      setTimeout(() => this.hideSuggestionsPanel(), 1500);
+    } else {
+      this.displayCorrectionsWithActions(this.currentCorrections, newText);
+    }
+
+    this.showSuccess('Correction applied!');
+  }
+
+  applyAllCorrections() {
+    const editorArea = document.getElementById('editorArea');
+    if (!editorArea || !this.correctedText) return;
+
+    editorArea.textContent = this.correctedText;
+    this.editorContent = editorArea.innerHTML;
+    this.updateEditorStats();
+    this.autoSaveContent();
+
+    this.displaySuggestions([{
+      type: 'Success',
+      text: '✓ All corrections applied!'
+    }]);
+
+    this.showSuccess('All corrections applied!');
+    setTimeout(() => this.hideSuggestionsPanel(), 1500);
+  }
+
+  ignoreCorrection(index) {
+    if (!this.currentCorrections) return;
+
+    this.currentCorrections.splice(index, 1);
+
+    if (this.currentCorrections.length === 0) {
+      this.displaySuggestions([{
+        type: 'Success',
+        text: '✓ No more corrections!'
+      }]);
+      setTimeout(() => this.hideSuggestionsPanel(), 1500);
+    } else {
+      const editorArea = document.getElementById('editorArea');
+      const currentText = editorArea ? editorArea.textContent : '';
+      this.displayCorrectionsWithActions(this.currentCorrections, currentText);
+    }
+  }
+
   handleSuggestionAction(action, suggestion, index) {
     // Add index to suggestion for button feedback
     suggestion.index = index;
-    
+
     if (action === 'apply') {
       this.applySuggestion(suggestion);
     } else if (action === 'copy') {
@@ -1013,7 +1730,7 @@ class IntelliPenSidepanel {
   copySuggestion(suggestion) {
     navigator.clipboard.writeText(suggestion.text).then(() => {
       this.showSuccess('Copied to clipboard!');
-      
+
       // Add visual feedback to the button that was clicked
       const buttons = document.querySelectorAll('.suggestion-btn.copy');
       buttons.forEach(btn => {
@@ -1028,7 +1745,7 @@ class IntelliPenSidepanel {
           btn.style.background = 'var(--color-success-bg)';
           btn.style.color = 'var(--color-success)';
           btn.style.borderColor = 'var(--color-success)';
-          
+
           setTimeout(() => {
             btn.innerHTML = originalHTML;
             btn.style.background = '';
@@ -1051,11 +1768,221 @@ class IntelliPenSidepanel {
   // ===== Translator Methods =====
 
   async initializeTranslator() {
-    console.log('Initializing translator...');
+    console.log('=== Initializing Translator ===');
+
+    // Update character count
     this.updateSourceCharCount();
 
     // Load saved language preferences
     await this.loadTranslationLanguages();
+
+    // Load translator settings
+    await this.loadTranslatorSettings();
+
+    // Set up event listeners for quick translate
+    this.updateTranslatorEventListeners();
+
+    console.log('=== Translator Initialized ===');
+    console.log('Settings:', this.translatorSettings);
+    console.log('Languages:', this.sourceLanguage, '→', this.targetLanguage);
+  }
+
+  async loadTranslatorSettings() {
+    try {
+      const settings = await chrome.storage.local.get(['translatorSettings']);
+
+      if (settings.translatorSettings) {
+        this.translatorSettings = {
+          ...this.translatorSettings,
+          ...settings.translatorSettings
+        };
+      }
+
+      // Update UI checkboxes
+      const doubleClickCheckbox = document.getElementById('doubleClickTranslate');
+      const shiftClickCheckbox = document.getElementById('shiftClickTranslate');
+
+      if (doubleClickCheckbox) {
+        doubleClickCheckbox.checked = this.translatorSettings.doubleClickTranslate;
+      }
+
+      if (shiftClickCheckbox) {
+        shiftClickCheckbox.checked = this.translatorSettings.shiftClickTranslate;
+      }
+
+      console.log('Loaded translator settings:', this.translatorSettings);
+    } catch (error) {
+      console.error('Failed to load translator settings:', error);
+    }
+  }
+
+  async saveTranslatorSettings() {
+    try {
+      await chrome.storage.local.set({
+        translatorSettings: this.translatorSettings
+      });
+
+      console.log('Saved translator settings:', this.translatorSettings);
+    } catch (error) {
+      console.error('Failed to save translator settings:', error);
+    }
+  }
+
+  openTranslatorSettings() {
+    const overlay = document.getElementById('translatorSettingsOverlay');
+    if (overlay) {
+      overlay.classList.remove('hidden');
+
+      // Add click outside to close
+      const handleOverlayClick = (e) => {
+        if (e.target === overlay) {
+          this.closeTranslatorSettings();
+          overlay.removeEventListener('click', handleOverlayClick);
+        }
+      };
+      overlay.addEventListener('click', handleOverlayClick);
+    }
+  }
+
+  closeTranslatorSettings() {
+    const overlay = document.getElementById('translatorSettingsOverlay');
+    if (overlay) {
+      overlay.classList.add('hidden');
+    }
+  }
+
+  updateTranslatorEventListeners() {
+    const sourceText = document.getElementById('sourceText');
+    if (!sourceText) {
+      console.warn('sourceText element not found for translator event listeners');
+      return;
+    }
+
+    console.log('Updating translator event listeners:', this.translatorSettings);
+
+    // Remove existing listeners
+    if (this.translatorDoubleClickHandler) {
+      sourceText.removeEventListener('dblclick', this.translatorDoubleClickHandler);
+      this.translatorDoubleClickHandler = null;
+    }
+    if (this.translatorShiftClickHandler) {
+      sourceText.removeEventListener('click', this.translatorShiftClickHandler);
+      this.translatorShiftClickHandler = null;
+    }
+
+    // Add new listeners based on settings
+    if (this.translatorSettings.doubleClickTranslate) {
+      this.translatorDoubleClickHandler = (e) => this.handleQuickTranslate(e, 'doubleclick');
+      sourceText.addEventListener('dblclick', this.translatorDoubleClickHandler);
+      console.log('✓ Double-click translator enabled');
+    }
+
+    if (this.translatorSettings.shiftClickTranslate) {
+      this.translatorShiftClickHandler = (e) => {
+        if (e.shiftKey) {
+          this.handleQuickTranslate(e, 'shiftclick');
+        }
+      };
+      sourceText.addEventListener('click', this.translatorShiftClickHandler);
+      console.log('✓ Shift+click translator enabled');
+    }
+  }
+
+  async handleQuickTranslate(e, triggerType) {
+    console.log(`Quick translate triggered: ${triggerType}`);
+
+    const sourceText = document.getElementById('sourceText');
+    if (!sourceText) {
+      console.error('sourceText element not found');
+      return;
+    }
+
+    // Get the word at cursor position
+    const cursorPos = sourceText.selectionStart;
+    const text = sourceText.value;
+
+    if (!text || text.trim() === '') {
+      this.showInfo('No text to translate');
+      return;
+    }
+
+    // Find word boundaries
+    let start = cursorPos;
+    let end = cursorPos;
+
+    // Move start back to beginning of word (including letters, numbers, and some punctuation)
+    while (start > 0 && /[^\s]/.test(text[start - 1])) {
+      start--;
+    }
+
+    // Move end forward to end of word
+    while (end < text.length && /[^\s]/.test(text[end])) {
+      end++;
+    }
+
+    const word = text.substring(start, end).trim();
+
+    if (!word) {
+      this.showInfo('No word selected');
+      return;
+    }
+
+    console.log(`Translating word: "${word}"`);
+
+    // Select the word for visual feedback
+    sourceText.setSelectionRange(start, end);
+
+    try {
+      // Check if AI manager is available
+      if (!this.aiManager) {
+        this.showError('AI features not initialized');
+        return;
+      }
+
+      // Detect language if auto
+      let sourceLanguage = this.sourceLanguage;
+      if (sourceLanguage === 'auto') {
+        if (this.aiManager.isAPIAvailable('languageDetector')) {
+          try {
+            const detection = await this.aiManager.detectLanguage(word);
+            if (detection && detection.language) {
+              sourceLanguage = detection.language;
+              console.log(`Detected language: ${sourceLanguage}`);
+            } else {
+              sourceLanguage = 'en';
+            }
+          } catch (detectionError) {
+            console.warn('Language detection failed:', detectionError);
+            sourceLanguage = 'en';
+          }
+        } else {
+          console.warn('Language detector not available, defaulting to English');
+          sourceLanguage = 'en';
+        }
+      }
+
+      // Check if translator is available
+      if (!this.aiManager.isAPIAvailable('translator')) {
+        this.showError('Translator API not available');
+        return;
+      }
+
+      // Translate the word
+      console.log(`Translating from ${sourceLanguage} to ${this.targetLanguage}`);
+      const translated = await this.aiManager.translate(word, sourceLanguage, this.targetLanguage);
+
+      if (translated) {
+        // Show translation in a tooltip-like notification
+        this.showSuccess(`"${word}" → "${translated}"`);
+        console.log(`Translation successful: "${word}" → "${translated}"`);
+      } else {
+        this.showError('Translation returned empty result');
+      }
+
+    } catch (error) {
+      console.error('Quick translate failed:', error);
+      this.showError(`Translation failed: ${error.message || 'Unknown error'}`);
+    }
   }
 
   async loadTranslationLanguages() {

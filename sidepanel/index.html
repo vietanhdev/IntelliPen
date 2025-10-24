@@ -25,11 +25,14 @@
       </div>
       <button id="themeToggle" class="btn-icon" title="Toggle theme">
         <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
-          <path d="M12 2v2m0 16v2M20 12h2M2 12h2m14.364-6.364l1.414-1.414M5.636 5.636L4.222 4.222m15.556 15.556l-1.414-1.414M5.636 18.364l-1.414 1.414" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" />
+          <path
+            d="M12 2v2m0 16v2M20 12h2M2 12h2m14.364-6.364l1.414-1.414M5.636 5.636L4.222 4.222m15.556 15.556l-1.414-1.414M5.636 18.364l-1.414 1.414"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
         <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
     </header>
@@ -115,6 +118,45 @@
       </div>
     </div>
 
+    <!-- Translator Settings Modal -->
+    <div class="modal-overlay hidden" id="translatorSettingsOverlay">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Translator Settings</h3>
+          <button class="btn-icon modal-close" id="closeTranslatorSettings">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-description">Configure quick translation shortcuts</p>
+          <div class="settings-options">
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">Double-click to Translate</div>
+                <div class="setting-desc">Double-click any word in the source text to translate it instantly</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="doubleClickTranslate">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">Shift + Click to Translate</div>
+                <div class="setting-desc">Hold Shift and click any word to translate it</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="shiftClickTranslate">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Editor Screen -->
     <div class="screen" id="editorScreen">
       <section class="toolbar">
@@ -160,25 +202,29 @@
         </div>
         <div class="toolbar-divider"></div>
         <div class="toolbar-group">
-          <button class="toolbar-btn" id="checkGrammarBtn" title="Check Grammar">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <label class="grammar-check-toggle">
+            <input type="checkbox" id="grammarCheckbox">
+            <svg class="checkbox-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
               <circle cx="18" cy="17" r="4" fill="currentColor" />
               <path d="M16 17l1.5 1.5 3-3" stroke="white" stroke-width="2" stroke-linecap="round" />
             </svg>
-          </button>
-          <button class="toolbar-btn" id="improveWritingBtn" title="Improve Writing">
+            <span class="checkbox-label">Check Grammar</span>
+          </label>
+          <button class="toolbar-btn toolbar-btn-with-text" id="improveWritingBtn" title="Improve Writing">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" />
               <circle cx="12" cy="12" r="2" fill="currentColor" />
             </svg>
+            <span class="toolbar-btn-text">Improve Writing</span>
           </button>
-          <button class="toolbar-btn" id="changeToneBtn" title="Change Tone">
+          <button class="toolbar-btn toolbar-btn-with-text" id="changeToneBtn" title="Change Tone">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 7h12M4 12h12M4 17h8M17 15l3 3-3 3M20 18h-4" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" />
             </svg>
+            <span class="toolbar-btn-text">Change Tone</span>
           </button>
         </div>
       </section>
@@ -187,6 +233,18 @@
         <div class="editor-wrapper">
           <div class="editor-area" id="editorArea" contenteditable="true" spellcheck="false"
             data-placeholder="Start writing or paste your text here..."></div>
+        </div>
+
+        <!-- Proofreader Popover -->
+        <div id="proofreadPopover" popover="manual">
+          <h4 id="popoverErrorType">Error Type</h4>
+          <div class="popover-content">
+            <div class="popover-explanation" id="popoverExplanation"></div>
+            <div class="popover-suggestion">
+              <strong>Suggestion:</strong>
+              <button type="button" class="correction-suggestion" id="popoverCorrectionBtn"></button>
+            </div>
+          </div>
         </div>
 
         <section class="suggestions-panel hidden" id="suggestionsPanel">
@@ -222,6 +280,15 @@
         <div class="stat-item">
           <span class="stat-label">Reading Time:</span>
           <span class="stat-value" id="readingTime">0 min</span>
+        </div>
+        <div class="stat-item grammar-status" id="grammarStatus" style="display: none;">
+          <span class="grammar-status-icon">
+            <svg class="spinner" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" opacity="0.25"/>
+              <path d="M12 2a10 10 0 0110 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="stat-value" id="grammarStatusText">Checking grammar...</span>
         </div>
       </footer>
     </div>
@@ -277,6 +344,13 @@
               <option value="th">Thai</option>
             </select>
           </div>
+
+          <button class="btn-icon" id="translatorSettingsBtn" title="Translator Settings">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </div>
       </section>
 
@@ -365,19 +439,21 @@
       <!-- Permission Banner -->
       <div class="permission-banner hidden" id="permissionBanner">
         <svg class="permission-banner-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L2 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M12 2L2 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" stroke="currentColor"
+            stroke-width="2" stroke-linejoin="round" />
+          <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
         <div class="permission-banner-content">
           <h4 class="permission-banner-title">Microphone Access Required</h4>
-          <p class="permission-banner-message">IntelliPen needs microphone access to record meetings. All processing happens locally on your device.</p>
+          <p class="permission-banner-message">IntelliPen needs microphone access to record meetings. All processing
+            happens locally on your device.</p>
           <div class="permission-banner-actions">
             <button class="btn btn-primary btn-sm" id="requestPermissionBtn">Grant Access</button>
             <button class="btn btn-text btn-sm" id="dismissBannerBtn">Dismiss</button>
           </div>
         </div>
       </div>
-      
+
       <section class="meeting-controls">
         <div class="device-selection">
           <div class="device-group">
@@ -477,15 +553,16 @@
       <nav class="meeting-tabs">
         <button class="meeting-tab active" data-tab="transcript">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
-            <path d="M8 9h8M8 12h8M8 15h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" />
+            <path d="M8 9h8M8 12h8M8 15h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
           </svg>
           <span>Live Transcript</span>
         </button>
         <button class="meeting-tab" data-tab="analysis">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+            <path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" />
+            <circle cx="12" cy="12" r="2" fill="currentColor" />
           </svg>
           <span>Meeting Analysis</span>
         </button>
@@ -531,9 +608,10 @@
           <div class="md-toolbar-actions">
             <button class="md-icon-button" id="regenerateAnalysis" title="Regenerate Analysis">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                <path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  opacity="0.5" />
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
               </svg>
             </button>
             <button class="md-icon-button" id="exportAnalysis" title="Export Analysis">
@@ -549,10 +627,13 @@
           <!-- Empty State -->
           <div class="md-empty-state" id="analysisEmptyState">
             <svg class="md-empty-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
             <h3 class="md-empty-title">No Analysis Yet</h3>
-            <p class="md-empty-description">Record a meeting to generate AI-powered analysis with summaries, action items, and more.</p>
+            <p class="md-empty-description">Record a meeting to generate AI-powered analysis with summaries, action
+              items, and more.</p>
           </div>
 
           <!-- Analysis Cards (hidden initially) -->
@@ -561,7 +642,9 @@
             <div class="md-card md-elevation-2">
               <div class="md-card-header">
                 <svg class="md-card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
                 <h3 class="md-card-title">Executive Summary</h3>
               </div>
@@ -574,7 +657,9 @@
             <div class="md-card md-elevation-2">
               <div class="md-card-header">
                 <svg class="md-card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
                 <h3 class="md-card-title">Action Items</h3>
               </div>
@@ -587,7 +672,9 @@
             <div class="md-card md-elevation-2">
               <div class="md-card-header">
                 <svg class="md-card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
                 <h3 class="md-card-title">Key Decisions</h3>
               </div>
@@ -600,7 +687,9 @@
             <div class="md-card md-elevation-2">
               <div class="md-card-header">
                 <svg class="md-card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
                 <h3 class="md-card-title">Follow-up Email Draft</h3>
               </div>
@@ -647,6 +736,7 @@
   <script src="../src/icons/icon-library.js"></script>
   <script src="../src/components/ui-components.js"></script>
   <script src="../src/ai-apis/AIAPIManager.js"></script>
+  <script src="../src/editor/RichTextProofreader.js"></script>
   <script src="../src/editor/EditorAIFeatures.js"></script>
   <script src="../src/meeting/MeetingAIFeatures.js"></script>
   <script src="index.js"></script>

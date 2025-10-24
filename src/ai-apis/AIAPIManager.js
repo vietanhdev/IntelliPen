@@ -14,7 +14,7 @@ class AIAPIManager {
       translator: null,
       languageDetector: null
     };
-    
+
     this.availability = {};
     this.isInitialized = false;
   }
@@ -23,7 +23,7 @@ class AIAPIManager {
     if (this.isInitialized) return;
 
     console.log('AIAPIManager: Initializing...');
-    
+
     try {
       await this.checkAllAPIs();
       this.isInitialized = true;
@@ -49,14 +49,14 @@ class AIAPIManager {
       try {
         if (check()) {
           // Check availability
-          const ApiClass = self[name === 'languageModel' ? 'LanguageModel' : 
-                               name === 'proofreader' ? 'Proofreader' :
-                               name === 'writer' ? 'Writer' :
-                               name === 'rewriter' ? 'Rewriter' :
-                               name === 'summarizer' ? 'Summarizer' :
-                               name === 'translator' ? 'Translator' :
-                               'LanguageDetector'];
-          
+          const ApiClass = self[name === 'languageModel' ? 'LanguageModel' :
+            name === 'proofreader' ? 'Proofreader' :
+              name === 'writer' ? 'Writer' :
+                name === 'rewriter' ? 'Rewriter' :
+                  name === 'summarizer' ? 'Summarizer' :
+                    name === 'translator' ? 'Translator' :
+                      'LanguageDetector'];
+
           if (ApiClass && ApiClass.availability) {
             const availability = await ApiClass.availability();
             this.availability[name] = availability;
@@ -83,10 +83,14 @@ class AIAPIManager {
       }
 
       const defaultOptions = {
+        includeCorrectionTypes: true,
+        includeCorrectionExplanations: true,      // Enable explanations
         expectedInputLanguages: ['en'],
+        correctionExplanationLanguage: 'en',      // Explanation language
         ...options
       };
 
+      console.log('Creating Proofreader with options:', defaultOptions);
       const proofreader = await Proofreader.create(defaultOptions);
       console.log('Proofreader created successfully');
       return proofreader;
@@ -97,30 +101,139 @@ class AIAPIManager {
   }
 
   async proofread(text, options = {}) {
+    let proofreader = null;
     try {
-      const proofreader = await this.createProofreader(options);
-      const result = await proofreader.proofread(text);
-      
-      // Format corrections
-      const corrections = result.corrections || [];
-      const formattedCorrections = corrections.map(correction => ({
-        type: correction.type || 'Grammar',
-        startIndex: correction.startIndex,
-        endIndex: correction.endIndex,
-        original: text.substring(correction.startIndex, correction.endIndex),
-        suggestion: correction.suggestion || '',
-        explanation: correction.explanation || ''
-      }));
+      // Validate input
+      if (!text || typeof text !== 'string') {
+        throw new Error('Invalid input: text must be a non-empty string');
+      }
+
+      // Trim and normalize the text
+      const normalizedText = text.trim();
+      if (normalizedText.length === 0) {
+        return {
+          corrected: text,
+          corrections: [],
+          hasErrors: false
+        };
+      }
+
+      proofreader = await this.createProofreader(options);
+      const result = await proofreader.proofread(normalizedText);
+
+      console.log('=== Proofreader API Response ===');
+      console.log('Full result object:', result);
+      console.log('Result type:', typeof result);
+      console.log('Result keys:', Object.keys(result));
+      console.log('Has corrected field:', 'corrected' in result);
+      console.log('Has correctedInput field:', 'correctedInput' in result);
+      console.log('Has corrections array:', 'corrections' in result);
+      console.log('Has explanation field:', 'explanation' in result);
+      console.log('Corrections array:', result.corrections);
+      console.log('Explanation:', result.explanation);
+      console.log('All values:', JSON.stringify(result, null, 2));
+
+      // According to the API docs, the corrected text is in result.corrected
+      // and corrections are in result.corrections array
+      const correctedText = result.corrected || result.correctedInput || normalizedText;
+
+      console.log('Original:', normalizedText);
+      console.log('Corrected:', correctedText);
+      console.log('Original words:', normalizedText.split(/\s+/).length);
+      console.log('Corrected words:', correctedText.split(/\s+/).length);
+
+      // If API returns corrections array, use it
+      if (result.corrections && Array.isArray(result.corrections) && result.corrections.length > 0) {
+        console.log('✓ Using API corrections array');
+        const formattedCorrections = result.corrections.map(correction => {
+          console.log('Processing correction:', correction);
+
+          // Extract the original text from the input using the indices
+          const originalText = text.substring(correction.startIndex, correction.endIndex);
+
+          // The correction field contains the suggested replacement
+          const suggestionText = correction.correction || '';
+
+          return {
+            type: correction.type || 'other',
+            startIndex: correction.startIndex,
+            endIndex: correction.endIndex,
+            original: originalText,
+            suggestion: suggestionText,
+            explanation: correction.explanation || this.explainCorrectionType(correction.type)
+          };
+        });
+
+        console.log('Formatted corrections:', formattedCorrections);
+
+        return {
+          corrected: correctedText,
+          corrections: formattedCorrections,
+          hasErrors: true
+        };
+      }
+
+      // API did not return corrections array - use full replacement
+      console.log('⚠️ Proofreader API did not return corrections array');
+      console.log('Note: The API is in early preview (Chrome 141-145) and corrections array is not yet implemented');
+
+      // Check if text was actually corrected
+      if (normalizedText === correctedText) {
+        console.log('✓ No corrections needed');
+        return {
+          corrected: correctedText,
+          corrections: [],
+          hasErrors: false
+        };
+      }
+
+      // Extract explanation from API if available
+      const apiExplanation = result.explanation ||
+        result.message ||
+        result.reason ||
+        'AI suggests rewriting this text';
+
+      console.log('Using explanation from API:', apiExplanation);
+
+      // Return full replacement correction
+      // This is the safest and clearest approach when we don't have detailed corrections from the API
+      console.log('Using full replacement mode - user will see complete suggested change');
 
       return {
-        corrected: result.corrected || text,
-        corrections: formattedCorrections,
-        hasErrors: corrections.length > 0
+        corrected: correctedText,
+        corrections: [{
+          type: 'grammar',
+          startIndex: 0,
+          endIndex: normalizedText.length,
+          original: normalizedText,
+          suggestion: correctedText,
+          explanation: apiExplanation
+        }],
+        hasErrors: true
       };
     } catch (error) {
       console.error('Proofreading failed:', error);
       throw error;
+    } finally {
+      // Clean up the proofreader session
+      if (proofreader && proofreader.destroy) {
+        proofreader.destroy();
+      }
     }
+  }
+
+  /**
+   * Explain correction type in user-friendly way
+   */
+  explainCorrectionType(type) {
+    const explanations = {
+      'spelling': 'Spelling error',
+      'grammar': 'Grammar error',
+      'punctuation': 'Punctuation error',
+      'capitalization': 'Capitalization error',
+      'other': 'Correction suggested'
+    };
+    return explanations[type] || 'Correction suggested';
   }
 
   // ===== Writer API =====
@@ -132,7 +245,7 @@ class AIAPIManager {
       }
 
       console.log('Writer API found in window, checking availability...');
-      
+
       // Check availability before creating
       if (Writer.availability) {
         const availability = await Writer.availability();
@@ -166,15 +279,15 @@ class AIAPIManager {
       console.log('Creating writer with options:', options);
       const writer = await this.createWriter(options);
       console.log('Writer created, calling write() with prompt length:', prompt.length);
-      
+
       const result = await writer.write(prompt, { context: options.context });
-      
+
       console.log('Write result received:', {
         type: typeof result,
         length: result?.length,
         preview: typeof result === 'string' ? result.substring(0, 100) : result
       });
-      
+
       return result;
     } catch (error) {
       console.error('Writing failed:', error);
@@ -191,13 +304,13 @@ class AIAPIManager {
     try {
       const writer = await this.createWriter(options);
       const stream = writer.writeStreaming(prompt, { context: options.context });
-      
+
       let fullText = '';
       for await (const chunk of stream) {
         fullText = chunk;
         if (onChunk) onChunk(chunk);
       }
-      
+
       return fullText;
     } catch (error) {
       console.error('Streaming write failed:', error);
@@ -244,13 +357,13 @@ class AIAPIManager {
     try {
       const rewriter = await this.createRewriter(options);
       const stream = rewriter.rewriteStreaming(text, { context: options.context });
-      
+
       let fullText = '';
       for await (const chunk of stream) {
         fullText = chunk;
         if (onChunk) onChunk(chunk);
       }
-      
+
       return fullText;
     } catch (error) {
       console.error('Streaming rewrite failed:', error);
@@ -297,13 +410,13 @@ class AIAPIManager {
     try {
       const summarizer = await this.createSummarizer(options);
       const stream = summarizer.summarizeStreaming(text, { context: options.context });
-      
+
       let fullText = '';
       for await (const chunk of stream) {
         fullText = chunk;
         if (onChunk) onChunk(chunk);
       }
-      
+
       return fullText;
     } catch (error) {
       console.error('Streaming summarization failed:', error);
@@ -324,7 +437,7 @@ class AIAPIManager {
         targetLanguage,
         ...options
       });
-      
+
       console.log(`Translator created: ${sourceLanguage} -> ${targetLanguage}`);
       return translator;
     } catch (error) {
@@ -348,13 +461,13 @@ class AIAPIManager {
     try {
       const translator = await this.createTranslator(sourceLanguage, targetLanguage);
       const stream = translator.translateStreaming(text);
-      
+
       let fullText = '';
       for await (const chunk of stream) {
         fullText = chunk;
         if (onChunk) onChunk(chunk);
       }
-      
+
       return fullText;
     } catch (error) {
       console.error('Streaming translation failed:', error);
@@ -383,7 +496,7 @@ class AIAPIManager {
     try {
       const detector = await this.createLanguageDetector();
       const results = await detector.detect(text);
-      
+
       // Return top result
       if (results && results.length > 0) {
         return {
@@ -392,7 +505,7 @@ class AIAPIManager {
           allResults: results
         };
       }
-      
+
       return null;
     } catch (error) {
       console.error('Language detection failed:', error);
@@ -438,13 +551,13 @@ class AIAPIManager {
     try {
       const model = await this.createLanguageModel(options);
       const stream = model.promptStreaming(text);
-      
+
       let fullText = '';
       for await (const chunk of stream) {
         fullText = chunk;
         if (onChunk) onChunk(chunk);
       }
-      
+
       return fullText;
     } catch (error) {
       console.error('Streaming prompt failed:', error);

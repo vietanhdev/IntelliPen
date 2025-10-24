@@ -35,3 +35,10 @@ Thumbs.db
 # Logs
 *.log
 intellipen-v*.zip
+
+# Tests
+coverage/
+.nyc_output/
+test-results/
+screenshots/
+*.test.log
