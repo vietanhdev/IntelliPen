@@ -42,3 +42,5 @@ coverage/
 test-results/
 screenshots/
 *.test.log
+
+/chrome

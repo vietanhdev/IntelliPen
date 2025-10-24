@@ -44,8 +44,8 @@ describe('Extension Popup', () => {
 
   test('should have multiple API status indicators', async () => {
     const statusElements = await page.$$('.api-status-item, .status-badge, .api-indicator');
-    // Should have at least one status indicator
-    expect(statusElements.length).toBeGreaterThanOrEqual(0);
+    // Should have status indicators array (may be empty)
+    expect(Array.isArray(statusElements)).toBe(true);
   });
 
   test('should have quick action buttons', async () => {
@@ -54,7 +54,6 @@ describe('Extension Popup', () => {
   });
 
   test('should have proper styling', async () => {
-    const body = await page.$('body');
     const backgroundColor = await page.$eval('body', el => 
       window.getComputedStyle(el).backgroundColor
     );
