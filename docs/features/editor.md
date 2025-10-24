@@ -2,6 +2,8 @@
 
 The IntelliPen Editor provides comprehensive AI-powered writing assistance.
 
+![IntelliPen Editor](../screenshots/editor.png)
+
 ## Grammar Checking
 
 Real-time grammar, spelling, and punctuation correction using Chrome's Proofreader API.

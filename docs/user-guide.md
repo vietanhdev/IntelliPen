@@ -6,6 +6,8 @@ Complete guide to using all IntelliPen features.
 
 The IntelliPen Editor provides comprehensive AI-powered writing assistance.
 
+![IntelliPen Editor](screenshots/editor.png)
+
 ### Basic Editing
 
 #### Creating Documents
@@ -87,6 +89,8 @@ Powered by Chrome's Rewriter API:
 
 Dedicated translation interface with privacy-first design.
 
+![Real-time Translator](screenshots/translator.png)
+
 ### Basic Translation
 
 === "Select Languages"
@@ -159,6 +163,8 @@ Listen to source and translated text:
 ## Meeting Dashboard
 
 Record, transcribe, and analyze meetings with AI.
+
+![Meeting Dashboard](screenshots/meeting.png)
 
 ### Setting Up
 

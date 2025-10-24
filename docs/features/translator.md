@@ -2,6 +2,8 @@
 
 Multi-language translation with privacy-first design.
 
+![Real-time Translator](../screenshots/translator.png)
+
 ## Multi-language Support
 
 Translate between 25+ languages using Chrome's Translator API.

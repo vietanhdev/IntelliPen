@@ -21,6 +21,41 @@
 
 IntelliPen brings professional writing assistance, real-time translation, and meeting intelligence directly to your browser—all processed locally on your device with zero data sharing.
 
+<div class="screenshot-slider">
+  <div class="slider-container">
+    <div class="slider-track">
+      <div class="slide active">
+        <img src="screenshots/editor.png" alt="IntelliPen Editor">
+        <div class="slide-caption">
+          <h3>:material-pen-plus: IntelliPen Editor</h3>
+          <p>Professional writing assistance with real-time grammar checking, AI-powered improvements, and tone adjustment</p>
+        </div>
+      </div>
+      <div class="slide">
+        <img src="screenshots/translator.png" alt="Real-time Translator">
+        <div class="slide-caption">
+          <h3>:material-translate: Real-time Translator</h3>
+          <p>Break language barriers with 25+ languages, auto-detection, and text-to-speech integration</p>
+        </div>
+      </div>
+      <div class="slide">
+        <img src="screenshots/meeting.png" alt="Meeting Dashboard">
+        <div class="slide-caption">
+          <h3>:material-microphone: Meeting Dashboard</h3>
+          <p>Never miss important details with live transcription, AI summaries, and action item extraction</p>
+        </div>
+      </div>
+    </div>
+    <button class="slider-btn prev" aria-label="Previous slide">‹</button>
+    <button class="slider-btn next" aria-label="Next slide">›</button>
+  </div>
+  <div class="slider-dots">
+    <button class="dot active" data-slide="0" aria-label="Go to slide 1"></button>
+    <button class="dot" data-slide="1" aria-label="Go to slide 2"></button>
+    <button class="dot" data-slide="2" aria-label="Go to slide 3"></button>
+  </div>
+</div>
+
 <div class="grid cards" markdown>
 
 -   :material-pen-plus:{ .lg .middle } __IntelliPen Editor__

@@ -2,10 +2,16 @@
 
 Your intelligent writing companion powered by Chrome's built-in AI. IntelliPen brings professional writing assistance, real-time translation, and meeting intelligence directly to your browser—all processed locally on your device with zero data sharing.
 
+<div align="center">
+  <img src="docs/screenshots/editor.png" alt="IntelliPen Editor" width="800"/>
+</div>
+
 ## Features
 
 ### ✍️ IntelliPen Editor
 A rich-text editor with comprehensive AI-powered writing assistance:
+
+![IntelliPen Editor](docs/screenshots/editor.png)
 
 - **Grammar Checking** (Proofreader API): Real-time grammar, spelling, and punctuation correction
 - **Writing Improvement** (Writer API): AI-powered content enhancement for clarity and readability
@@ -16,6 +22,8 @@ A rich-text editor with comprehensive AI-powered writing assistance:
 
 ### 🌐 Translator
 Dedicated translation interface with complete privacy:
+
+![Real-time Translator](docs/screenshots/translator.png)
 
 - **Multi-language Support**: Translate between 25+ languages, all processed locally
 - **Auto-detection** (Language Detector API): Automatic source language identification
@@ -29,6 +37,8 @@ Dedicated translation interface with complete privacy:
 
 ### 🎙️ Meeting Dashboard
 Comprehensive meeting recording and AI-powered analysis:
+
+![Meeting Dashboard](docs/screenshots/meeting.png)
 
 - **Audio Recording**: Professional recording with microphone permission management
 - **Device Selection**: Choose microphone and speaker with test functionality

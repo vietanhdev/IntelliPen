@@ -2,6 +2,8 @@
 
 Record, transcribe, and analyze meetings with AI.
 
+![Meeting Dashboard](../screenshots/meeting.png)
+
 ## Audio Recording
 
 Professional recording with microphone permission management.
