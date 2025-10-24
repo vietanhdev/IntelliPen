@@ -337,6 +337,10 @@ IntelliPen is built with privacy as a core principle:
 - **Issues**: [GitHub Issues](https://github.com/vietanhdev/IntelliPen/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/vietanhdev/IntelliPen/discussions)
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ## Acknowledgments
 
 - Chrome team for the built-in AI APIs
