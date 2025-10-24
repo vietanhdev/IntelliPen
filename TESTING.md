@@ -14,9 +14,22 @@ npm run test:install-chrome
 # 3. Build the extension
 npm run build
 
-# 4. Run tests
+# 4. Run tests (with visible browser)
 npm test
+
+# OR run tests in headless mode (no visible windows)
+npm run test:headless
 ```
+
+## Quick Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run all tests with visible browser |
+| `npm run test:headless` | Run all tests in headless mode (no windows) |
+| `npm run test:e2e:verbose` | Run with detailed output |
+| `npm run test:e2e:watch` | Run in watch mode for development |
+| `HEADLESS=true npm test -- <file>` | Run specific test file in headless mode |
 
 ## Detailed Setup
 
@@ -62,11 +75,17 @@ npm run build:watch
 ### Step 4: Run Tests
 
 ```bash
-# Run all tests
+# Run all tests (with visible browser windows)
 npm test
+
+# Run all tests in headless mode (no visible windows)
+npm run test:headless
 
 # Run specific test file
 npm test -- tests/e2e/editor.test.js
+
+# Run specific test file in headless mode
+HEADLESS=true npm test -- tests/e2e/editor.test.js
 
 # Run with verbose output
 npm run test:e2e:verbose
@@ -247,6 +266,38 @@ This is expected if:
 
 Tests check for API availability but don't require full functionality.
 
+## Headless Mode
+
+Tests can run in headless mode (without visible browser windows) for faster execution and CI/CD environments.
+
+### Running in Headless Mode
+
+```bash
+# Using npm script
+npm run test:headless
+
+# Using environment variable
+HEADLESS=true npm test
+
+# Specific test file
+HEADLESS=true npm test -- tests/e2e/translator.test.js
+```
+
+### Benefits of Headless Mode
+
+- **Faster execution**: No GUI rendering overhead
+- **CI/CD friendly**: Works in environments without display servers
+- **Resource efficient**: Lower memory and CPU usage
+- **Parallel execution**: Can run multiple test suites simultaneously
+
+### When to Use Headed Mode
+
+Use headed mode (default) when:
+- Debugging test failures
+- Developing new tests
+- Verifying UI interactions visually
+- Recording test execution
+
 ## Continuous Integration
 
 ### GitHub Actions Example
@@ -267,7 +318,7 @@ jobs:
       - run: npm install
       - run: npm run test:install-chrome
       - run: npm run build
-      - run: npm test
+      - run: npm run test:headless  # Use headless mode in CI
 ```
 
 ## Performance Tips
@@ -275,7 +326,8 @@ jobs:
 1. **Run tests serially** (already configured with `maxWorkers: 1`)
 2. **Reuse browser instances** when possible
 3. **Skip AI model downloads** in CI environments
-4. **Use headed mode** only when debugging
+4. **Use headless mode** for faster execution and CI/CD pipelines
+5. **Use headed mode** only when debugging or developing tests
 
 ## Additional Resources
 

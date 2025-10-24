@@ -3,22 +3,17 @@ describe('AI APIs Integration', () => {
 
   beforeAll(async () => {
     ({ browser } = await global.setupBrowser());
+    // Create a single page for all tests
+    page = await browser.newPage();
+    await page.goto(global.getExtensionPage('sidepanel/index.html'));
+    await new Promise(resolve => setTimeout(resolve, 2000));
   });
 
   afterAll(async () => {
-    await global.teardownBrowser();
-  });
-
-  beforeEach(async () => {
-    page = await browser.newPage();
-    await page.goto(global.getExtensionPage('sidepanel/index.html'));
-    await page.waitForTimeout(2000);
-  });
-
-  afterEach(async () => {
     if (page) {
       await page.close();
     }
+    await global.teardownBrowser();
   });
 
   test('should check for AI APIs in window', async () => {

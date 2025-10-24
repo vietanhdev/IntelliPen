@@ -13,7 +13,7 @@ describe('Extension Popup', () => {
     page = await browser.newPage();
     // Open popup in tab (since we can't open actual popup in tests)
     await page.goto(global.getExtensionPage('popup/menu.html'));
-    await page.waitForTimeout(1000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
   });
 
   afterEach(async () => {
@@ -28,22 +28,22 @@ describe('Extension Popup', () => {
   });
 
   test('should have extension branding', async () => {
-    const heading = await page.$('h1, h2, .app-title');
+    const heading = await page.$('.brand, .brand-info');
     expect(heading).toBeTruthy();
   });
 
   test('should have open sidepanel button', async () => {
-    const openBtn = await page.$('#open-sidepanel-btn, button[data-action="open-sidepanel"]');
+    const openBtn = await page.$('#openSidebar, #openTab');
     expect(openBtn).toBeTruthy();
   });
 
   test('should display API status section', async () => {
-    const statusSection = await page.$('.api-status, #api-status, .status-container');
+    const statusSection = await page.$('.status-indicator, .menu-footer');
     expect(statusSection).toBeTruthy();
   });
 
   test('should have multiple API status indicators', async () => {
-    const statusElements = await page.$$('.api-status-item, .status-badge, .api-indicator');
+    const statusElements = await page.$$('.api-status-item, .status-badge');
     // Should have status indicators array (may be empty)
     expect(Array.isArray(statusElements)).toBe(true);
   });

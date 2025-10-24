@@ -94,8 +94,11 @@ global.setupBrowser = async () => {
   
   chromePath = getChromePath();
   
+  // Check if headless mode is requested via environment variable
+  const isHeadless = process.env.HEADLESS === 'true' || process.env.HEADLESS === '1';
+  
   const launchOptions = {
-    headless: false, // Extensions require headed mode
+    headless: isHeadless ? 'new' : false, // Use 'new' headless mode for extension support
     args: [
       `--disable-extensions-except=${extensionPath}`,
       `--load-extension=${extensionPath}`,
@@ -107,7 +110,12 @@ global.setupBrowser = async () => {
       '--disable-extensions-file-access-check',
       '--disable-features=IsolateOrigins,site-per-process',
       '--allow-insecure-localhost',
-      '--ignore-certificate-errors'
+      '--ignore-certificate-errors',
+      ...(isHeadless ? [
+        '--disable-gpu',
+        '--disable-software-rasterizer',
+        '--disable-dev-shm-usage'
+      ] : [])
     ],
     dumpio: false // Set to true for debugging Chrome output
   };

@@ -1,11 +1,17 @@
 describe('Service Worker', () => {
-  let browser, extensionId;
+  let browser, extensionId, page;
 
   beforeAll(async () => {
     ({ browser, extensionId } = await global.setupBrowser());
+    // Create a single page for all tests
+    page = await browser.newPage();
+    await page.goto(global.getExtensionPage('sidepanel/index.html'));
   });
 
   afterAll(async () => {
+    if (page) {
+      await page.close();
+    }
     await global.teardownBrowser();
   });
 
@@ -24,38 +30,26 @@ describe('Service Worker', () => {
   });
 
   test('should have chrome APIs available via extension page', async () => {
-    const page = await browser.newPage();
-    await page.goto(global.getExtensionPage('sidepanel/index.html'));
-    
     const hasChromeAPI = await page.evaluate(() => {
       return typeof chrome !== 'undefined';
     });
     
-    await page.close();
     expect(hasChromeAPI).toBe(true);
   });
 
   test('should have storage API available', async () => {
-    const page = await browser.newPage();
-    await page.goto(global.getExtensionPage('sidepanel/index.html'));
-    
     const hasStorageAPI = await page.evaluate(() => {
       return typeof chrome.storage !== 'undefined';
     });
     
-    await page.close();
     expect(hasStorageAPI).toBe(true);
   });
 
   test('should have runtime API available', async () => {
-    const page = await browser.newPage();
-    await page.goto(global.getExtensionPage('sidepanel/index.html'));
-    
     const hasRuntimeAPI = await page.evaluate(() => {
       return typeof chrome.runtime !== 'undefined';
     });
     
-    await page.close();
     expect(hasRuntimeAPI).toBe(true);
   });
 });
